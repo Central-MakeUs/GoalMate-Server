@@ -1,0 +1,127 @@
+openapi: 3.0.3
+info:
+  title: GoalMate API
+  description: |-
+    CMC GoalMate API 입니다.
+  contact:
+    email: goalmate@gmail.com
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+    description: Optional server description, e.g. Main (production) server
+tags:
+  - name: auth
+    description: 인증 API
+  - name: mentee
+    description: 멘티 API
+  - name: goal
+    description: 목표 API
+
+paths:
+  /auth/login:
+    post:
+      tags:
+        - auth
+      summary: 소셜 로그인 (회원가입)
+      description: 소셜 로그인을 통해 로그인 또는 회원가입을 진행합니다.
+      operationId: loginWithOauth
+      requestBody:
+        description: 소셜 로그인 또는 회원가입에 대한 응답입니다. 로그인 완료 시 200, 회원가입 실패 시 201이 응답됩니다.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+        required: true
+      responses:
+        '200':
+          description: 로그인 성공
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/JWT'
+              examples:
+                successLogin:
+                  summary: Successful login example
+                  value:
+                    status: SUCCESS
+                    code: AUTH_2000
+                    message: 로그인 성공
+                    data:
+                      accessToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                      refreshToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        '201':
+          description: 회원가입 성공
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/JWT'
+              examples:
+                successSignup:
+                  summary: Successful signup example
+                  value:
+                    status: SUCCESS
+                    code: AUTH_2010
+                    message: 회원가입이 정상적으로 처리되었습니다.
+                    data:
+                      accessToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                      refreshToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        '400':
+          description: 잘못된 요청
+        '404':
+          description: 사용자 정보를 찾을 수 없음
+
+components:
+  schemas:
+    LoginRequest:
+      type: object
+      properties:
+        authorization_code:
+          type: string
+          example: 7LL63SPQ0gEd-T3KT7K8DPHiMIu3IFf-AAAAAQo8JJoAAAGURQDd7RKZRqbpl2cW
+        provider:
+          type: string
+          enum:
+            - KAKAO
+            - APPLE
+          example: APPLE
+      required:
+        - authorization_code
+        - provider
+    ApiResponse:
+      type: object
+      properties:
+        status:
+          enum:
+            - SUCCESS
+            - ERROR
+          example: SUCCESS
+        code:
+          type: string
+        message:
+          type: string
+    JWT:
+      type: object
+      properties:
+        accessToken:
+          type: string
+        refreshToken:
+          type: string
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
