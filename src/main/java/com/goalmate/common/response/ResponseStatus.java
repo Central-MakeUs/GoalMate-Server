@@ -1,6 +1,6 @@
 package com.goalmate.common.response;
 
-public enum StatusType {
+public enum ResponseStatus {
 
 	SUCCESS, ERROR
 
