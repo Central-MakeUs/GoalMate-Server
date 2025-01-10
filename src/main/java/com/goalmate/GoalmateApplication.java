@@ -1,4 +1,4 @@
-package dev.cmc.goalmate;
+package com.goalmate;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

@@ -1,0 +1,603 @@
+openapi: 3.0.3
+info:
+  title: GoalMate API
+  description: |-
+    CMC GoalMate API 입니다.
+  contact:
+    email: goalmate@gmail.com
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8080
+    description: Optional server description, e.g. Main (production) server
+
+tags:
+  - name: Auth
+    description: 인증 API
+  - name: Mentee
+    description: 멘티 API
+  - name: Goal
+    description: 목표 API
+  - name: MenteeGoal
+    description: 멘티 목표 API
+
+paths:
+  /auth/login:
+    post:
+      tags:
+        - Auth
+      summary: 소셜 로그인 (회원가입)
+      description: 소셜 로그인을 통해 로그인 또는 회원가입을 진행합니다. 로그인 완료 시 200, 회원가입 성공 시 201이 응답됩니다.
+      operationId: loginWithOauth
+      requestBody:
+        description: authorization code와 provider(소셜 종류)가 필요합니다.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+
+      responses:
+        '200':
+          description: 로그인 성공
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/JWT'
+              example:
+                status: SUCCESS
+                code: AUTH_2000
+                message: 로그인이 정상적으로 처리되었습니다.
+                data:
+                  accessToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                  refreshToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        '201':
+          description: 회원가입 성공
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/JWT'
+              example:
+                status: SUCCESS
+                code: AUTH_2010
+                message: 회원가입이 정상적으로 처리되었습니다.
+                data:
+                  accessToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                  refreshToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        '400':
+          description: 잘못된 요청
+        '404':
+          description: 사용자 정보를 찾을 수 없음
+  /auth/logout:
+    post:
+      tags:
+        - Auth
+      summary: 로그아웃
+      description: 로그아웃을 진행합니다. 토큰이 필요합니다.
+      operationId: logout
+      security:
+        - bearerAuth: [ ]
+      responses:
+        '200':
+          description: 로그아웃 성공
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+              example:
+                value:
+                  status: SUCCESS
+                  code: AUTH_2000
+                  message: 로그아웃이 정상적으로 처리되었습니다.
+        '400':
+          description: 잘못된 요청
+  /auth/reissue:
+    put:
+      tags:
+        - Auth
+      summary: 토큰 재발급
+      description: 토큰 재발급을 진행합니다. 리프레시 토큰이 필요합니다.
+      operationId: reissue
+      security:
+        - bearerAuth: [ ]
+      responses:
+        '200':
+          description: 재발급 성공
+        '400':
+          description: 잘못된 요청
+  /auth/withdraw:
+    delete:
+      tags:
+        - Auth
+      summary: 회원탈퇴
+      description: 회원 탈퇴를 진행합니다.
+      operationId: withdraw
+      security:
+        - bearerAuth: [ ]
+      responses:
+        '200':
+          description: 탈퇴 성공
+        '400':
+          description: 잘못된 요청
+        '404':
+          description: 사용자 정보를 찾을 수 없음
+
+  /mentees/my:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Mentee
+      summary: 내 기본 정보
+      description: 내 기본 정보를 반환합니다.
+      operationId: getMenteeInfo
+      responses:
+        '200':
+          description: 멘티 기본 정보 및 간단한 목표 현황을 반환합니다.
+        '400':
+          description: 잘못된 요청
+
+  /mentees/my/name:
+    put:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Mentee
+      summary: 내 이름 설정
+      description: 내 이름을 설정합니다.
+      operationId: updateMenteeName
+      parameters:
+        - name: name
+          in: query
+          required: true
+          description: 멘티 이름
+          schema:
+            type: string
+            example: 멘티1
+      responses:
+        '200':
+          description: 이름 설정 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '400':
+          description: 잘못된 요청
+        '409':
+          description: 이름 중복 확인 실패 (중복됨)
+        '500':
+          description: 서버 오류
+
+  /mentees/name/check:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Mentee
+      summary: 이름 중복 확인
+      description: 멘티 이름의 중복확인을 진행합니다.
+      operationId: checkMenteeNameDuplicated
+      parameters:
+        - name: name
+          in: query
+          description: 멘티 이름
+          required: true
+          schema:
+            type: string
+            example: 멘티1
+      responses:
+        '200':
+          description: 이름 중복 확인 성공 (사용 가능)
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          isDuplicate:
+                            type: boolean
+                            example: false
+        '400':
+          description: 잘못된 요청
+        '409':
+          description: 이름 중복 확인 실패 (중복됨)
+        '500':
+          description: 서버 오류
+
+  /goals:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Goal
+      summary: 목표 리스트 조회
+      description: 목표를 최신순으로 조회합니다.
+      operationId: getGoals
+      parameters:
+        - name: page
+          in: query
+          description: 페이지 번호 (1부터 시작)
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: size
+          in: query
+          description: 페이지당 아이템 수
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+      responses:
+        '200':
+          description: 조회 성공
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          goals:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/GoalSummaryResponse'
+                          pageInfo:
+                            $ref: '#/components/schemas/PageInfo'
+        '400':
+          description: 잘못된 요청
+        '500':
+          description: 서버 오류
+  /goals/{goalId}:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Goal
+      summary: 목표 세부정보 조회
+      description: 목표 세부정보를 조회합니다.
+      operationId: getGoalDetails
+      parameters:
+        - name: goalId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 조회할 목표의 ID
+      responses:
+        '200':
+          description: 조회 성공
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/GoalDetailResponse'
+    post:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Goal
+      summary: 목표 신청
+      description: 목표 시작하기 버튼을 눌러 참여합니다.
+      operationId: joinGoal
+      parameters:
+        - name: goalId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 참여할 목표의 ID
+      responses:
+        '200':
+          description: 참여 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '400':
+          description: 잘못된 요청
+        '403':
+          description: 이미 마감된 목표
+        '404':
+          description: 존재하지 않는 목표
+        '409':
+          description: 이미 참여중인 목표
+
+  /goals/my:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - MenteeGoal
+      summary: 멘티 목표 리스트 조회
+      description: 멘티가 참여한 목표들을 조회합니다.
+      operationId: getMenteeGoals
+      responses:
+        '200':
+          description: 조회 성공. (리스트) 목표별 멘토명, 진행기간, 달성율을 포함합니다.
+
+  /goals/my/{goalId}:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - MenteeGoal
+      summary: 멘티의 목표 세부정보 조회
+      description: 멘티가 참여한 목표의 세부정보를 조회합니다. 쿼리 파라미터로 날짜가 필요합니다. 존재하지 않을 시, 오늘의 정보를 가져옵니다.
+      operationId: getMenteeGoalDetails
+      parameters:
+        - name: goalId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 조회할 멘티목표 ID
+        - name: date
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+          description: 조회할 날짜
+      responses:
+        '200':
+          description: 조회 성공. 오늘 할 일 리스트, 진척도 정보(오늘, 전체), 멘토 코멘트, 목표명, 멘토를 포함합니다.
+  /goals/my/{goalId}/todos/{todoId}:
+    post:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - MenteeGoal
+      summary: 멘티의 목표 투두 업데이
+      description: 멘티가 참여한 목표의 투두 상태를 업데이트 합니다.
+      operationId: updateMenteeGoalTodoStatus
+      parameters:
+        - name: goalId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 업데이트할 멘티목표 ID
+        - name: todoId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 조회할 투두 ID
+      responses:
+        '200':
+          description: 업데이트 성공. 투두 상태, 진척도가 업데이트된 목표 세부정보를 재반환합니다.
+
+  /goals/my/{goalId}/comments:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - MenteeGoal
+      summary: 특정 목표 멘토 코멘트 조회
+      description: 특정 목표의 멘토 코멘트를 조회합니다. (날짜 내림차순)
+      operationId: getMenteeGoalComments
+      parameters:
+        - name: goalId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 조회할 멘티목표 ID
+      responses:
+        '200':
+          description: 조회 성공. (리스트) 멘티의 코멘트를 날짜 내림차순으로 반환합니다.
+
+components:
+  schemas:
+    GoalSummaryResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: 골메이트와 함께하는 1일 1커밋
+        mentor_name:
+          type: string
+          example: 골메이트
+        price:
+          type: integer
+          example: 100000
+        discount_price:
+          type: integer
+          example: 85000
+        max_participants:
+          type: integer
+          example: 100
+        current_free_participants:
+          type: integer
+          example: 10
+        free_participants_limit:
+          type: integer
+          example: 50
+        main_image:
+          type: string
+          example: https://image.url
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    GoalDetailResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: 골메이트와 함께하는 1일 1커밋
+        topic:
+          type: string
+          example: 코딩
+        period:
+          type: integer
+          example: 30
+        mentor_name:
+          type: string
+          example: 골메이트
+        price:
+          type: integer
+          example: 100000
+        discount_price:
+          type: integer
+          example: 85000
+        max_participants:
+          type: integer
+          example: 100
+        current_free_participants:
+          type: integer
+          example: 10
+        free_participants_limit:
+          type: integer
+          example: 50
+        weekly_objectives:
+          type: array
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/WeeklyObjective'
+        mid_objectives:
+          type: array
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/MidObjective'
+        thumbnail_images:
+          type: array
+          items:
+            type: string
+            example: https://image.url
+        body_images:
+          type: array
+          items:
+            type: string
+            example: https://image.url
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    WeeklyObjective:
+      type: object
+      properties:
+        week_number:
+          type: integer
+          description: 현재 주차
+          example: 1
+        objective_description:
+          type: string
+          description: 목표 설명
+          example: 깃허브 세팅 및 깃학습
+    MidObjective:
+      type: object
+      properties:
+        objective_description:
+          type: string
+          description: 중간 목표 설명
+          example: 기본적인 깃허브 사용법과 프로젝트 관리법에 대해 학습한다.
+    PageInfo:
+      type: object
+      properties:
+        total:
+          type: integer
+          description: 전체 아이템 수
+          example: 999
+        page:
+          type: integer
+          description: 현재 페이지 번호
+          example: 1
+        size:
+          type: integer
+          description: 페이지당 아이템 수
+          example: 10
+    LoginRequest:
+      type: object
+      properties:
+        authorization_code:
+          type: string
+          example: 7LL63SPQ0gEd-T3KT7K8DPHiMIu3IFf-AAAAAQo8JJoAAAGURQDd7RKZRqbpl2cW
+        provider:
+          type: string
+          enum:
+            - KAKAO
+            - APPLE
+          example: APPLE
+      required:
+        - authorization_code
+        - provider
+      example:
+        authorization_code: 7LL63SPQ0gEd-T3KT7K8DPHiMIu3IFf-AAAAAQo8JJoAAAGURQDd7RKZRqbpl2cW
+        provider: APPLE
+    ApiResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            - SUCCESS
+            - ERROR
+          example: SUCCESS
+        code:
+          type: string
+          example: custom code
+        message:
+          type: string
+          example: 정상적으로 처리되었습니다.
+      required:
+        - status
+        - code
+        - message
+    JWT:
+      type: object
+      properties:
+        accessToken:
+          type: string
+        refreshToken:
+          type: string
+      required:
+        - accessToken
+        - refreshToken
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

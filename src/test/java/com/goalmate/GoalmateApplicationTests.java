@@ -1,4 +1,4 @@
-package dev.cmc.goalmate;
+package com.goalmate;
 
 import org.junit.jupiter.api.Test;
 

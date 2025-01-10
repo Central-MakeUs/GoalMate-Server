@@ -4,11 +4,10 @@ spring:
   config:
     import:
       - optional:file:.env[.properties]
-  web.resources.add-mappings: false
-
 server:
   tomcat:
     max-connections: 20000
     threads:
       max: 600
       min-spare: 100
+  port: 8080

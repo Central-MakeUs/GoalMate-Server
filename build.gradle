@@ -1,13 +1,11 @@
-import org.openapitools.generator.gradle.plugin.tasks.GenerateTask
-
 plugins {
     id 'java'
     id 'org.springframework.boot' version '3.4.1'
     id 'io.spring.dependency-management' version '1.1.7'
-    id 'org.openapi.generator' version '7.10.0'
+    id 'org.hidetake.swagger.generator' version '2.19.2'
 }
 
-group = 'dev.cmc'
+group = 'com.goalmate'
 version = '0.0.1-SNAPSHOT'
 
 java {
@@ -26,133 +24,60 @@ configurations {
 
 repositories {
     mavenCentral()
+    maven { url 'https://repo.spring.io/milestone' }
 }
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0'
-
-//    implementation 'org.springframework.boot:spring-boot-starter-security'
-//    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-//    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-//    runtimeOnly 'com.mysql:mysql-connector-j'
-
-    compileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
-
+    compileOnly 'org.springframework.boot:spring-boot-starter-validation'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    swaggerCodegen 'org.openapitools:openapi-generator-cli:6.2.1'
+    swaggerUI 'org.webjars:swagger-ui:3.52.5'
+    compileOnly 'io.swagger:swagger-annotations:1.6.4'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
+
+    compileOnly 'org.openapitools:jackson-databind-nullable:0.2.3'
+    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml'
+    implementation 'org.springframework.boot:spring-boot-starter-hateoas'
 }
+
+swaggerSources {
+    def typeMappings = 'URI=URI'
+    def importMappings = 'URI=java.net.URI'
+    goalmate {
+        def apiYaml = "${rootDir}/src/main/resources/api/goalmate-spec.yaml"
+        def configJson = "${rootDir}/src/main/resources/api/config.json"
+        inputFile = file(apiYaml)
+        def ignoreFile = file("${rootDir}/src/main/resources/api/.openapi-generator-ignore")
+        code {
+            language = 'spring'
+            configFile = file(configJson)
+            rawOptions = ['--ignore-file-override', ignoreFile, '--type-mappings',
+                          typeMappings, '--import-mappings', importMappings] as List<String>
+            components = [models: true, apis: true, supportingFiles: 'ApiUtil.java']
+            dependsOn validation
+        }
+    }
+}
+
+compileJava.dependsOn swaggerSources.goalmate.code
+sourceSets.main.java.srcDir "${swaggerSources.goalmate.code.outputDir}/src/main/java"
+sourceSets.main.resources.srcDir "${swaggerSources.goalmate.code.outputDir}/src/main/resources"
 
 tasks.named('test') {
     useJUnitPlatform()
 }
 
-sourceSets {
-    main {
-        java {
-            srcDir("$buildDir/generated")
-        }
-    }
+build {
+    dependsOn generateSwaggerUI
 }
 
-ext {
-    dirs = [
-            'spec'           : "$rootDir/spec",
-            'openApiGenerate': layout.buildDirectory.dir("openapi").get().asFile.absolutePath
-    ]
-    // api, invoker, model이 위치할 패키지 경로
-    openApiPackages = ['openapi.api', 'openapi.invoker', 'openapi.model']
-
-    // 명세를 기반으로 코드를 생성하는 task들을 만들고 저장해둔다.
-    generateOpenApiTasks = fileTree(dirs.get("spec"))
-            .files
-            .findAll { file -> file.name.endsWith('.yaml') }
-            .collect(file -> createOpenApiGenerateTask(file.name))
-}
-
-def createOpenApiGenerateTask(String fileName) {
-    tasks.register("openApiGenerate_$fileName", GenerateTask) {
-        getGeneratorName().set("spring")
-        getInputSpec().set("${dirs["spec"]}/$fileName")
-        getOutputDir().set(dirs.get("openApiGenerate") as String)
-        getApiPackage().set(openApiPackages[0] as String)
-        getInvokerPackage().set(openApiPackages[1] as String)
-        getModelPackage().set(openApiPackages[2] as String)
-        // 다음 문서를 확인하여 적절한 옵션을 넣는다.
-        // https://openapi-generator.tech/docs/generators/spring
-        getConfigOptions().set(
-                [
-                        "dateLibrary"    : "java8",
-                        "useTags"        : "true",
-                        "interfaceOnly"  : "true",
-                        "useSpringBoot3" : "true",
-                        "openApiNullable": "false"
-                ]
-        )
-//        getTemplateDir().set("${dirs.get('contract')}/template")
+processResources {
+    dependsOn generateSwaggerCode
+    dependsOn generateSwaggerUI
+    from("${swaggerSources.goalmate.ui.outputDir}") {
+        into 'static/swagger-ui'
     }
 }
-
-// ext에 선언해놨던 생성된 Task들에 의존한다.
-tasks.register("createOpenApi") {
-    doFirst {
-        println("Creating Code By OpenAPI...")
-    }
-    doLast {
-        println("OpenAPI Code created.")
-    }
-    // 해당 작업은 generateOpenApiTasks에 의존한다.
-    dependsOn(generateOpenApiTasks)
-}
-
-
-// 문서를 기반으로 생성된 코드 중 사용할 코드만 source 디렉토리로 이동한다.
-tasks.register("moveGeneratedSources") {
-    doFirst {
-        println("Moving generated sources...")
-    }
-
-    doLast {
-        openApiPackages.each { packageName ->
-            def buildDir = layout.buildDirectory.get().asFile.absolutePath
-            def packagePath = packageName.replace(".", "/")
-            def originDir = file("${dirs.get('openApiGenerate')}/src/main/java/${packagePath}")
-            def destinationDir = file("$buildDir/generated/${packagePath}")
-
-            copy {
-                from originDir
-                into destinationDir
-            }
-        }
-        println 'Generated sources moved.'
-    }
-    // 해당 작업은 createOpenApi Task에 의존한다.
-    dependsOn("createOpenApi")
-}
-
-// 문서를 기반으로 생성된 불필요한 코드들을 제거한다.
-tasks.register("cleanGeneratedDirectory") {
-    doFirst {
-        println("Cleaning generated directory...")
-    }
-    doLast {
-        def openApiGenerateDir = file(dirs.get('openApiGenerate'))
-        if (openApiGenerateDir.exists()) {
-            openApiGenerateDir.deleteDir()
-            println "Directory ${openApiGenerateDir} deleted."
-        } else {
-            println "Directory ${openApiGenerateDir} does not exist."
-        }
-    }
-    // 해당 작업은 moveGeneratedSources에 의존한다.
-    dependsOn("moveGeneratedSources")
-}
-
-tasks.named("compileJava") {
-    // 컴파일 이전에 코드 생성작업이 수행된다.
-    dependsOn("cleanGeneratedDirectory")
-}
-
-
