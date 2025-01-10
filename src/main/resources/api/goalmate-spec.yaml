@@ -25,21 +25,20 @@ tags:
     description: 멘티 목표 API
 
 paths:
+  # Auth
   /auth/login:
     post:
       tags:
         - Auth
       summary: 소셜 로그인 (회원가입)
       description: 소셜 로그인을 통해 로그인 또는 회원가입을 진행합니다. 로그인 완료 시 200, 회원가입 성공 시 201이 응답됩니다.
-      operationId: loginWithOauth
+      operationId: loginOrSignUp
       requestBody:
-        description: authorization code와 provider(소셜 종류)가 필요합니다.
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/LoginRequest'
-
+              $ref: '#/components/schemas/OAuthRequest'
       responses:
         '200':
           description: 로그인 성공
@@ -51,7 +50,7 @@ paths:
                   - type: object
                     properties:
                       data:
-                        $ref: '#/components/schemas/JWT'
+                        $ref: '#/components/schemas/LoginResponse'
               example:
                 status: SUCCESS
                 code: AUTH_2000
@@ -69,7 +68,7 @@ paths:
                   - type: object
                     properties:
                       data:
-                        $ref: '#/components/schemas/JWT'
+                        $ref: '#/components/schemas/LoginResponse'
               example:
                 status: SUCCESS
                 code: AUTH_2010
@@ -77,16 +76,12 @@ paths:
                 data:
                   accessToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
                   refreshToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-        '400':
-          description: 잘못된 요청
-        '404':
-          description: 사용자 정보를 찾을 수 없음
   /auth/logout:
     post:
       tags:
         - Auth
       summary: 로그아웃
-      description: 로그아웃을 진행합니다. 토큰이 필요합니다.
+      description: 로그아웃을 진행합니다. 액세스 토큰과 리프레시 토큰이 파기됩니다. (후순위)
       operationId: logout
       security:
         - bearerAuth: [ ]
@@ -103,8 +98,6 @@ paths:
                   status: SUCCESS
                   code: AUTH_2000
                   message: 로그아웃이 정상적으로 처리되었습니다.
-        '400':
-          description: 잘못된 요청
   /auth/reissue:
     put:
       tags:
@@ -117,8 +110,6 @@ paths:
       responses:
         '200':
           description: 재발급 성공
-        '400':
-          description: 잘못된 요청
   /auth/withdraw:
     delete:
       tags:
@@ -131,34 +122,28 @@ paths:
       responses:
         '200':
           description: 탈퇴 성공
-        '400':
-          description: 잘못된 요청
-        '404':
-          description: 사용자 정보를 찾을 수 없음
 
+  # Mentee
   /mentees/my:
     get:
       security:
         - bearerAuth: [ ]
       tags:
         - Mentee
-      summary: 내 기본 정보
-      description: 내 기본 정보를 반환합니다.
+      summary: 멘티 기본 정보
+      description: 멘티 기본 정보를 조회합니다.
       operationId: getMenteeInfo
       responses:
         '200':
           description: 멘티 기본 정보 및 간단한 목표 현황을 반환합니다.
-        '400':
-          description: 잘못된 요청
-
   /mentees/my/name:
     put:
       security:
         - bearerAuth: [ ]
       tags:
         - Mentee
-      summary: 내 이름 설정
-      description: 내 이름을 설정합니다.
+      summary: 멘티 이름 설정
+      description: 멘티 이름을 설정합니다.
       operationId: updateMenteeName
       parameters:
         - name: name
@@ -175,22 +160,17 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
-        '400':
-          description: 잘못된 요청
         '409':
           description: 이름 중복 확인 실패 (중복됨)
-        '500':
-          description: 서버 오류
-
-  /mentees/name/check:
+  /mentees/name/validate:
     get:
       security:
         - bearerAuth: [ ]
       tags:
         - Mentee
-      summary: 이름 중복 확인
-      description: 멘티 이름의 중복확인을 진행합니다.
-      operationId: checkMenteeNameDuplicated
+      summary: 멘티 이름 중복 확인
+      description: 멘티 이름의 중복 확인을 진행합니다.
+      operationId: validateMenteeName
       parameters:
         - name: name
           in: query
@@ -221,7 +201,91 @@ paths:
           description: 이름 중복 확인 실패 (중복됨)
         '500':
           description: 서버 오류
+  /mentees/my/goals:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - MenteeGoal
+      summary: 멘티 목표 리스트 조회
+      description: 멘티가 참여한 목표들을 조회합니다.
+      operationId: getMenteeGoals
+      responses:
+        '200':
+          description: 조회 성공. (리스트) 목표별 멘토명, 진행기간, 달성율을 포함합니다.
 
+  /mentees/my/goals/{goalId}:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - MenteeGoal
+      summary: 멘티의 목표 세부정보 조회
+      description: 멘티의 목표의 세부정보를 조회합니다. 쿼리 파라미터로 날짜가 필요합니다. 존재하지 않을 시, 오늘의 정보를 가져옵니다.
+      operationId: getMenteeGoalDetails
+      parameters:
+        - name: goalId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 조회할 멘티목표 ID
+        - name: date
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+          description: 조회할 날짜
+      responses:
+        '200':
+          description: 조회 성공. 오늘 할 일 리스트, 진척도 정보(오늘, 전체), 멘토 코멘트, 목표명, 멘토를 포함합니다.
+  /mentees/my/goal/{goalId}/todos/{todoId}:
+    post:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - MenteeGoal
+      summary: 멘티의 목표 투두 업데이트
+      description: 멘티의 목표에 대해 투두 상태를 업데이트 합니다.
+      operationId: updateMenteeGoalTodoStatus
+      parameters:
+        - name: goalId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 업데이트할 멘티목표 ID
+        - name: todoId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 조회할 투두 ID
+      responses:
+        '200':
+          description: 업데이트 성공. 투두 상태, 진척도가 업데이트된 목표 세부정보를 재반환합니다.
+  /mentees/my/goal/{goalId}/comments:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - MenteeGoal
+      summary: 멘티의 목표 멘토 코멘트 조회
+      description: 멘티의 목표에 대해 멘토가 작성한 코멘트를 날짜 내림차순으로 조회합니다.
+      operationId: getMenteeGoalComments
+      parameters:
+        - name: goalId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 조회할 멘티목표 ID
+      responses:
+        '200':
+          description: 조회 성공. (리스트) 멘티의 코멘트를 날짜 내림차순으로 반환합니다.
+
+  # Goals
   /goals:
     get:
       security:
@@ -300,14 +364,15 @@ paths:
                     properties:
                       data:
                         $ref: '#/components/schemas/GoalDetailResponse'
+  /goals/{goalId}/mentees:
     post:
       security:
         - bearerAuth: [ ]
       tags:
         - Goal
-      summary: 목표 신청
-      description: 목표 시작하기 버튼을 눌러 참여합니다.
-      operationId: joinGoal
+      summary: 목표 시작
+      description: 멘티가 목표 시작하기 버튼을 눌러 참여합니다.
+      operationId: registerMentee
       parameters:
         - name: goalId
           in: path
@@ -322,8 +387,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
-        '400':
-          description: 잘못된 요청
         '403':
           description: 이미 마감된 목표
         '404':
@@ -331,93 +394,41 @@ paths:
         '409':
           description: 이미 참여중인 목표
 
-  /goals/my:
-    get:
-      security:
-        - bearerAuth: [ ]
-      tags:
-        - MenteeGoal
-      summary: 멘티 목표 리스트 조회
-      description: 멘티가 참여한 목표들을 조회합니다.
-      operationId: getMenteeGoals
-      responses:
-        '200':
-          description: 조회 성공. (리스트) 목표별 멘토명, 진행기간, 달성율을 포함합니다.
-
-  /goals/my/{goalId}:
-    get:
-      security:
-        - bearerAuth: [ ]
-      tags:
-        - MenteeGoal
-      summary: 멘티의 목표 세부정보 조회
-      description: 멘티가 참여한 목표의 세부정보를 조회합니다. 쿼리 파라미터로 날짜가 필요합니다. 존재하지 않을 시, 오늘의 정보를 가져옵니다.
-      operationId: getMenteeGoalDetails
-      parameters:
-        - name: goalId
-          in: path
-          required: true
-          schema:
-            type: integer
-          description: 조회할 멘티목표 ID
-        - name: date
-          in: query
-          required: false
-          schema:
-            type: string
-            format: date
-          description: 조회할 날짜
-      responses:
-        '200':
-          description: 조회 성공. 오늘 할 일 리스트, 진척도 정보(오늘, 전체), 멘토 코멘트, 목표명, 멘토를 포함합니다.
-  /goals/my/{goalId}/todos/{todoId}:
-    post:
-      security:
-        - bearerAuth: [ ]
-      tags:
-        - MenteeGoal
-      summary: 멘티의 목표 투두 업데이
-      description: 멘티가 참여한 목표의 투두 상태를 업데이트 합니다.
-      operationId: updateMenteeGoalTodoStatus
-      parameters:
-        - name: goalId
-          in: path
-          required: true
-          schema:
-            type: integer
-          description: 업데이트할 멘티목표 ID
-        - name: todoId
-          in: path
-          required: true
-          schema:
-            type: integer
-          description: 조회할 투두 ID
-      responses:
-        '200':
-          description: 업데이트 성공. 투두 상태, 진척도가 업데이트된 목표 세부정보를 재반환합니다.
-
-  /goals/my/{goalId}/comments:
-    get:
-      security:
-        - bearerAuth: [ ]
-      tags:
-        - MenteeGoal
-      summary: 특정 목표 멘토 코멘트 조회
-      description: 특정 목표의 멘토 코멘트를 조회합니다. (날짜 내림차순)
-      operationId: getMenteeGoalComments
-      parameters:
-        - name: goalId
-          in: path
-          required: true
-          schema:
-            type: integer
-          description: 조회할 멘티목표 ID
-      responses:
-        '200':
-          description: 조회 성공. (리스트) 멘티의 코멘트를 날짜 내림차순으로 반환합니다.
-
 components:
   schemas:
+    # Request DTO
+    OAuthRequest:
+      type: object
+      properties:
+        authorization_code:
+          type: string
+          example: 7LL63SPQ0gEd-T3KT7K8DPHiMIu3IFf-AAAAAQo8JJoAAAGURQDd7RKZRqbpl2cW
+        provider:
+          type: string
+          enum:
+            - KAKAO
+            - APPLE
+          example: APPLE
+      required:
+        - authorization_code
+        - provider
+      example:
+        authorization_code: 7LL63SPQ0gEd-T3KT7K8DPHiMIu3IFf-AAAAAQo8JJoAAAGURQDd7RKZRqbpl2cW
+        provider: APPLE
+
+    # Response Dto
+    LoginResponse:
+      type: object
+      properties:
+        accessToken:
+          type: string
+        refreshToken:
+          type: string
+      required:
+        - accessToken
+        - refreshToken
+
+
     GoalSummaryResponse:
       type: object
       properties:
@@ -548,24 +559,8 @@ components:
           type: integer
           description: 페이지당 아이템 수
           example: 10
-    LoginRequest:
-      type: object
-      properties:
-        authorization_code:
-          type: string
-          example: 7LL63SPQ0gEd-T3KT7K8DPHiMIu3IFf-AAAAAQo8JJoAAAGURQDd7RKZRqbpl2cW
-        provider:
-          type: string
-          enum:
-            - KAKAO
-            - APPLE
-          example: APPLE
-      required:
-        - authorization_code
-        - provider
-      example:
-        authorization_code: 7LL63SPQ0gEd-T3KT7K8DPHiMIu3IFf-AAAAAQo8JJoAAAGURQDd7RKZRqbpl2cW
-        provider: APPLE
+
+    # 공통응답. Data 필드를 제외한 부분이며, Data 필드에 들어갈 정보는 Response component로!
     ApiResponse:
       type: object
       properties:
@@ -585,16 +580,6 @@ components:
         - status
         - code
         - message
-    JWT:
-      type: object
-      properties:
-        accessToken:
-          type: string
-        refreshToken:
-          type: string
-      required:
-        - accessToken
-        - refreshToken
 
   securitySchemes:
     bearerAuth:

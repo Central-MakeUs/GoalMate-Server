@@ -21,7 +21,7 @@ public class GoalController implements GoalApi {
 	}
 
 	@Override
-	public ResponseEntity<ModelApiResponse> joinGoal(Integer goalId) throws Exception {
-		return GoalApi.super.joinGoal(goalId);
+	public ResponseEntity<ModelApiResponse> registerMentee(Integer goalId) throws Exception {
+		return GoalApi.super.registerMentee(goalId);
 	}
 }

@@ -3,7 +3,7 @@ spring:
     name: goalmate
   config:
     import:
-      - optional:file:.env[.properties]
+      - optional:classpath:env.yaml
   profiles:
     active: dev
 
@@ -32,14 +32,14 @@ spring:
     defer-datasource-initialization: false
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://${AWS_RDS_URL}
-    username: ${AWS_RDS_USERNAME}
-    password: ${AWS_RDS_PASSWORD}
+    url: jdbc:mysql://${aws.rds.url}
+    username: ${aws.rds.username}
+    password: ${aws.rds.password}
   sql:
     init:
       mode: never
+      #      data-locations: classpath:db/data.sql
       #      schema-locations: classpath:db/schema.sql
-      data-locations: classpath:db/data.sql
   #  data:
   #    redis:
   #      host: ${REDIS_HOST}

@@ -37,5 +37,4 @@ out/
 .vscode/
 
 ### environment ###
-**/.env
-**/**-secret.yaml
+**/env.yaml
