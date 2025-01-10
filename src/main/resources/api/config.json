@@ -9,6 +9,7 @@
   "useTags": true,
   "useGzipFeature": true,
   "hateoas": true,
+  "interfaceOnly": true,
   "unhandledException": true,
   "useSpringBoot3": true,
   "useSwaggerUI": true,

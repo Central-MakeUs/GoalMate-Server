@@ -29,18 +29,16 @@ repositories {
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
-    compileOnly 'org.springframework.boot:spring-boot-starter-validation'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-
     swaggerCodegen 'org.openapitools:openapi-generator-cli:6.2.1'
     swaggerUI 'org.webjars:swagger-ui:3.52.5'
     compileOnly 'io.swagger:swagger-annotations:1.6.4'
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
-
+    compileOnly 'org.springframework.boot:spring-boot-starter-validation'
     compileOnly 'org.openapitools:jackson-databind-nullable:0.2.3'
     implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml'
     implementation 'org.springframework.boot:spring-boot-starter-hateoas'
+    implementation 'io.springfox:springfox-oas:3.0.0'
 }
 
 swaggerSources {
