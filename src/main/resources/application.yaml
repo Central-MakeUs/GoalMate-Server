@@ -1,9 +1,12 @@
-spring.profiles.active: local
-
 spring:
+  application:
+    name: goalmate
   config:
     import:
       - optional:file:.env[.properties]
+  profiles:
+    active: local
+    
 server:
   tomcat:
     max-connections: 20000
