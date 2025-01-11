@@ -1,14 +1,14 @@
-package com.goalmate;
+package com.goalmate.presentation;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.goalmate.api.AuthApi;
-import com.goalmate.api.model.LoginOrSignUp200Response;
-import com.goalmate.api.model.Logout200Response;
+import com.goalmate.api.model.LoginResponse;
 import com.goalmate.api.model.OAuthRequest;
-import com.goalmate.oauth.apple.AppleOAuthUserProvider;
 import com.goalmate.service.AuthService;
+import com.goalmate.service.LoginResult;
 
 import lombok.RequiredArgsConstructor;
 
@@ -16,15 +16,22 @@ import lombok.RequiredArgsConstructor;
 @RestController
 public class AuthController implements AuthApi {
 	private final AuthService authService;
-	private final AppleOAuthUserProvider appleOAuthUserProvider;
 
+	// 로직처리는 최대한 서비스에서하고, 컨트롤러에서 조합. 매핑이 복잡하다면 별도 매퍼로 넘기기
 	@Override
-	public ResponseEntity<LoginOrSignUp200Response> loginOrSignUp(OAuthRequest oauthRequest) throws Exception {
-		return AuthApi.super.loginOrSignUp(oauthRequest);
+	public ResponseEntity loginOrSignUp(OAuthRequest oauthRequest) {
+		LoginResult result = authService.authenticateWithOauth(oauthRequest.getAuthorizationCode(),
+			oauthRequest.getProvider().toString());
+		LoginResponse response = new LoginResponse();
+		response.setAccessToken(result.accessToken());
+		response.setRefreshToken(result.refreshToken());
+		if (result.isPending())
+			return ResponseEntity.status(HttpStatus.CREATED).body(response);
+		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
 
 	@Override
-	public ResponseEntity<Logout200Response> logout() throws Exception {
+	public ResponseEntity logout() throws Exception {
 		return AuthApi.super.logout();
 	}
 
