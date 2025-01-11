@@ -1,0 +1,17 @@
+services:
+  goalmate:
+    image: dhxl50/goalmate:latest  # 빌드한 Docker 이미지
+    ports:
+      - "80:8080"                 # 호스트 포트 80 -> 컨테이너 포트 8080 매핑
+    deploy:
+      replicas: 2                 # 컨테이너 2개 실행 (분산 배치)
+      update_config:
+        parallelism: 1            # 한 번에 하나의 컨테이너 업데이트
+        delay: 10s                # 업데이트 사이 간격
+      restart_policy:
+        condition: on-failure     # 실패 시 재시작
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/swagger-ui/index.html" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
