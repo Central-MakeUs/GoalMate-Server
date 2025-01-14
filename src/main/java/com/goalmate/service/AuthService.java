@@ -1,5 +1,8 @@
 package com.goalmate.service;
 
+import java.util.List;
+
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -9,6 +12,9 @@ import com.goalmate.oauth.apple.AppleOAuthUserProvider;
 import com.goalmate.oauth.kakao.KakaoOAuthUserProvider;
 import com.goalmate.oauth.oidc.OAuthMember;
 import com.goalmate.repository.MenteeRepository;
+import com.goalmate.security.JwtProvider;
+import com.goalmate.security.TokenPair;
+import com.goalmate.security.UserDetailsImpl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 public class AuthService {
 	private final AppleOAuthUserProvider appleOAuthUserProvider;
 	private final KakaoOAuthUserProvider kakaoOAuthUserProvider;
-	// private final JwtProvider jwtProvider;
+	private final JwtProvider jwtProvider;
 	private final MenteeRepository menteeRepository;
 
 	public LoginResult authenticateWithOauth(String identityToken, String nonce, String provider) {
@@ -41,7 +47,16 @@ public class AuthService {
 				.build()
 			);
 		menteeRepository.save(mentee);
-		log.info("Successfully authenticated with {}", mentee);
-		return new LoginResult("accessToken", "refreshToken", mentee.isPending());
+		log.info(">>>>>> 멤버 회원가입");
+		TokenPair tokenPair = generateMenteeToken(mentee);
+		return new LoginResult(tokenPair.accessToken(), tokenPair.refreshToken(), mentee.isPending());
+	}
+
+	private TokenPair generateMenteeToken(Mentee mentee) {
+		return jwtProvider.generateTokenPair(
+			UserDetailsImpl.builder()
+				.id(mentee.getId())
+				.authorities(List.of(new SimpleGrantedAuthority(mentee.getRole().getValue())))
+				.build());
 	}
 }
