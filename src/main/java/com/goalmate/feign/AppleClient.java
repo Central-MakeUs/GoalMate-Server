@@ -4,13 +4,12 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.GetMapping;
 
-import com.goalmate.feign.config.AppleSocialFeignConfig;
-import com.goalmate.oauth.apple.ApplePublicKeys;
+import com.goalmate.feign.config.AppleFeignConfig;
+import com.goalmate.oauth.oidc.OIDCPublicKeys;
 
-@FeignClient(name = "apple-public-key-client", url = "https://appleid.apple.com/auth", configuration = AppleSocialFeignConfig.class)
+@FeignClient(name = "apple-public-key-client", url = "https://appleid.apple.com/auth", configuration = AppleFeignConfig.class)
 @Component
 public interface AppleClient {
 	@GetMapping("/keys")
-	ApplePublicKeys getApplePublicKeys();
-
+	OIDCPublicKeys getApplePublicKeys();
 }

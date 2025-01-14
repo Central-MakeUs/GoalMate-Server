@@ -1,4 +1,4 @@
-package com.goalmate.oauth.apple;
+package com.goalmate.oauth.oidc;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -7,7 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ApplePublicKey {
+public class OIDCPublicKey {
 
 	private String kty;
 	private String kid;

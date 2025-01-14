@@ -1,4 +1,4 @@
-package com.goalmate.common.error;
+package com.goalmate.support.error;
 
 import org.springframework.boot.logging.LogLevel;
 import org.springframework.http.HttpStatus;

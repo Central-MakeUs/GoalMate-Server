@@ -1,4 +1,4 @@
-package com.goalmate.oauth.apple;
+package com.goalmate.oauth.oidc;
 
 import java.math.BigInteger;
 import java.security.KeyFactory;
@@ -11,24 +11,20 @@ import java.util.Map;
 
 import org.springframework.stereotype.Component;
 
-import com.goalmate.oauth.oidc.OIDCPublicKey;
-import com.goalmate.oauth.oidc.OIDCPublicKeys;
-
 @Component
-public class PublicKeyGenerator {
+public class OIDCPublicKeyProvider {
 
 	private static final String SIGN_ALGORITHM_HEADER_KEY = "alg";
 	private static final String KEY_ID_HEADER_KEY = "kid";
 	private static final int POSITIVE_SIGN_NUMBER = 1;
 
-	public PublicKey generatePublicKey(Map<String, String> headers, OIDCPublicKeys oidcPublicKeys) {
+	public PublicKey getPublicKeyFromHeaders(Map<String, String> headers, OIDCPublicKeys OIDCPublicKeys) {
 		OIDCPublicKey OIDCPublicKey =
-			oidcPublicKeys.getMatchesKey(headers.get(SIGN_ALGORITHM_HEADER_KEY), headers.get(KEY_ID_HEADER_KEY));
-
-		return generatePublicKeyWithApplePublicKey(OIDCPublicKey);
+			OIDCPublicKeys.getMatchesKey(headers.get(SIGN_ALGORITHM_HEADER_KEY), headers.get(KEY_ID_HEADER_KEY));
+		return generatePublicKeyFromOIDCKey(OIDCPublicKey);
 	}
 
-	private PublicKey generatePublicKeyWithApplePublicKey(OIDCPublicKey publicKey) {
+	private PublicKey generatePublicKeyFromOIDCKey(OIDCPublicKey publicKey) {
 		byte[] nBytes = Base64.getUrlDecoder().decode(publicKey.getN());
 		byte[] eBytes = Base64.getUrlDecoder().decode(publicKey.getE());
 
@@ -41,7 +37,7 @@ public class PublicKeyGenerator {
 			KeyFactory keyFactory = KeyFactory.getInstance(publicKey.getKty());
 			return keyFactory.generatePublic(publicKeySpec);
 		} catch (NoSuchAlgorithmException | InvalidKeySpecException exception) {
-			throw new IllegalStateException("Apple OAuth 로그인 중 public key 생성에 문제가 발생했습니다.");
+			throw new RuntimeException(exception); //test
 		}
 	}
 }

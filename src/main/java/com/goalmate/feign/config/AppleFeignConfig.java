@@ -8,7 +8,7 @@ import feign.Logger;
 import feign.RequestInterceptor;
 import feign.codec.ErrorDecoder;
 
-public class AppleSocialFeignConfig {
+public class AppleFeignConfig {
 	@Bean
 	public RequestInterceptor requestInterceptor() {
 		return template -> template.header("Content-Type", "application/json;charset=UTF-8");

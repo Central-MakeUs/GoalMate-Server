@@ -1,6 +1,6 @@
-package com.goalmate.common.response;
+package com.goalmate.support.response;
 
-import com.goalmate.common.error.ErrorType;
+import com.goalmate.support.error.ErrorType;
 
 public class ApiResponse<S> {
 	private final ResponseStatus status;

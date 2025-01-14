@@ -1,4 +1,4 @@
-package com.goalmate.common.response;
+package com.goalmate.support.response;
 
 public enum ResponseStatus {
 

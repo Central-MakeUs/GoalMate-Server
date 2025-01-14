@@ -400,33 +400,34 @@ components:
     OAuthRequest:
       type: object
       properties:
-        authorization_code:
+        identity_token:
           type: string
-          example: 7LL63SPQ0gEd-T3KT7K8DPHiMIu3IFf-AAAAAQo8JJoAAAGURQDd7RKZRqbpl2cW
+        nonce:
+          type: string
         provider:
           type: string
           enum:
             - KAKAO
             - APPLE
-          example: APPLE
       required:
-        - authorization_code
+        - identity_token
         - provider
       example:
-        authorization_code: 7LL63SPQ0gEd-T3KT7K8DPHiMIu3IFf-AAAAAQo8JJoAAAGURQDd7RKZRqbpl2cW
+        identity_token: identity_token
+        nonce: 임의의 nonce 값
         provider: APPLE
 
     # Response Dto
     LoginResponse:
       type: object
       properties:
-        accessToken:
+        access_token:
           type: string
-        refreshToken:
+        refresh_token:
           type: string
       required:
-        - accessToken
-        - refreshToken
+        - access_token
+        - refresh_token
 
 
     GoalSummaryResponse:

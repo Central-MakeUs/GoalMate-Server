@@ -1,4 +1,4 @@
-package com.goalmate.oauth.apple;
+package com.goalmate.oauth.oidc;
 
 import java.security.PublicKey;
 import java.util.Base64;
@@ -17,10 +17,9 @@ import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.SignatureException;
 
 @Component
-public class AppleJwtParser {
-
-	private static final String IDENTITY_TOKEN_VALUE_DELIMITER = "\\.";
+public class OIDCJwtParser {
 	private static final int HEADER_INDEX = 0;
+	private static final String IDENTITY_TOKEN_VALUE_DELIMITER = "\\.";
 
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
@@ -30,20 +29,21 @@ public class AppleJwtParser {
 			String decodedHeader = new String(Base64.getUrlDecoder().decode(encodedHeader));
 			return OBJECT_MAPPER.readValue(decodedHeader, Map.class);
 		} catch (JsonProcessingException | ArrayIndexOutOfBoundsException e) {
-			throw new IllegalArgumentException("Apple OAuth Identity Token 형식이 올바르지 않습니다.");
+			throw new IllegalArgumentException("Error parsing identity token: " + identityToken, e);
 		}
 	}
 
-	public Claims parsePublicKeyAndGetClaims(String idToken, PublicKey publicKey) {
+	public Claims parsePublicKeyAndGetClaims(String identityToken, PublicKey publicKey) {
 		try {
 			return Jwts.parser()
-				.setSigningKey(publicKey)
-				.parseClaimsJws(idToken)
-				.getBody();
+				.verifyWith(publicKey)
+				.build()
+				.parseSignedClaims(identityToken)
+				.getPayload();
 		} catch (ExpiredJwtException e) {
-			throw new IllegalArgumentException("Apple OAuth 로그인 중 Identity Token 유효기간이 만료됐습니다.");
+			throw new IllegalArgumentException("Expired or invalid JWT token");
 		} catch (UnsupportedJwtException | MalformedJwtException | SignatureException | IllegalArgumentException e) {
-			throw new IllegalArgumentException("Apple OAuth Identity Token 값이 올바르지 않습니다.");
+			throw new IllegalArgumentException("Invalid JWT token");
 		}
 	}
 }

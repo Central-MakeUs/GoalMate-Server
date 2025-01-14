@@ -1,4 +1,4 @@
-package com.goalmate.common.error;
+package com.goalmate.support.error;
 
 public class CoreApiException extends RuntimeException {
 
