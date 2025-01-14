@@ -1,4 +1,6 @@
-package com.goalmate.domain;
+package com.goalmate.domain.mentee;
+
+import com.goalmate.domain.BaseEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

@@ -11,7 +11,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import com.goalmate.domain.Mentee;
+import com.goalmate.domain.mentee.Mentee;
 import com.goalmate.repository.MenteeRepository;
 
 import lombok.RequiredArgsConstructor;

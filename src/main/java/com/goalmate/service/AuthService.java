@@ -6,8 +6,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.goalmate.domain.Mentee;
-import com.goalmate.domain.SocialProvider;
+import com.goalmate.domain.mentee.Mentee;
+import com.goalmate.domain.mentee.SocialProvider;
 import com.goalmate.oauth.apple.AppleOAuthUserProvider;
 import com.goalmate.oauth.kakao.KakaoOAuthUserProvider;
 import com.goalmate.oauth.oidc.OAuthMember;

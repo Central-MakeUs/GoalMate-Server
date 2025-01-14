@@ -1,4 +1,4 @@
-package com.goalmate.domain;
+package com.goalmate.domain.mentee;
 
 public enum UserRole {
 	ADMIN("ADMIN"),
