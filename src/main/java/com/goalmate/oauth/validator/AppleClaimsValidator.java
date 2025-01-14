@@ -1,4 +1,4 @@
-package com.goalmate.oauth.apple;
+package com.goalmate.oauth.validator;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;

@@ -12,19 +12,27 @@ import java.util.Map;
 import org.springframework.stereotype.Component;
 
 @Component
-public class OIDCPublicKeyProvider {
+public class OIDCPublicKeyResolver {
 
 	private static final String SIGN_ALGORITHM_HEADER_KEY = "alg";
 	private static final String KEY_ID_HEADER_KEY = "kid";
 	private static final int POSITIVE_SIGN_NUMBER = 1;
 
-	public PublicKey getPublicKeyFromHeaders(Map<String, String> headers, OIDCPublicKeys OIDCPublicKeys) {
-		OIDCPublicKey OIDCPublicKey =
-			OIDCPublicKeys.getMatchesKey(headers.get(SIGN_ALGORITHM_HEADER_KEY), headers.get(KEY_ID_HEADER_KEY));
-		return generatePublicKeyFromOIDCKey(OIDCPublicKey);
+	/**
+	 * Resolves the appropriate PublicKey based on headers and available OIDC public keys.
+	 */
+	public PublicKey resolvePublicKey(Map<String, String> headers, OIDCPublicKeys oidcPublicKeys) {
+		OIDCPublicKey oidcPublicKey = oidcPublicKeys.getMatchesKey(
+			headers.get(SIGN_ALGORITHM_HEADER_KEY),
+			headers.get(KEY_ID_HEADER_KEY)
+		);
+		return convertOIDCKeyToPublicKey(oidcPublicKey);
 	}
 
-	private PublicKey generatePublicKeyFromOIDCKey(OIDCPublicKey publicKey) {
+	/**
+	 * Converts an OIDC public key to a Java PublicKey object.
+	 */
+	private PublicKey convertOIDCKeyToPublicKey(OIDCPublicKey publicKey) {
 		byte[] nBytes = Base64.getUrlDecoder().decode(publicKey.getN());
 		byte[] eBytes = Base64.getUrlDecoder().decode(publicKey.getE());
 
@@ -37,7 +45,7 @@ public class OIDCPublicKeyProvider {
 			KeyFactory keyFactory = KeyFactory.getInstance(publicKey.getKty());
 			return keyFactory.generatePublic(publicKeySpec);
 		} catch (NoSuchAlgorithmException | InvalidKeySpecException exception) {
-			throw new RuntimeException(exception); //test
+			throw new RuntimeException("Failed to convert OIDC key to PublicKey", exception);
 		}
 	}
 }

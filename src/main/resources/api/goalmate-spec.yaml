@@ -51,13 +51,6 @@ paths:
                     properties:
                       data:
                         $ref: '#/components/schemas/LoginResponse'
-              example:
-                status: SUCCESS
-                code: AUTH_2000
-                message: 로그인이 정상적으로 처리되었습니다.
-                data:
-                  accessToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-                  refreshToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
         '201':
           description: 회원가입 성공
           content:
@@ -69,13 +62,6 @@ paths:
                     properties:
                       data:
                         $ref: '#/components/schemas/LoginResponse'
-              example:
-                status: SUCCESS
-                code: AUTH_2010
-                message: 회원가입이 정상적으로 처리되었습니다.
-                data:
-                  accessToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-                  refreshToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
   /auth/logout:
     post:
       tags:
@@ -93,17 +79,12 @@ paths:
               schema:
                 allOf:
                   - $ref: '#/components/schemas/ApiResponse'
-              example:
-                value:
-                  status: SUCCESS
-                  code: AUTH_2000
-                  message: 로그아웃이 정상적으로 처리되었습니다.
   /auth/reissue:
     put:
       tags:
         - Auth
       summary: 토큰 재발급
-      description: 토큰 재발급을 진행합니다. 리프레시 토큰이 필요합니다.
+      description: 토큰 재발급을 진행합니다. 리프레시 토큰이 필요합니다. (후순위)
       operationId: reissue
       security:
         - bearerAuth: [ ]
@@ -152,7 +133,7 @@ paths:
           description: 멘티 이름
           schema:
             type: string
-            example: 멘티1
+            example: 김멘티
       responses:
         '200':
           description: 이름 설정 성공
@@ -161,7 +142,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
         '409':
-          description: 이름 중복 확인 실패 (중복됨)
+          description: 중복된 이름
   /mentees/name/validate:
     get:
       security:
@@ -181,26 +162,14 @@ paths:
             example: 멘티1
       responses:
         '200':
-          description: 이름 중복 확인 성공 (사용 가능)
+          description: 이름 중복 확인 성공
           content:
             application/json:
               schema:
                 allOf:
                   - $ref: '#/components/schemas/ApiResponse'
-                  - type: object
-                    properties:
-                      data:
-                        type: object
-                        properties:
-                          isDuplicate:
-                            type: boolean
-                            example: false
-        '400':
-          description: 잘못된 요청
         '409':
-          description: 이름 중복 확인 실패 (중복됨)
-        '500':
-          description: 서버 오류
+          description: 중복된 이름
   /mentees/my/goals:
     get:
       security:
@@ -428,6 +397,9 @@ components:
       required:
         - access_token
         - refresh_token
+      example:
+        access_token: json_web_token
+        refresh_token: json_web_token
 
 
     GoalSummaryResponse:
@@ -570,17 +542,19 @@ components:
           enum:
             - SUCCESS
             - ERROR
-          example: SUCCESS
         code:
           type: string
-          example: custom code
+          example: 200
         message:
           type: string
-          example: 정상적으로 처리되었습니다.
       required:
         - status
         - code
         - message
+      example:
+        status: SUCCESS
+        code: 200
+        message: 정상적으로 처리되었습니다.
 
   securitySchemes:
     bearerAuth:
