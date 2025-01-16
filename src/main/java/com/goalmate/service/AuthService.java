@@ -8,13 +8,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.goalmate.domain.mentee.Mentee;
 import com.goalmate.domain.mentee.SocialProvider;
-import com.goalmate.oauth.oidc.OAuthMember;
-import com.goalmate.oauth.provider.AppleUserProvider;
-import com.goalmate.oauth.provider.KakaoUserProvider;
 import com.goalmate.repository.MenteeRepository;
-import com.goalmate.security.JwtProvider;
-import com.goalmate.security.TokenPair;
-import com.goalmate.security.UserDetailsImpl;
+import com.goalmate.security.jwt.JwtProvider;
+import com.goalmate.security.jwt.TokenPair;
+import com.goalmate.security.jwt.UserDetailsImpl;
+import com.goalmate.security.oauth.oidc.OAuthMember;
+import com.goalmate.security.oauth.provider.AppleUserProvider;
+import com.goalmate.security.oauth.provider.KakaoUserProvider;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

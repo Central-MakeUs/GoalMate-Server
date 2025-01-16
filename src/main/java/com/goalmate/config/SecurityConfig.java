@@ -19,10 +19,10 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.ExceptionTranslationFilter;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
-import com.goalmate.security.JwtAccessDeniedHandler;
-import com.goalmate.security.JwtAuthenticationEntryPoint;
-import com.goalmate.security.JwtAuthenticationFilter;
-import com.goalmate.security.JwtProvider;
+import com.goalmate.security.jwt.JwtAccessDeniedHandler;
+import com.goalmate.security.jwt.JwtAuthenticationEntryPoint;
+import com.goalmate.security.jwt.JwtAuthenticationFilter;
+import com.goalmate.security.jwt.JwtProvider;
 
 import lombok.RequiredArgsConstructor;
 
