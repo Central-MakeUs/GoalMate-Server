@@ -1,16 +1,65 @@
 package com.goalmate.mapper;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+
 import com.goalmate.api.model.GoalDetailResponse;
+import com.goalmate.api.model.GoalSummaryListResponse;
+import com.goalmate.api.model.GoalSummaryResponse;
 import com.goalmate.api.model.MidObjectiveResponse;
+import com.goalmate.api.model.PageResponse;
 import com.goalmate.api.model.WeeklyObjectiveResponse;
 import com.goalmate.domain.goal.ContentImageEntity;
 import com.goalmate.domain.goal.GoalEntity;
 import com.goalmate.domain.goal.ThumbnailImageEntity;
 
-public class GoalMapper {
-	public static GoalDetailResponse toDto(GoalEntity goalEntity) {
+public class GoalResponseMapper {
+	public static GoalSummaryResponse toSummaryDto(GoalEntity goalEntity) {
+		if (goalEntity == null) {
+			return null;
+		}
+
+		GoalSummaryResponse response = new GoalSummaryResponse();
+		response.setId(goalEntity.getId().intValue());
+		response.setName(goalEntity.getName());
+		response.setTopic(goalEntity.getTopic());
+		response.setDescription(goalEntity.getDescription());
+		response.setPeriod(goalEntity.getPeriod());
+		response.setStartDate(goalEntity.getStartDate());
+		response.setEndDate(goalEntity.getEndDate());
+		response.setPrice(goalEntity.getPrice());
+		response.setDiscountPrice(goalEntity.getDiscountPrice());
+		response.setParticipantsLimit(goalEntity.getParticipantsLimit());
+		response.setFreeParticipantsLimit(goalEntity.getFreeParticipantsLimit());
+		response.setGoalStatus(goalEntity.getGoalStatus().name());
+		response.setMainImage(goalEntity.getThumbnailImages().stream()
+			.findFirst().orElse(null).getImageUrl());
+		response.setCreatedAt(goalEntity.getCreatedAt().atOffset(java.time.ZoneOffset.UTC));
+		response.setUpdatedAt(goalEntity.getUpdatedAt().atOffset(java.time.ZoneOffset.UTC));
+
+		return response;
+	}
+
+	public static GoalSummaryListResponse toSummaryListDto(Page<GoalEntity> goals) {
+		if (goals == null) {
+			return null;
+		}
+
+		List<GoalSummaryResponse> content = goals.getContent().stream()
+			.map(GoalResponseMapper::toSummaryDto)
+			.collect(Collectors.toList());
+
+		PageResponse page = PageResponseMapper.toDto(goals);
+
+		GoalSummaryListResponse response = new GoalSummaryListResponse();
+		response.setGoals(content);
+		response.setPage(page);
+		return response;
+	}
+
+	public static GoalDetailResponse toDetailDto(GoalEntity goalEntity) {
 		if (goalEntity == null) {
 			return null;
 		}

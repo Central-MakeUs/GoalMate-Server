@@ -63,19 +63,19 @@ public class GoalEntity extends BaseEntity {
 	@Column(nullable = false)
 	private GoalStatus goalStatus;
 
-	@OneToMany(mappedBy = "goal", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "goalEntity", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<WeeklyObjectiveEntity> weeklyObjective;
 
-	@OneToMany(mappedBy = "goal", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "goalEntity", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<MidObjectiveEntity> midObjective;
 
-	@OneToMany(mappedBy = "goal", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "goalEntity", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<ThumbnailImageEntity> thumbnailImages;
 
-	@OneToMany(mappedBy = "goal", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "goalEntity", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<ContentImageEntity> contentImages;
 
-	@OneToMany(mappedBy = "goal", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "goalEntity", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<DailyTodoEntity> dailyTodos;
 
 	public GoalEntity(

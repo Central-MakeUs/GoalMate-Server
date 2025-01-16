@@ -4,10 +4,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.goalmate.api.model.GoalDetailResponse;
+import com.goalmate.api.model.GoalSummaryListResponse;
 import com.goalmate.api.model.ModelApiResponse;
 import com.goalmate.service.GoalService;
-import com.goalmate.service.dto.GoalSummary;
-import com.goalmate.service.dto.PageResponse;
 import com.goalmate.support.response.ApiResponse;
 
 import lombok.RequiredArgsConstructor;
@@ -19,8 +18,8 @@ public class GoalController implements GoalApi {
 
 	@Override
 	public ResponseEntity getGoals(Integer page, Integer size) throws Exception {
-		PageResponse<GoalSummary> goals = goalService.getGoals(page, size);
-		return ResponseEntity.ok(ApiResponse.success(goals));
+		GoalSummaryListResponse response = goalService.getGoals(page, size);
+		return ResponseEntity.ok(ApiResponse.success(response));
 	}
 
 	@Override

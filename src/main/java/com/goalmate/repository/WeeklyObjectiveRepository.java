@@ -3,7 +3,7 @@ package com.goalmate.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.goalmate.domain.goal.MidObjectiveEntity;
+import com.goalmate.domain.goal.WeeklyObjectiveEntity;
 
-public interface GoalMidObjectiveRepository extends JpaRepository<MidObjectiveEntity, Long> {
-	MidObjectiveEntity findByGoalId(Long goalId);
+public interface WeeklyObjectiveRepository extends JpaRepository<WeeklyObjectiveEntity, Long> {
 }
