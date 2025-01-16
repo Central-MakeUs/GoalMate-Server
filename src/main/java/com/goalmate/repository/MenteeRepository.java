@@ -4,8 +4,10 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.goalmate.domain.mentee.Mentee;
+import com.goalmate.domain.mentee.MenteeEntity;
 
-public interface MenteeRepository extends JpaRepository<Mentee, Long> {
-	Optional<Mentee> findBySocialId(String socialId);
+public interface MenteeRepository extends JpaRepository<MenteeEntity, Long> {
+	Optional<MenteeEntity> findBySocialId(String socialId);
+
+	Optional<MenteeEntity> findByName(String name);
 }

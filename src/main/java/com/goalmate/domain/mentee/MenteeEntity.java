@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Entity
 @Table(name = "mentee")
-public class Mentee extends BaseEntity {
+public class MenteeEntity extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -48,7 +48,7 @@ public class Mentee extends BaseEntity {
 	private UserRole role;
 
 	@Builder
-	public Mentee(String email, String socialId, SocialProvider provider) {
+	public MenteeEntity(String email, String socialId, SocialProvider provider) {
 		this.email = email;
 		this.socialId = socialId;
 		this.freeJoinCount = 1L;    // 기본 제공 1회
@@ -61,6 +61,12 @@ public class Mentee extends BaseEntity {
 		if (name != null) {
 			this.name = name;
 			this.status = MenteeStatus.ACTIVE;
+		}
+	}
+
+	public void updateRole(UserRole role) {
+		if (role != null) {
+			this.role = role;
 		}
 	}
 

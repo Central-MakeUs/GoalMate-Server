@@ -3,8 +3,8 @@ package com.goalmate.api;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.goalmate.api.model.ModelApiResponse;
 import com.goalmate.service.MenteeService;
+import com.goalmate.support.response.ApiResponse;
 
 import lombok.RequiredArgsConstructor;
 
@@ -19,14 +19,14 @@ public class MenteeController implements MenteeApi {
 	}
 
 	@Override
-	public ResponseEntity<ModelApiResponse> updateMenteeName(String name) throws Exception {
-		// TODO 구현
-		return MenteeApi.super.updateMenteeName(name);
+	public ResponseEntity updateMenteeName(String name) throws Exception {
+		menteeService.updateMenteeName(name);
+		return ResponseEntity.ok(ApiResponse.success());
 	}
 
 	@Override
 	public ResponseEntity validateMenteeName(String name) throws Exception {
-		// TODO 구현
-		return MenteeApi.super.validateMenteeName(name);
+		menteeService.validateMenteeName(name);
+		return ResponseEntity.ok(ApiResponse.success());
 	}
 }

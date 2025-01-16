@@ -6,7 +6,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.goalmate.domain.mentee.Mentee;
+import com.goalmate.domain.mentee.MenteeEntity;
 import com.goalmate.domain.mentee.SocialProvider;
 import com.goalmate.repository.MenteeRepository;
 import com.goalmate.security.jwt.JwtProvider;
@@ -35,16 +35,16 @@ public class AuthService {
 		OAuthMember oauthMember = getOAuthMember(identityToken, nonce, socialProvider);
 
 		// Mentee 조회 또는 생성
-		Mentee mentee = menteeRepository.findBySocialId(oauthMember.subject())
+		MenteeEntity menteeEntity = menteeRepository.findBySocialId(oauthMember.subject())
 			.orElseGet(() -> createNewMentee(oauthMember, socialProvider));
 
 		// 데이터베이스에 저장
-		menteeRepository.save(mentee);
-		log.info(">>>>>> 멤버 회원가입 또는 로그인 완료: {}", mentee.getSocialId());
+		menteeRepository.save(menteeEntity);
+		log.info(">>>>>> 멤버 회원가입 또는 로그인 완료: {}", menteeEntity.getSocialId());
 
 		// 토큰 생성 및 결과 반환
-		TokenPair tokenPair = generateMenteeToken(mentee);
-		return new LoginResult(tokenPair.accessToken(), tokenPair.refreshToken(), mentee.isPending());
+		TokenPair tokenPair = generateMenteeToken(menteeEntity);
+		return new LoginResult(tokenPair.accessToken(), tokenPair.refreshToken(), menteeEntity.isPending());
 	}
 
 	private OAuthMember getOAuthMember(String identityToken, String nonce, SocialProvider socialProvider) {
@@ -56,21 +56,21 @@ public class AuthService {
 		};
 	}
 
-	private Mentee createNewMentee(OAuthMember oauthMember, SocialProvider socialProvider) {
+	private MenteeEntity createNewMentee(OAuthMember oauthMember, SocialProvider socialProvider) {
 		// 새로운 Mentee 생성
 		log.info(">>>>>> 새로운 멤버 생성: {}", oauthMember.subject());
-		return Mentee.builder()
+		return MenteeEntity.builder()
 			.email(oauthMember.email())
 			.socialId(oauthMember.subject())
 			.provider(socialProvider)
 			.build();
 	}
 
-	private TokenPair generateMenteeToken(Mentee mentee) {
+	private TokenPair generateMenteeToken(MenteeEntity menteeEntity) {
 		return jwtProvider.generateTokenPair(
 			UserDetailsImpl.builder()
-				.id(mentee.getId())
-				.authorities(List.of(new SimpleGrantedAuthority(mentee.getRole().getValue())))
+				.id(menteeEntity.getId())
+				.authorities(List.of(new SimpleGrantedAuthority(menteeEntity.getRole().getValue())))
 				.build());
 	}
 }

@@ -11,7 +11,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import com.goalmate.domain.mentee.Mentee;
+import com.goalmate.domain.mentee.MenteeEntity;
 import com.goalmate.repository.MenteeRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -29,20 +29,20 @@ public class UserDetailServiceImpl implements UserDetailsService {
 	@Override
 	public UserDetails loadUserByUsername(String socialId) throws UsernameNotFoundException {
 		log.info(">>>>>> UserDetailServiceImpl loadUserByUsername");
-		Mentee mentee = menteeRepository.findBySocialId(socialId)
+		MenteeEntity menteeEntity = menteeRepository.findBySocialId(socialId)
 			.orElseThrow(() -> new UsernameNotFoundException("User not found with socialId	: " + socialId));
 
-		List<GrantedAuthority> authorities = getAuthorities(mentee);
+		List<GrantedAuthority> authorities = getAuthorities(menteeEntity);
 
 		return UserDetailsImpl.builder()
-			.id(mentee.getId())
+			.id(menteeEntity.getId())
 			.authorities(authorities)
 			.build();
 	}
 
-	private List<GrantedAuthority> getAuthorities(Mentee mentee) {
-		return mentee.getRole() != null ?
-			List.of(new SimpleGrantedAuthority(mentee.getRole().getValue()))
+	private List<GrantedAuthority> getAuthorities(MenteeEntity menteeEntity) {
+		return menteeEntity.getRole() != null ?
+			List.of(new SimpleGrantedAuthority(menteeEntity.getRole().getValue()))
 			: List.of();
 	}
 }

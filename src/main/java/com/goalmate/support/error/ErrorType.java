@@ -8,7 +8,8 @@ public enum ErrorType {
 	UNAUTHORIZED(HttpStatus.UNAUTHORIZED, ErrorCode.E401, "Unauthorized", LogLevel.WARN),
 	FORBIDDEN(HttpStatus.FORBIDDEN, ErrorCode.E403, "Forbidden", LogLevel.WARN),
 	NOT_FOUND(HttpStatus.NOT_FOUND, ErrorCode.E404, "Not Found", LogLevel.WARN),
-	DEFAULT_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.E500, "An unexpected error has occurred.",
+	CONFLICT(HttpStatus.CONFLICT, ErrorCode.E409, "Conflict", LogLevel.WARN),
+	INTERNAL_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.E500, "An unexpected error has occurred.",
 		LogLevel.ERROR);
 
 	private final HttpStatus status;

@@ -86,12 +86,11 @@ public class JwtProvider {
 				claims.get(AUTHENTICATION_CLAIM_NAME).toString());
 		}
 
-		// UserDetailsImpl principal = UserDetailsImpl.builder()
-		// 	.id(Long.valueOf(claims.getSubject()))
-		// 	.password(null)
-		// 	.authorities(authorities)
-		// 	.build();
-		return new UsernamePasswordAuthenticationToken(Long.valueOf(claims.getSubject()), null, authorities);
+		UserDetailsImpl principal = UserDetailsImpl.builder()
+			.id(Long.valueOf(claims.getSubject()))
+			.authorities(authorities)
+			.build();
+		return new UsernamePasswordAuthenticationToken(principal, null, authorities);
 	}
 
 	public String resolveToken(String bearerToken) {
