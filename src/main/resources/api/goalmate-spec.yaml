@@ -299,12 +299,8 @@ paths:
                             type: array
                             items:
                               $ref: '#/components/schemas/GoalSummaryResponse'
-                          pageInfo:
-                            $ref: '#/components/schemas/PageInfo'
-        '400':
-          description: 잘못된 요청
-        '500':
-          description: 서버 오류
+                          page:
+                            $ref: '#/components/schemas/PageResponse'
   /goals/{goalId}:
     get:
       security:
@@ -392,16 +388,13 @@ components:
       properties:
         access_token:
           type: string
+          example: <header>.<payload>.<signature>
         refresh_token:
           type: string
+          example: <header>.<payload>.<signature>
       required:
         - access_token
         - refresh_token
-      example:
-        access_token: json_web_token
-        refresh_token: json_web_token
-
-
     GoalSummaryResponse:
       type: object
       properties:
@@ -410,28 +403,43 @@ components:
           example: 1
         name:
           type: string
-          example: 골메이트와 함께하는 1일 1커밋
-        mentor_name:
+          example: 1일 1커밋 챌린지
+        topic:
           type: string
-          example: 골메이트
+          example: 코딩
+        description:
+          type: string
+          example: "하루에 한 번씩 커밋하는 챌린지입니다."
+        period:
+          type: integer
+          example: 30
+        start_date:
+          type: string
+          format: date
+          example: "2025-01-01"
+        end_date:
+          type: string
+          format: date
+          example: "2025-01-30"
         price:
           type: integer
           example: 100000
         discount_price:
           type: integer
           example: 85000
-        max_participants:
+        participants_limit:
           type: integer
           example: 100
-        current_free_participants:
-          type: integer
-          example: 10
         free_participants_limit:
           type: integer
           example: 50
+        goal_status:
+          type: string
+          description: "NOT_STARTED / IN_PROGRESS / COMPLETED"
+          example: "NOT_STARTED"
         main_image:
           type: string
-          example: https://image.url
+          example: "https://image.url"
         created_at:
           type: string
           format: date-time
@@ -446,92 +454,138 @@ components:
           example: 1
         name:
           type: string
-          example: 골메이트와 함께하는 1일 1커밋
+          example: 1일 1커밋 챌린지
         topic:
           type: string
           example: 코딩
+        description:
+          type: string
+          example: "매일 깃에 커밋하며 기록하는 챌린지입니다."
         period:
           type: integer
           example: 30
-        mentor_name:
+        start_date:
           type: string
-          example: 골메이트
+          format: date
+          example: "2025-01-01"
+        end_date:
+          type: string
+          format: date
+          example: "2025-01-30"
         price:
           type: integer
           example: 100000
         discount_price:
           type: integer
           example: 85000
-        max_participants:
+        participants_limit:
           type: integer
           example: 100
-        current_free_participants:
-          type: integer
-          example: 10
         free_participants_limit:
           type: integer
           example: 50
-        weekly_objectives:
-          type: array
-          items:
-            type: array
-            items:
-              $ref: '#/components/schemas/WeeklyObjective'
+        goal_status:
+          type: string
+          description: "NOT_STARTED / IN_PROGRESS / COMPLETED"
+          example: "IN_PROGRESS"
         mid_objectives:
           type: array
           items:
-            type: array
-            items:
-              $ref: '#/components/schemas/MidObjective'
+            $ref: '#/components/schemas/MidObjectiveResponse'
+        weekly_objectives:
+          type: array
+          items:
+            $ref: '#/components/schemas/WeeklyObjectiveResponse'
         thumbnail_images:
           type: array
           items:
             type: string
-            example: https://image.url
+            example: "https://image.url"
         body_images:
           type: array
           items:
             type: string
-            example: https://image.url
+            example: "https://image.url"
+        daily_todos:
+          type: array
+          items:
+            $ref: '#/components/schemas/DailyTodoResponse'
         created_at:
           type: string
           format: date-time
         updated_at:
           type: string
           format: date-time
-    WeeklyObjective:
+    MidObjectiveResponse:
+      type: object
+      properties:
+        description:
+          type: string
+          description: 중간 목표 설명
+          example: "깃허브 세팅 및 프로젝트 관리법에 대해 학습한다."
+    WeeklyObjectiveResponse:
       type: object
       properties:
         week_number:
           type: integer
           description: 현재 주차
           example: 1
-        objective_description:
+        description:
           type: string
-          description: 목표 설명
-          example: 깃허브 세팅 및 깃학습
-    MidObjective:
+          description: 목표 주차별 상세 설명
+          example: "깃허브 기본 사용법 숙지 및 리포지토리 생성"
+    DailyTodoResponse:
       type: object
       properties:
-        objective_description:
+        todo_date:
           type: string
-          description: 중간 목표 설명
-          example: 기본적인 깃허브 사용법과 프로젝트 관리법에 대해 학습한다.
-    PageInfo:
+          format: date
+          example: "2025-01-02"
+        description:
+          type: string
+          example: "오늘의 커밋 진행하기"
+    PageResponse:
       type: object
       properties:
-        total:
+        totalElements:
           type: integer
-          description: 전체 아이템 수
-          example: 999
-        page:
+          description: 전체 아이템 개수
+          example: 123
+        totalPages:
+          type: integer
+          description: 전체 페이지 수
+          example: 13
+        currentPage:
           type: integer
           description: 현재 페이지 번호
-          example: 1
-        size:
+          example: 2
+        pageSize:
           type: integer
-          description: 페이지당 아이템 수
+          description: 한 페이지당 아이템 수
           example: 10
+        hasNext:
+          type: boolean
+          description: 다음 페이지가 존재하는지 여부
+          example: true
+        hasPrevious:
+          type: boolean
+          description: 이전 페이지가 존재하는지 여부
+          example: true
+        nextPage:
+          type: integer
+          description: 다음 페이지 번호 (다음 페이지가 없으면 null 또는 현재 값과 동일하게 처리 가능)
+          example: 3
+        prevPage:
+          type: integer
+          description: 이전 페이지 번호 (이전 페이지가 없으면 null 또는 1로 고정 등 처리 가능)
+          example: 1
+      required:
+        - totalElements
+        - totalPages
+        - currentPage
+        - pageSize
+        - hasNext
+        - hasPrevious
 
     # 공통응답. Data 필드를 제외한 부분이며, Data 필드에 들어갈 정보는 Response component로!
     ApiResponse:
@@ -547,14 +601,12 @@ components:
           example: 200
         message:
           type: string
+          example: 정상적으로 처리되었습니다.
       required:
         - status
         - code
         - message
-      example:
-        status: SUCCESS
-        code: 200
-        message: 정상적으로 처리되었습니다.
+
 
   securitySchemes:
     bearerAuth:

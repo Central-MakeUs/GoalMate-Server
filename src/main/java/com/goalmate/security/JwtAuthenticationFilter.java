@@ -8,9 +8,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.goalmate.support.HttpResponseUtil;
 import com.goalmate.support.error.CoreApiException;
 import com.goalmate.support.error.ErrorType;
-import com.goalmate.util.HttpResponseUtil;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;

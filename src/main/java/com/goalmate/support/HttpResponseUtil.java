@@ -1,4 +1,4 @@
-package com.goalmate.util;
+package com.goalmate.support;
 
 import java.io.IOException;
 

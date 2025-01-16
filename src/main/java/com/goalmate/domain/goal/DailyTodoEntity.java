@@ -1,5 +1,7 @@
 package com.goalmate.domain.goal;
 
+import java.time.LocalDate;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
@@ -11,25 +13,30 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Getter
 @NoArgsConstructor
 @Entity
-@Table(name = "goal_thunbnail_image")
-public class GoalThumbnailImage {
+@Table(name = "goal_daily_todo")
+public class DailyTodoEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
 	@Column(nullable = false)
-	private String imageUrl;
+	private LocalDate todoDate;
 
-	@ManyToOne(optional = false, fetch = FetchType.EAGER)
+	@Column(nullable = false)
+	private String description;
+
+	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "goal_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-	private Goal goal;
+	private GoalEntity goalEntity;
 
-	public GoalThumbnailImage(String imageUrl, Goal goal) {
-		this.imageUrl = imageUrl;
-		this.goal = goal;
+	public DailyTodoEntity(LocalDate todoDate, String description) {
+		this.todoDate = todoDate;
+		this.description = description;
 	}
 }

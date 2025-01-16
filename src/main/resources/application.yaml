@@ -27,9 +27,10 @@ spring:
         dialect: org.hibernate.dialect.MySQLDialect
         format_sql: true
         show_sql: true
+      hibernate.default_batch_fetch_size: 1000
     show-sql: true
     generate-ddl: true
-    defer-datasource-initialization: false
+    defer-datasource-initialization: true
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://${aws.rds.url}
@@ -37,8 +38,8 @@ spring:
     password: ${aws.rds.password}
   sql:
     init:
-      mode: never
-      #      data-locations: classpath:db/data.sql
+      mode: always
+      data-locations: classpath:db/data.sql
       #      schema-locations: classpath:db/schema.sql
   #  data:
   #    redis:

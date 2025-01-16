@@ -11,25 +11,27 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Getter
 @NoArgsConstructor
 @Entity
-@Table(name = "goal_mid_objective")
-public class GoalMidObjective {
+@Table(name = "goal_thumbnail_image")
+public class ThumbnailImageEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
 	@Column(nullable = false)
-	private String description;
+	private String imageUrl;
 
-	@ManyToOne(optional = false, fetch = FetchType.EAGER)
+	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "goal_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-	private Goal goal;
+	private GoalEntity goalEntity;
 
-	public GoalMidObjective(String description, Goal goal) {
-		this.description = description;
-		this.goal = goal;
+	public ThumbnailImageEntity(String imageUrl, GoalEntity goalEntity) {
+		this.imageUrl = imageUrl;
+		this.goalEntity = goalEntity;
 	}
 }

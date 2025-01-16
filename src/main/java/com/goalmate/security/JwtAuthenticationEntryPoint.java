@@ -6,9 +6,9 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 
+import com.goalmate.support.HttpResponseUtil;
 import com.goalmate.support.error.CoreApiException;
 import com.goalmate.support.error.ErrorType;
-import com.goalmate.util.HttpResponseUtil;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

@@ -11,29 +11,27 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Getter
 @NoArgsConstructor
 @Entity
-@Table(name = "goal_weekly_objective")
-public class GoalWeeklyObjective {
+@Table(name = "goal_content_image")
+public class ContentImageEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
 	@Column(nullable = false)
-	private Integer weekNumber;
+	private String imageUrl;
 
-	@Column(nullable = false)
-	private String description;
-
-	@ManyToOne(optional = false, fetch = FetchType.EAGER)
+	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "goal_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-	private Goal goal;
+	private GoalEntity goalEntity;
 
-	public GoalWeeklyObjective(Integer weekNumber, String description, Goal goal) {
-		this.weekNumber = weekNumber;
-		this.description = description;
-		this.goal = goal;
+	public ContentImageEntity(String imageUrl, GoalEntity goalEntity) {
+		this.imageUrl = imageUrl;
+		this.goalEntity = goalEntity;
 	}
 }
