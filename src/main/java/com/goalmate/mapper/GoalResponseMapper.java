@@ -23,7 +23,7 @@ public class GoalResponseMapper {
 
 		GoalSummaryResponse response = new GoalSummaryResponse();
 		response.setId(goalEntity.getId().intValue());
-		response.setName(goalEntity.getName());
+		response.setTitle(goalEntity.getTitle());
 		response.setTopic(goalEntity.getTopic());
 		response.setDescription(goalEntity.getDescription());
 		response.setPeriod(goalEntity.getPeriod());
@@ -66,7 +66,7 @@ public class GoalResponseMapper {
 
 		GoalDetailResponse response = new GoalDetailResponse();
 		response.setId(goalEntity.getId().intValue());
-		response.setName(goalEntity.getName());
+		response.setTitle(goalEntity.getTitle());
 		response.setTopic(goalEntity.getTopic());
 		response.setDescription(goalEntity.getDescription());
 		response.setPeriod(goalEntity.getPeriod());

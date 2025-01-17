@@ -20,6 +20,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -41,7 +42,7 @@ public class MenteeGoalEntity extends BaseEntity {
 	private MenteeGoalStatus status;
 
 	@Lob
-	@Column(nullable = false)
+	@Column(nullable = true)
 	private String finalComment;
 
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
@@ -51,4 +52,13 @@ public class MenteeGoalEntity extends BaseEntity {
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "goal_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
 	private GoalEntity goalEntity;
+
+	@Builder
+	public MenteeGoalEntity(LocalDateTime joinedAt, MenteeEntity menteeEntity, GoalEntity goalEntity) {
+		this.joinedAt = joinedAt;
+		this.status = MenteeGoalStatus.IN_PROGRESS;
+		this.finalComment = null;
+		this.menteeEntity = menteeEntity;
+		this.goalEntity = goalEntity;
+	}
 }

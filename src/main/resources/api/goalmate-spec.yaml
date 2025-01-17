@@ -111,7 +111,7 @@ paths:
         - bearerAuth: [ ]
       tags:
         - Mentee
-      summary: 멘티 기본 정보
+      summary: 멘티 기본 정보 | DONE
       description: 멘티 기본 정보 및 간단한 목표 현황을 조회합니다.
       operationId: getMenteeInfo
       responses:
@@ -132,7 +132,7 @@ paths:
         - bearerAuth: [ ]
       tags:
         - Mentee
-      summary: 멘티 이름 설정
+      summary: 멘티 이름 설정 | DONE
       description: 멘티 이름을 설정합니다.
       operationId: updateMenteeName
       parameters:
@@ -149,7 +149,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: string
+                        example: 설정 된 이름
         '409':
           description: 중복된 이름
   /mentees/name/validate:
@@ -158,7 +164,7 @@ paths:
         - bearerAuth: [ ]
       tags:
         - Mentee
-      summary: 멘티 이름 중복 확인
+      summary: 멘티 이름 중복 확인 | DONE
       description: 멘티 이름의 중복 확인을 진행합니다.
       operationId: validateMenteeName
       parameters:
@@ -179,6 +185,105 @@ paths:
                   - $ref: '#/components/schemas/ApiResponse'
         '409':
           description: 중복된 이름
+  # Goals
+  /goals:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Goal
+      summary: 목표 리스트 조회 | DONE
+      description: 목표를 최신순으로 조회합니다.
+      operationId: getGoals
+      parameters:
+        - name: page
+          in: query
+          description: 페이지 번호 (1부터 시작)
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: size
+          in: query
+          description: 페이지당 아이템 수
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+      responses:
+        '200':
+          description: 조회 성공
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/GoalSummaryPagingResponse'
+  /goals/{goalId}:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Goal
+      summary: 목표 세부정보 조회 | DONE
+      description: 목표 세부정보를 조회합니다.
+      operationId: getGoalDetails
+      parameters:
+        - name: goalId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 조회할 목표의 ID
+      responses:
+        '200':
+          description: 조회 성공
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/GoalDetailResponse'
+  /goals/{goalId}/mentees:
+    post:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Goal
+      summary: 목표 참여 | DONE
+      description: 멘티가 목표 시작하기 버튼을 눌러 참여합니다.
+      operationId: participateInGoal
+      parameters:
+        - name: goalId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 참여할 목표의 ID
+      responses:
+        '200':
+          description: 참여 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '403':
+          description: 이미 마감된 목표
+        '404':
+          description: 존재하지 않는 목표
+        '409':
+          description: 이미 참여중인 목표
+
+  # MenteeGoal
   /mentees/my/goals:
     get:
       security:
@@ -191,7 +296,6 @@ paths:
       responses:
         '200':
           description: 조회 성공. (리스트) 목표별 멘토명, 진행기간, 달성율을 포함합니다.
-
   /mentees/my/goals/{goalId}:
     get:
       security:
@@ -262,104 +366,6 @@ paths:
       responses:
         '200':
           description: 조회 성공. (리스트) 멘티의 코멘트를 날짜 내림차순으로 반환합니다.
-
-  # Goals
-  /goals:
-    get:
-      security:
-        - bearerAuth: [ ]
-      tags:
-        - Goal
-      summary: 목표 리스트 조회
-      description: 목표를 최신순으로 조회합니다.
-      operationId: getGoals
-      parameters:
-        - name: page
-          in: query
-          description: 페이지 번호 (1부터 시작)
-          required: false
-          schema:
-            type: integer
-            minimum: 1
-            default: 1
-        - name: size
-          in: query
-          description: 페이지당 아이템 수
-          required: false
-          schema:
-            type: integer
-            minimum: 1
-            maximum: 100
-            default: 10
-      responses:
-        '200':
-          description: 조회 성공
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/ApiResponse'
-                  - type: object
-                    properties:
-                      data:
-                        $ref: '#/components/schemas/GoalSummaryPagingResponse'
-  /goals/{goalId}:
-    get:
-      security:
-        - bearerAuth: [ ]
-      tags:
-        - Goal
-      summary: 목표 세부정보 조회
-      description: 목표 세부정보를 조회합니다.
-      operationId: getGoalDetails
-      parameters:
-        - name: goalId
-          in: path
-          required: true
-          schema:
-            type: integer
-          description: 조회할 목표의 ID
-      responses:
-        '200':
-          description: 조회 성공
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/ApiResponse'
-                  - type: object
-                    properties:
-                      data:
-                        $ref: '#/components/schemas/GoalDetailResponse'
-  /goals/{goalId}/mentees:
-    post:
-      security:
-        - bearerAuth: [ ]
-      tags:
-        - Goal
-      summary: 목표 시작
-      description: 멘티가 목표 시작하기 버튼을 눌러 참여합니다.
-      operationId: registerMentee
-      parameters:
-        - name: goalId
-          in: path
-          required: true
-          schema:
-            type: integer
-          description: 참여할 목표의 ID
-      responses:
-        '200':
-          description: 참여 성공
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiResponse'
-        '403':
-          description: 이미 마감된 목표
-        '404':
-          description: 존재하지 않는 목표
-        '409':
-          description: 이미 참여중인 목표
 
 components:
   schemas:
@@ -460,25 +466,25 @@ components:
           type: string
           enum:
             - TODO
-            - DONE
+            - COMPLETED
     GoalSummaryResponse:
       type: object
       properties:
         id:
           type: integer
           example: 1
-        name:
+        title:
           type: string
-          example: 1일 1커밋 챌린지
+          example: 목표 제목
         topic:
           type: string
-          example: 코딩
+          example: 코딩/운동/독서 등
         description:
           type: string
-          example: "하루에 한 번씩 커밋하는 챌린지입니다."
+          example: 목표에 대한 설명
         period:
           type: integer
-          example: 30
+          example: 30 (일)
         start_date:
           type: string
           format: date
@@ -489,19 +495,22 @@ components:
           example: "2025-01-30"
         price:
           type: integer
-          example: 100000
+          example: 100000 (원)
         discount_price:
           type: integer
-          example: 85000
+          example: 85000 (원)
         participants_limit:
           type: integer
-          example: 100
+          example: 100 (명)
         free_participants_limit:
           type: integer
-          example: 50
+          example: 50 (명)
         goal_status:
           type: string
-          description: "NOT_STARTED / IN_PROGRESS / COMPLETED"
+          description: >
+            **NOT_STARTED** : 아직 시작하지 않은 목표
+            **IN_PROGRESS** : 진행 중인 목표
+            **COMPLETED**   : 완료된 목표
           example: "NOT_STARTED"
         main_image:
           type: string
@@ -527,18 +536,18 @@ components:
         id:
           type: integer
           example: 1
-        name:
+        title:
           type: string
-          example: 1일 1커밋 챌린지
+          example: 목표 제목
         topic:
           type: string
-          example: 코딩
+          example: 코딩/운동/독서 등
         description:
           type: string
-          example: "매일 깃에 커밋하며 기록하는 챌린지입니다."
+          example: 목표에 대한 설명
         period:
           type: integer
-          example: 30
+          example: 30 (일)
         start_date:
           type: string
           format: date
@@ -549,19 +558,22 @@ components:
           example: "2025-01-30"
         price:
           type: integer
-          example: 100000
+          example: 100000 (원)
         discount_price:
           type: integer
-          example: 85000
+          example: 85000 (원)
         participants_limit:
           type: integer
-          example: 100
+          example: 100 (명)
         free_participants_limit:
           type: integer
-          example: 50
+          example: 50 (명)
         goal_status:
           type: string
-          description: "NOT_STARTED / IN_PROGRESS / COMPLETED"
+          description: >
+            **NOT_STARTED** : 아직 시작하지 않은 목표
+            **IN_PROGRESS** : 진행 중인 목표
+            **COMPLETED**   : 완료된 목표
           example: "IN_PROGRESS"
         mid_objectives:
           type: array

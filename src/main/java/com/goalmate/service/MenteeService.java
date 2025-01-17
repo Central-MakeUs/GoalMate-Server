@@ -11,7 +11,6 @@ import com.goalmate.domain.menteeGoal.MenteeGoalEntity;
 import com.goalmate.mapper.MenteeResponseMapper;
 import com.goalmate.repository.MenteeGoalRepository;
 import com.goalmate.repository.MenteeRepository;
-import com.goalmate.security.SecurityUtil;
 import com.goalmate.support.error.CoreApiException;
 import com.goalmate.support.error.ErrorType;
 
@@ -26,6 +25,7 @@ public class MenteeService {
 	private final MenteeRepository menteeRepository;
 	private final MenteeGoalRepository menteeGoalRepository;
 
+	@Transactional(readOnly = true)
 	public MenteeInfoResponse getMenteeInfo(Long menteeId) {
 		MenteeEntity mentee = getMenteeById(menteeId);
 		List<MenteeGoalEntity> menteeGoals = menteeGoalRepository.findByMenteeEntityId(menteeId);
@@ -46,9 +46,9 @@ public class MenteeService {
 		});
 	}
 
-	private MenteeEntity getMenteeById(Long menteeId) {
-		return menteeRepository.findById(SecurityUtil.getCurrentUserId()).orElseThrow(() ->
-			new CoreApiException(ErrorType.NOT_FOUND));
+	public MenteeEntity getMenteeById(Long menteeId) {
+		return menteeRepository.findById(menteeId).orElseThrow(() ->
+			new CoreApiException(ErrorType.NOT_FOUND, "Mentee not found: " + menteeId));
 	}
 }
 

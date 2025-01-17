@@ -36,7 +36,7 @@ public class GoalEntity extends BaseEntity {
 	private Long id;
 
 	@Column(nullable = false)
-	private String name;
+	private String title;
 
 	@Column(nullable = false)
 	private String topic;
@@ -89,7 +89,7 @@ public class GoalEntity extends BaseEntity {
 	private List<DailyTodoEntity> dailyTodos;
 
 	public GoalEntity(
-		String name,
+		String title,
 		String topic,
 
 		String description,
@@ -101,7 +101,7 @@ public class GoalEntity extends BaseEntity {
 		Integer participantsLimit,
 		Integer freeParticipantsLimit,
 		GoalStatus goalStatus) {
-		this.name = name;
+		this.title = title;
 		this.topic = topic;
 		this.description = description;
 		this.period = period;

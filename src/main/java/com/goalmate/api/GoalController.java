@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.goalmate.api.model.GoalDetailResponse;
 import com.goalmate.api.model.GoalSummaryPagingResponse;
-import com.goalmate.api.model.ModelApiResponse;
+import com.goalmate.security.SecurityUtil;
 import com.goalmate.service.GoalService;
 import com.goalmate.support.response.ApiResponse;
 
@@ -29,7 +29,9 @@ public class GoalController implements GoalApi {
 	}
 
 	@Override
-	public ResponseEntity<ModelApiResponse> registerMentee(Integer goalId) throws Exception {
-		return GoalApi.super.registerMentee(goalId);
+	public ResponseEntity participateInGoal(Integer goalId) {
+		Long currentUserId = SecurityUtil.getCurrentUserId();
+		goalService.participateInGoal(currentUserId, goalId.longValue());
+		return ResponseEntity.ok(ApiResponse.success());
 	}
 }

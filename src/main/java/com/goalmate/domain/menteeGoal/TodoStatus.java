@@ -1,4 +1,4 @@
-package com.goalmate.domain.goal;
+package com.goalmate.domain.menteeGoal;
 
 public enum TodoStatus {
 	TODO("TODO"),
@@ -8,5 +8,9 @@ public enum TodoStatus {
 
 	TodoStatus(String value) {
 		this.value = value;
+	}
+
+	public String getValue() {
+		return value;
 	}
 }

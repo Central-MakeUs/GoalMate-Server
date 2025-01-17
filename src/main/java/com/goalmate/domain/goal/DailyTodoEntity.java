@@ -32,9 +32,6 @@ public class DailyTodoEntity {
 	@Column(nullable = false)
 	private String description;
 
-	@Column(nullable = false)
-	private TodoStatus status;
-
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "goal_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
 	private GoalEntity goalEntity;
@@ -43,11 +40,7 @@ public class DailyTodoEntity {
 	public DailyTodoEntity(LocalDate todoDate, String description, GoalEntity goalEntity) {
 		this.todoDate = todoDate;
 		this.description = description;
-		this.status = TodoStatus.TODO;
 		this.goalEntity = goalEntity;
 	}
 
-	public void updateStatus(TodoStatus status) {
-		this.status = status;
-	}
 }
