@@ -416,6 +416,128 @@ components:
           type: integer
         completed_goal_count:
           type: integer
+        free_participation_count:
+          type: integer
+
+    GoalCommonInfo:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: 목표 제목
+        topic:
+          type: string
+          example: 코딩/운동/독서 등
+        description:
+          type: string
+          example: 목표에 대한 설명
+        period:
+          type: integer
+          example: 30
+        price:
+          type: integer
+          example: 100000
+        discount_price:
+          type: integer
+          example: 85000
+        participants_limit:
+          type: integer
+          example: 100
+        current_participants:
+          type: integer
+          example: 50
+        goal_status:
+          $ref: '#/components/schemas/GoalStatusEnum'
+        mentor_name:
+          type: string
+          example: 멘토 이름
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    GoalStatusEnum:
+      type: string
+      enum:
+        - NOT_STARTED
+        - IN_PROGRESS
+        - CLOSED
+    GoalSummaryResponse:
+      type: object
+      properties:
+        info:
+          $ref: '#/components/schemas/GoalCommonInfo'
+        main_image:
+          type: string
+          example: "https://image.url"
+    GoalSummaryPagingResponse:
+      type: object
+      properties:
+        goals:
+          type: array
+          items:
+            $ref: '#/components/schemas/GoalSummaryResponse'
+        page:
+          $ref: '#/components/schemas/PageResponse'
+    GoalDetailResponse:
+      type: object
+      properties:
+        info:
+          $ref: '#/components/schemas/GoalCommonInfo'
+        mid_objectives:
+          type: array
+          items:
+            $ref: '#/components/schemas/MidObjectiveResponse'
+        weekly_objectives:
+          type: array
+          items:
+            $ref: '#/components/schemas/WeeklyObjectiveResponse'
+        thumbnail_images:
+          type: array
+          items:
+            type: string
+            example: "https://image.url"
+        content_images:
+          type: array
+          items:
+            type: string
+            example: "https://image.url"
+        daily_todos:
+          type: array
+          items:
+            $ref: '#/components/schemas/DailyTodoResponse'
+    MidObjectiveResponse:
+      type: object
+      properties:
+        description:
+          type: string
+          description: 중간 목표 설명
+          example: "깃허브 세팅 및 프로젝트 관리법에 대해 학습한다."
+    WeeklyObjectiveResponse:
+      type: object
+      properties:
+        week_number:
+          type: integer
+          description: 현재 주차
+          example: 1
+        description:
+          type: string
+          description: 목표 주차별 상세 설명
+          example: "깃허브 기본 사용법 숙지 및 리포지토리 생성"
+    DailyTodoResponse:
+      type: object
+      properties:
+        todo_date:
+          type: string
+          format: date
+          example: "2025-01-02"
+        description:
+          type: string
+          example: "오늘의 커밋 진행하기"
 
     MenteeGoalSummaryResponse:
       type: object
@@ -461,176 +583,7 @@ components:
             - TODO
             - COMPLETED
 
-    GoalSummaryResponse:
-      type: object
-      properties:
-        id:
-          type: integer
-          example: 1
-        title:
-          type: string
-          example: 목표 제목
-        topic:
-          type: string
-          example: 코딩/운동/독서 등
-        description:
-          type: string
-          example: 목표에 대한 설명
-        period:
-          type: integer
-          example: 30 (일)
-        start_date:
-          type: string
-          format: date
-          example: "2025-01-01"
-        end_date:
-          type: string
-          format: date
-          example: "2025-01-30"
-        price:
-          type: integer
-          example: 100000 (원)
-        discount_price:
-          type: integer
-          example: 85000 (원)
-        participants_limit:
-          type: integer
-          example: 100 (명)
-        free_participants_limit:
-          type: integer
-          example: 50 (명)
-        goal_status:
-          type: string
-          description: >
-            **NOT_STARTED** : 아직 시작하지 않은 목표
-            **IN_PROGRESS** : 진행 중인 목표
-            **COMPLETED**   : 완료된 목표
-          example: "NOT_STARTED"
-        main_image:
-          type: string
-          example: "https://image.url"
-        mentor_name:
-          type: string
-          example: 멘토 이름
-        created_at:
-          type: string
-          format: date-time
-        updated_at:
-          type: string
-          format: date-time
-    GoalSummaryPagingResponse:
-      type: object
-      properties:
-        goals:
-          type: array
-          items:
-            $ref: '#/components/schemas/GoalSummaryResponse'
-        page:
-          $ref: '#/components/schemas/PageResponse'
-    GoalDetailResponse:
-      type: object
-      properties:
-        id:
-          type: integer
-          example: 1
-        title:
-          type: string
-          example: 목표 제목
-        topic:
-          type: string
-          example: 코딩/운동/독서 등
-        description:
-          type: string
-          example: 목표에 대한 설명
-        period:
-          type: integer
-          example: 30 (일)
-        start_date:
-          type: string
-          format: date
-          example: "2025-01-01"
-        end_date:
-          type: string
-          format: date
-          example: "2025-01-30"
-        price:
-          type: integer
-          example: 100000 (원)
-        discount_price:
-          type: integer
-          example: 85000 (원)
-        participants_limit:
-          type: integer
-          example: 100 (명)
-        free_participants_limit:
-          type: integer
-          example: 50 (명)
-        goal_status:
-          type: string
-          description: >
-            **NOT_STARTED** : 아직 시작하지 않은 목표
-            **IN_PROGRESS** : 진행 중인 목표
-            **COMPLETED**   : 완료된 목표
-          example: "IN_PROGRESS"
-        mid_objectives:
-          type: array
-          items:
-            $ref: '#/components/schemas/MidObjectiveResponse'
-        weekly_objectives:
-          type: array
-          items:
-            $ref: '#/components/schemas/WeeklyObjectiveResponse'
-        thumbnail_images:
-          type: array
-          items:
-            type: string
-            example: "https://image.url"
-        content_images:
-          type: array
-          items:
-            type: string
-            example: "https://image.url"
-        daily_todos:
-          type: array
-          items:
-            $ref: '#/components/schemas/DailyTodoResponse'
-        mentor_name:
-          type: string
-          example: 멘토 이름
-        created_at:
-          type: string
-          format: date-time
-        updated_at:
-          type: string
-          format: date-time
-    MidObjectiveResponse:
-      type: object
-      properties:
-        description:
-          type: string
-          description: 중간 목표 설명
-          example: "깃허브 세팅 및 프로젝트 관리법에 대해 학습한다."
-    WeeklyObjectiveResponse:
-      type: object
-      properties:
-        week_number:
-          type: integer
-          description: 현재 주차
-          example: 1
-        description:
-          type: string
-          description: 목표 주차별 상세 설명
-          example: "깃허브 기본 사용법 숙지 및 리포지토리 생성"
-    DailyTodoResponse:
-      type: object
-      properties:
-        todo_date:
-          type: string
-          format: date
-          example: "2025-01-02"
-        description:
-          type: string
-          example: "오늘의 커밋 진행하기"
+    # Paging
     PageResponse:
       type: object
       properties:
@@ -664,7 +617,7 @@ components:
         - currentPage
         - pageSize
 
-    # 공통응답. Data 필드를 제외한 부분이며, Data 필드에 들어갈 정보는 Response component로!
+    # 공통응답. Data 필드를 제외한 부분이며, Data 필드에 들어갈 정보는 Response component에 정의
     ApiResponse:
       type: object
       properties:
@@ -683,7 +636,6 @@ components:
         - status
         - code
         - message
-
 
   securitySchemes:
     bearerAuth:
