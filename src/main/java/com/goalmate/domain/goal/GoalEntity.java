@@ -69,7 +69,7 @@ public class GoalEntity extends BaseEntity {
 	@Column(nullable = false)
 	private GoalStatus goalStatus;
 
-	@ManyToOne(optional = false, fetch = FetchType.LAZY)
+	@ManyToOne(optional = false, fetch = FetchType.EAGER)
 	@JoinColumn(name = "mentor_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
 	private MentorEntity mentorEntity;
 

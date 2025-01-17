@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.AbstractRequestMatcherRegistry;
@@ -58,6 +59,7 @@ public class SecurityConfig {
 		List<RequestMatcher> requestMatchers = List.of(
 			// antMatcher("/actuator/**"),
 			antMatcher("/auth/login"),
+			antMatcher(HttpMethod.GET, "/goals/**"),
 			antMatcher("/swagger-ui/**"),
 			antMatcher("/v3/api-docs/**")
 		);

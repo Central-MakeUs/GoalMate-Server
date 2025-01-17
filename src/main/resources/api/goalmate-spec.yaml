@@ -390,7 +390,7 @@ components:
       example:
         identity_token: identity_token
         nonce: 임의의 nonce 값
-        provider: APPLE
+        provider: KAKAO
 
     # Response Dto
     LoginResponse:
@@ -434,15 +434,6 @@ components:
             - CANCELED
         goal:
           $ref: '#/components/schemas/GoalSummaryResponse'
-    #    MenteeGoalSummaryListResponse:
-    #      type: object
-    #      properties:
-    #        goals:
-    #          type: array
-    #          items:
-    #            $ref: '#/components/schemas/MenteeGoalSummaryResponse'
-    #        page:
-    #          $ref: '#/components/schemas/PageResponse'
     MenteeGoalDailyResponse:
       type: object
       properties:
@@ -469,6 +460,7 @@ components:
           enum:
             - TODO
             - COMPLETED
+
     GoalSummaryResponse:
       type: object
       properties:
@@ -517,6 +509,9 @@ components:
         main_image:
           type: string
           example: "https://image.url"
+        mentor_name:
+          type: string
+          example: 멘토 이름
         created_at:
           type: string
           format: date-time
@@ -599,6 +594,9 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/DailyTodoResponse'
+        mentor_name:
+          type: string
+          example: 멘토 이름
         created_at:
           type: string
           format: date-time

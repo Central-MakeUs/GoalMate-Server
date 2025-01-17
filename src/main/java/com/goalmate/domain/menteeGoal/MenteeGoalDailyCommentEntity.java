@@ -5,7 +5,9 @@ import java.time.LocalDate;
 import com.goalmate.domain.BaseEntity;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
+import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -33,6 +35,6 @@ public class MenteeGoalDailyCommentEntity extends BaseEntity {
 	private LocalDate commentDate;
 
 	@ManyToOne(optional = false)
-	@JoinColumn(name = "mentee_goal_id")
+	@JoinColumn(name = "mentee_goal_id", foreignKey = @ForeignKey(ConstraintMode.CONSTRAINT))
 	private MenteeGoalEntity menteeGoalEntity;
 }

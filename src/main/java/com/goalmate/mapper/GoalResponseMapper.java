@@ -17,10 +17,6 @@ import com.goalmate.domain.goal.ThumbnailImageEntity;
 
 public class GoalResponseMapper {
 	public static GoalSummaryResponse mapToSummaryResponse(GoalEntity goalEntity) {
-		if (goalEntity == null) {
-			return null;
-		}
-
 		GoalSummaryResponse response = new GoalSummaryResponse();
 		response.setId(goalEntity.getId().intValue());
 		response.setTitle(goalEntity.getTitle());
@@ -36,6 +32,7 @@ public class GoalResponseMapper {
 		response.setGoalStatus(goalEntity.getGoalStatus().name());
 		response.setMainImage(goalEntity.getThumbnailImages().stream()
 			.findFirst().orElse(null).getImageUrl());
+		response.setMentorName(goalEntity.getMentorEntity().getName());
 		response.setCreatedAt(goalEntity.getCreatedAt().atOffset(java.time.ZoneOffset.UTC));
 		response.setUpdatedAt(goalEntity.getUpdatedAt().atOffset(java.time.ZoneOffset.UTC));
 
@@ -112,6 +109,7 @@ public class GoalResponseMapper {
 				return dailyTodoResponse;
 			})
 			.collect(Collectors.toList()));
+		response.setMentorName(goalEntity.getMentorEntity().getName());
 		response.setCreatedAt(goalEntity.getCreatedAt().atOffset(java.time.ZoneOffset.UTC));
 		response.setUpdatedAt(goalEntity.getUpdatedAt().atOffset(java.time.ZoneOffset.UTC));
 

@@ -39,8 +39,6 @@ public class GoalService {
 	public GoalSummaryPagingResponse getGoals(Integer page, Integer size) {
 		Pageable pageable = PageRequest.of(page - 1, size); // Input 기본값은 1부터 시작이지만, PageRequest.of()는 0부터 시작
 		Page<GoalEntity> goals = goalRepository.findAll(pageable);
-
-		log.info("getGoals goals: {}", goals);
 		return GoalResponseMapper.mapToSummaryPagingResponse(goals);
 	}
 
@@ -74,8 +72,12 @@ public class GoalService {
 				.build())
 			.toList();
 
-		// Bulk insert로 개선
+		// Bulk insert로 개선 필요
 		dailyTodoRepository.saveAll(menteeDailyTodoEntities);
+
+		// GoalEntity의 참여자 수 증가
+		// 다시 참여하면 예외처리
+		// 마감되었어도 예외처리
 	}
 
 	private GoalEntity getGoalById(Long goalId) {
