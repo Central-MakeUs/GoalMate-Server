@@ -11,8 +11,10 @@ info:
   version: 1.0.0
 
 servers:
+  - url: http://3.39.253.230
+    description: 개발 서버
   - url: http://localhost:8080
-    description: Optional server description, e.g. Main (production) server
+    description: 로컬 서버
 
 tags:
   - name: Auth
