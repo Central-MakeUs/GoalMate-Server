@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
 
 import com.goalmate.api.model.GoalDetailResponse;
-import com.goalmate.api.model.GoalSummaryListResponse;
+import com.goalmate.api.model.GoalSummaryPagingResponse;
 import com.goalmate.api.model.GoalSummaryResponse;
 import com.goalmate.api.model.MidObjectiveResponse;
 import com.goalmate.api.model.PageResponse;
@@ -16,7 +16,7 @@ import com.goalmate.domain.goal.GoalEntity;
 import com.goalmate.domain.goal.ThumbnailImageEntity;
 
 public class GoalResponseMapper {
-	public static GoalSummaryResponse toSummaryDto(GoalEntity goalEntity) {
+	public static GoalSummaryResponse mapToSummaryResponse(GoalEntity goalEntity) {
 		if (goalEntity == null) {
 			return null;
 		}
@@ -42,24 +42,24 @@ public class GoalResponseMapper {
 		return response;
 	}
 
-	public static GoalSummaryListResponse toSummaryListDto(Page<GoalEntity> goals) {
+	public static GoalSummaryPagingResponse mapToSummaryPagingResponse(Page<GoalEntity> goals) {
 		if (goals == null) {
 			return null;
 		}
 
 		List<GoalSummaryResponse> content = goals.getContent().stream()
-			.map(GoalResponseMapper::toSummaryDto)
+			.map(GoalResponseMapper::mapToSummaryResponse)
 			.collect(Collectors.toList());
 
-		PageResponse page = PageResponseMapper.toDto(goals);
+		PageResponse page = PageResponseMapper.mapToPageResponse(goals);
 
-		GoalSummaryListResponse response = new GoalSummaryListResponse();
+		GoalSummaryPagingResponse response = new GoalSummaryPagingResponse();
 		response.setGoals(content);
 		response.setPage(page);
 		return response;
 	}
 
-	public static GoalDetailResponse toDetailDto(GoalEntity goalEntity) {
+	public static GoalDetailResponse mapToDetailResponse(GoalEntity goalEntity) {
 		if (goalEntity == null) {
 			return null;
 		}
@@ -81,7 +81,7 @@ public class GoalResponseMapper {
 			.map(ThumbnailImageEntity::getImageUrl)
 			.collect(Collectors.toList()));
 		// Images
-		response.setBodyImages(goalEntity.getContentImages().stream()
+		response.setContentImages(goalEntity.getContentImages().stream()
 			.map(ContentImageEntity::getImageUrl)
 			.collect(Collectors.toList()));
 		response.setThumbnailImages(goalEntity.getThumbnailImages().stream()

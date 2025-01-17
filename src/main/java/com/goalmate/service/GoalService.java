@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.goalmate.api.model.GoalDetailResponse;
-import com.goalmate.api.model.GoalSummaryListResponse;
+import com.goalmate.api.model.GoalSummaryPagingResponse;
 import com.goalmate.domain.goal.GoalEntity;
 import com.goalmate.mapper.GoalResponseMapper;
 import com.goalmate.repository.GoalRepository;
@@ -24,19 +24,19 @@ import lombok.extern.slf4j.Slf4j;
 public class GoalService {
 	private final GoalRepository goalRepository;
 
-	public GoalSummaryListResponse getGoals(Integer page, Integer size) {
+	public GoalSummaryPagingResponse getGoals(Integer page, Integer size) {
 		Pageable pageable = PageRequest.of(page - 1, size);
 		Page<GoalEntity> goals = goalRepository.findAll(pageable);
 
 		log.info("getGoals goals: {}", goals);
-		return GoalResponseMapper.toSummaryListDto(goals);
+		return GoalResponseMapper.mapToSummaryPagingResponse(goals);
 	}
 
 	public GoalDetailResponse getGoalDetails(Long goalId) {
 		log.info("getGoalDetails goalId: {}", goalId);
 		GoalEntity goalEntity = goalRepository.findByIdWithDetails(goalId).orElseThrow(() -> new CoreApiException(
 			ErrorType.NOT_FOUND));
-		log.info(GoalResponseMapper.toDetailDto(goalEntity).toString());
-		return GoalResponseMapper.toDetailDto(goalEntity);
+		log.info(GoalResponseMapper.mapToDetailResponse(goalEntity).toString());
+		return GoalResponseMapper.mapToDetailResponse(goalEntity);
 	}
 }

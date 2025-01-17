@@ -1,53 +1,54 @@
-package com.goalmate.domain.goal;
+package com.goalmate.domain.menteeGoal;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
+
+import com.goalmate.domain.BaseEntity;
+import com.goalmate.domain.goal.GoalEntity;
+import com.goalmate.domain.mentee.MenteeEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
 @Entity
-@Table(name = "goal_daily_todo")
-public class DailyTodoEntity {
+@Table(name = "mentee_goal")
+public class MenteeGoalEntity extends BaseEntity {
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
 	@Column(nullable = false)
-	private LocalDate todoDate;
+	private LocalDateTime joinedAt;
 
+	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
-	private String description;
+	private MenteeGoalStatus status;
 
+	@Lob
 	@Column(nullable = false)
-	private TodoStatus status;
+	private String finalComment;
+
+	@ManyToOne(optional = false, fetch = FetchType.LAZY)
+	@JoinColumn(name = "mentee_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+	private MenteeEntity menteeEntity;
 
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "goal_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
 	private GoalEntity goalEntity;
-
-	@Builder
-	public DailyTodoEntity(LocalDate todoDate, String description, GoalEntity goalEntity) {
-		this.todoDate = todoDate;
-		this.description = description;
-		this.status = TodoStatus.TODO;
-		this.goalEntity = goalEntity;
-	}
-
-	public void updateStatus(TodoStatus status) {
-		this.status = status;
-	}
 }

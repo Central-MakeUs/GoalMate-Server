@@ -6,7 +6,7 @@ import com.goalmate.api.model.PageResponse;
 
 public class PageResponseMapper {
 
-	public static <T> PageResponse toDto(Page<T> page) {
+	public static <T> PageResponse mapToPageResponse(Page<T> page) {
 		PageResponse pageResponse = new PageResponse();
 		pageResponse.setTotalPages(page.getTotalPages());
 		pageResponse.setTotalElements(Long.valueOf(page.getTotalElements()).intValue());

@@ -30,7 +30,7 @@ paths:
     post:
       tags:
         - Auth
-      summary: 소셜 로그인 (회원가입)
+      summary: 소셜 로그인 (회원가입) | DONE
       description: 소셜 로그인을 통해 로그인 또는 회원가입을 진행합니다. 로그인 완료 시 200, 회원가입 성공 시 201이 응답됩니다.
       operationId: loginOrSignUp
       requestBody:
@@ -112,11 +112,20 @@ paths:
       tags:
         - Mentee
       summary: 멘티 기본 정보
-      description: 멘티 기본 정보를 조회합니다.
+      description: 멘티 기본 정보 및 간단한 목표 현황을 조회합니다.
       operationId: getMenteeInfo
       responses:
         '200':
-          description: 멘티 기본 정보 및 간단한 목표 현황을 반환합니다.
+          description: 조회 성공
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/MenteeInfoResponse'
   /mentees/my/name:
     put:
       security:
@@ -159,7 +168,7 @@ paths:
           required: true
           schema:
             type: string
-            example: 멘티1
+            example: 김멘티
       responses:
         '200':
           description: 이름 중복 확인 성공
@@ -293,7 +302,7 @@ paths:
                   - type: object
                     properties:
                       data:
-                        $ref: '#/components/schemas/GoalSummaryListResponse'
+                        $ref: '#/components/schemas/GoalSummaryPagingResponse'
   /goals/{goalId}:
     get:
       security:
@@ -388,6 +397,70 @@ components:
       required:
         - access_token
         - refresh_token
+    MenteeInfoResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        in_progress_goal_count:
+          type: integer
+        completed_goal_count:
+          type: integer
+
+    MenteeGoalSummaryResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        total_objective_count:
+          type: integer
+        completed_objective_count:
+          type: integer
+        mentee_goal_status:
+          type: string
+          enum:
+            - IN_PROGRESS
+            - COMPLETED
+            - CANCELED
+        goal:
+          $ref: '#/components/schemas/GoalSummaryResponse'
+    #    MenteeGoalSummaryListResponse:
+    #      type: object
+    #      properties:
+    #        goals:
+    #          type: array
+    #          items:
+    #            $ref: '#/components/schemas/MenteeGoalSummaryResponse'
+    #        page:
+    #          $ref: '#/components/schemas/PageResponse'
+    MenteeGoalDailyResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        goal:
+          $ref: '#/components/schemas/GoalSummaryResponse'
+        todos:
+          type: array
+          items:
+            $ref: '#/components/schemas/MenteeGoalDailyTodoResponse'
+        comment:
+          type: string
+    MenteeGoalDailyTodoResponse:
+      type: object
+      properties:
+        todo_date:
+          type: string
+          format: date
+        description:
+          type: string
+        status:
+          type: string
+          enum:
+            - TODO
+            - DONE
     GoalSummaryResponse:
       type: object
       properties:
@@ -439,7 +512,7 @@ components:
         updated_at:
           type: string
           format: date-time
-    GoalSummaryListResponse:
+    GoalSummaryPagingResponse:
       type: object
       properties:
         goals:
@@ -503,7 +576,7 @@ components:
           items:
             type: string
             example: "https://image.url"
-        body_images:
+        content_images:
           type: array
           items:
             type: string

@@ -45,7 +45,7 @@ public class MenteeEntity extends BaseEntity {
 
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
-	private UserRole role;
+	private Role role;
 
 	@Builder
 	public MenteeEntity(String email, String socialId, SocialProvider provider) {
@@ -54,7 +54,7 @@ public class MenteeEntity extends BaseEntity {
 		this.freeJoinCount = 1L;    // 기본 제공 1회
 		this.provider = provider;
 		this.status = MenteeStatus.PENDING; // 기본 Pending 상태
-		this.role = UserRole.USER; // 기본값
+		this.role = Role.ROLE_MENTEE; // 기본값
 	}
 
 	public void updateName(String name) {
@@ -64,7 +64,7 @@ public class MenteeEntity extends BaseEntity {
 		}
 	}
 
-	public void updateRole(UserRole role) {
+	public void updateRole(Role role) {
 		if (role != null) {
 			this.role = role;
 		}

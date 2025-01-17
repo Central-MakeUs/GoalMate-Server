@@ -4,15 +4,21 @@ import java.time.LocalDate;
 import java.util.List;
 
 import com.goalmate.domain.BaseEntity;
+import com.goalmate.domain.mentor.MentorEntity;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Getter;
@@ -63,6 +69,10 @@ public class GoalEntity extends BaseEntity {
 	@Column(nullable = false)
 	private GoalStatus goalStatus;
 
+	@ManyToOne(optional = false, fetch = FetchType.LAZY)
+	@JoinColumn(name = "mentor_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+	private MentorEntity mentorEntity;
+
 	@OneToMany(mappedBy = "goalEntity", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<WeeklyObjectiveEntity> weeklyObjective;
 
@@ -81,6 +91,7 @@ public class GoalEntity extends BaseEntity {
 	public GoalEntity(
 		String name,
 		String topic,
+
 		String description,
 		Integer period,
 		LocalDate startDate,
