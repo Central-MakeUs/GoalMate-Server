@@ -33,7 +33,7 @@ public class MenteeEntity extends BaseEntity {
 	private String socialId;
 
 	@Column(nullable = false)
-	private Long freeJoinCount;
+	private Integer freeParticipationCount;
 
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
@@ -51,7 +51,7 @@ public class MenteeEntity extends BaseEntity {
 	public MenteeEntity(String email, String socialId, SocialProvider provider) {
 		this.email = email;
 		this.socialId = socialId;
-		this.freeJoinCount = 1L;    // 기본 제공 1회
+		this.freeParticipationCount = 1;    // 기본 제공 1회
 		this.provider = provider;
 		this.status = MenteeStatus.PENDING; // 기본 Pending 상태
 		this.role = Role.ROLE_MENTEE; // 기본값
@@ -60,17 +60,23 @@ public class MenteeEntity extends BaseEntity {
 	public void updateName(String name) {
 		if (name != null) {
 			this.name = name;
-			this.status = MenteeStatus.ACTIVE;
-		}
-	}
-
-	public void updateRole(Role role) {
-		if (role != null) {
-			this.role = role;
+			updateToActive();
 		}
 	}
 
 	public boolean isPending() {
 		return status == MenteeStatus.PENDING;
+	}
+
+	public boolean isFreeParticipationAvailable() {
+		return freeParticipationCount > 0;
+	}
+
+	public void decreaseFreeParticipationCount() {
+		freeParticipationCount--;
+	}
+
+	private void updateToActive() {
+		this.status = MenteeStatus.ACTIVE;
 	}
 }

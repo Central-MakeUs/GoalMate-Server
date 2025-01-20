@@ -56,9 +56,13 @@ public class MenteeGoalDailyTodoEntity extends BaseEntity {
 		this.status = TodoStatus.TODO;
 	}
 
+	public boolean isCompleted() {
+		return status == TodoStatus.COMPLETED;
+	}
+
 	public void toggleStatus() {
 		if (status == TodoStatus.TODO) {
-			status = TodoStatus.DONE;
+			status = TodoStatus.COMPLETED;
 			completedAt = LocalDateTime.now();
 		} else {
 			status = TodoStatus.TODO;

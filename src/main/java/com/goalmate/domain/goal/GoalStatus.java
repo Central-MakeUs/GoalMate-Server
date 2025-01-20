@@ -3,7 +3,7 @@ package com.goalmate.domain.goal;
 public enum GoalStatus {
 	NOT_STARTED("NOT_STARTED"),  // 곧 시작
 	IN_PROGRESS("IN_PROGRESS"),  // 진행 중
-	COMPLETED("COMPLETED");     // 마감
+	CLOSED("CLOSED");     // 마감
 
 	private final String value;
 

@@ -1,5 +1,7 @@
 package com.goalmate.mapper;
 
+import static com.goalmate.api.model.MenteeInfoResponse.*;
+
 import java.util.List;
 
 import com.goalmate.api.model.MenteeInfoResponse;
@@ -28,12 +30,12 @@ public class MenteeResponseMapper {
 					break;
 			}
 		}
-
 		response.setId(mentee.getId().intValue());
 		response.setName(mentee.getName());
 		response.setInProgressGoalCount(inProgressCount);
 		response.setCompletedGoalCount(completedCount);
-
+		response.setFreeParticipationCount(mentee.getFreeParticipationCount());
+		response.setMenteeStatus(MenteeStatusEnum.fromValue(mentee.getStatus().name()));
 		return response;
 	}
 

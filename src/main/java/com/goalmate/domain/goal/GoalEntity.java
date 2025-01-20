@@ -1,6 +1,5 @@
 package com.goalmate.domain.goal;
 
-import java.time.LocalDate;
 import java.util.List;
 
 import com.goalmate.domain.BaseEntity;
@@ -21,6 +20,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -48,12 +48,6 @@ public class GoalEntity extends BaseEntity {
 	private Integer period;
 
 	@Column(nullable = false)
-	private LocalDate startDate;
-
-	@Column(nullable = false)
-	private LocalDate endDate;
-
-	@Column(nullable = false)
 	private Integer price;
 
 	@Column(nullable = false)
@@ -63,7 +57,7 @@ public class GoalEntity extends BaseEntity {
 	private Integer participantsLimit;
 
 	@Column(nullable = false)
-	private Integer freeParticipantsLimit;
+	private Integer currentParticipants = 0; // TODO : 참여자 수를 Goal 에도 추가, 동기화 로직 필요
 
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
@@ -88,30 +82,27 @@ public class GoalEntity extends BaseEntity {
 	@OneToMany(mappedBy = "goalEntity", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<DailyTodoEntity> dailyTodos;
 
+	@Builder
 	public GoalEntity(
 		String title,
 		String topic,
-
 		String description,
 		Integer period,
-		LocalDate startDate,
-		LocalDate endDate,
 		Integer price,
 		Integer discountPrice,
 		Integer participantsLimit,
-		Integer freeParticipantsLimit,
 		GoalStatus goalStatus) {
 		this.title = title;
 		this.topic = topic;
 		this.description = description;
 		this.period = period;
-		this.startDate = startDate;
-		this.endDate = endDate;
 		this.price = price;
 		this.discountPrice = discountPrice;
 		this.participantsLimit = participantsLimit;
-		this.freeParticipantsLimit = freeParticipantsLimit;
 		this.goalStatus = goalStatus;
 	}
 
+	public void increaseCurrentParticipants() {
+		this.currentParticipants++;
+	}
 }

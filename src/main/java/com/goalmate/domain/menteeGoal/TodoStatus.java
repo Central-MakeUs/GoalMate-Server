@@ -2,7 +2,7 @@ package com.goalmate.domain.menteeGoal;
 
 public enum TodoStatus {
 	TODO("TODO"),
-	DONE("DONE");
+	COMPLETED("COMPLETED");
 
 	private final String value;
 

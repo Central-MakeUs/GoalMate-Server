@@ -4,23 +4,27 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.goalmate.api.model.GoalDetailResponse;
 import com.goalmate.api.model.GoalSummaryPagingResponse;
+import com.goalmate.api.model.GoalSummaryResponse;
+import com.goalmate.api.model.PageResponse;
 import com.goalmate.domain.goal.GoalEntity;
+import com.goalmate.domain.goal.GoalStatus;
 import com.goalmate.domain.mentee.MenteeEntity;
 import com.goalmate.domain.menteeGoal.MenteeGoalDailyTodoEntity;
 import com.goalmate.domain.menteeGoal.MenteeGoalEntity;
 import com.goalmate.mapper.GoalResponseMapper;
+import com.goalmate.mapper.PageResponseMapper;
 import com.goalmate.repository.GoalRepository;
 import com.goalmate.repository.MenteeGoalDailyTodoRepository;
 import com.goalmate.repository.MenteeGoalRepository;
 import com.goalmate.support.error.CoreApiException;
 import com.goalmate.support.error.ErrorType;
+import com.goalmate.util.PageRequestUtil;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,50 +41,67 @@ public class GoalService {
 
 	@Transactional(readOnly = true)
 	public GoalSummaryPagingResponse getGoals(Integer page, Integer size) {
-		Pageable pageable = PageRequest.of(page - 1, size); // Input 기본값은 1부터 시작이지만, PageRequest.of()는 0부터 시작
+		Pageable pageable = PageRequestUtil.createPageRequest(page, size);
 		Page<GoalEntity> goals = goalRepository.findAll(pageable);
-		return GoalResponseMapper.mapToSummaryPagingResponse(goals);
+
+		List<GoalSummaryResponse> summaries = goals.getContent().stream()
+			.map(GoalResponseMapper::mapToSummaryResponse).toList();
+		PageResponse pageResponse = PageResponseMapper.mapToPageResponse(goals);
+
+		return GoalResponseMapper.mapToSummaryPagingResponse(summaries, pageResponse);
 	}
 
 	@Transactional(readOnly = true)
 	public GoalDetailResponse getGoalDetails(Long goalId) {
-		log.info("getGoalDetails goalId: {}", goalId);
-		GoalEntity goalEntity = goalRepository.findByIdWithDetails(goalId).orElseThrow(() -> new CoreApiException(
-			ErrorType.NOT_FOUND));
-		log.info(GoalResponseMapper.mapToDetailResponse(goalEntity).toString());
-		return GoalResponseMapper.mapToDetailResponse(goalEntity);
+		GoalEntity goal = goalRepository.findByIdWithDetails(goalId).orElseThrow(()
+			-> new CoreApiException(ErrorType.NOT_FOUND));
+		log.info(GoalResponseMapper.mapToDetailResponse(goal).toString());
+		return GoalResponseMapper.mapToDetailResponse(goal);
 	}
 
 	public void participateInGoal(Long currentUserId, Long goalId) {
-		MenteeEntity menteeEntity = menteeService.getMenteeById(currentUserId);
-		GoalEntity goalEntity = getGoalById(goalId);
+		MenteeEntity mentee = menteeService.getMenteeById(currentUserId);
+		GoalEntity goal = getGoalById(goalId);
+
+		validateGoalParticipation(goal, mentee);
 
 		// MenteeGoalEntity 생성, 저장
-		MenteeGoalEntity menteeGoalEntity = MenteeGoalEntity.builder()
+		MenteeGoalEntity menteeGoal = MenteeGoalEntity.builder()
 			.joinedAt(LocalDateTime.now())
-			.menteeEntity(menteeEntity)
-			.goalEntity(goalEntity)
+			.menteeEntity(mentee)
+			.goalEntity(goal)
 			.build();
-		menteeGoalRepository.save(menteeGoalEntity);
+		menteeGoalRepository.save(menteeGoal);
 
 		// GoalEntity로부터 DailyTodoEntity를 모두 가져와서 MenteeDailyTodoEntity로 변환하여 저장
-		List<MenteeGoalDailyTodoEntity> menteeDailyTodoEntities = goalEntity.getDailyTodos().stream()
-			.map(dailyTodoEntity -> MenteeGoalDailyTodoEntity.builder()
-				.todoDate(dailyTodoEntity.getTodoDate())
-				.description(dailyTodoEntity.getDescription())
-				.menteeGoalEntity(menteeGoalEntity)
+		List<MenteeGoalDailyTodoEntity> menteeDailyTodos = goal.getDailyTodos().stream()
+			.map(dailyTodo -> MenteeGoalDailyTodoEntity.builder()
+				.todoDate(dailyTodo.getTodoDate())
+				.description(dailyTodo.getDescription())
+				.menteeGoalEntity(menteeGoal)
 				.build())
 			.toList();
 
-		// Bulk insert로 개선 필요
-		dailyTodoRepository.saveAll(menteeDailyTodoEntities);
-
-		// GoalEntity의 참여자 수 증가
-		// 다시 참여하면 예외처리
-		// 마감되었어도 예외처리
+		// TODO: Bulk insert로 개선 필요
+		dailyTodoRepository.saveAll(menteeDailyTodos);
+		mentee.decreaseFreeParticipationCount(); // 무료 참여 횟수 차감
+		goal.increaseCurrentParticipants(); // 현재 참여자 수 증가
 	}
 
-	private GoalEntity getGoalById(Long goalId) {
+	public GoalEntity getGoalById(Long goalId) {
 		return goalRepository.findById(goalId).orElseThrow(() -> new CoreApiException(ErrorType.NOT_FOUND));
+	}
+
+	private void validateGoalParticipation(GoalEntity goalEntity, MenteeEntity menteeEntity) {
+		if (!menteeEntity.isFreeParticipationAvailable()) {
+			throw new CoreApiException(ErrorType.FORBIDDEN, "No free participation available.");
+		}
+		if (goalEntity.getGoalStatus().equals(GoalStatus.CLOSED)) {
+			throw new CoreApiException(ErrorType.FORBIDDEN, "Goal is closed.");
+		}
+		menteeGoalRepository.findByMenteeIdAndGoalId(menteeEntity.getId(), goalEntity.getId())
+			.ifPresent(menteeGoalEntity -> {
+				throw new CoreApiException(ErrorType.FORBIDDEN, "Already participated.");
+			});
 	}
 }

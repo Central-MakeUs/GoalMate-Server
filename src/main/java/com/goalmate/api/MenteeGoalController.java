@@ -1,29 +1,23 @@
 package com.goalmate.api;
 
-import java.time.LocalDate;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.goalmate.api.model.MenteeGoalSummaryPagingResponse;
+import com.goalmate.security.SecurityUtil;
+import com.goalmate.service.MenteeGoalService;
+
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 @RestController
 public class MenteeGoalController implements MenteeGoalApi {
-	@Override
-	public ResponseEntity<Void> getMenteeGoalComments(Integer goalId) throws Exception {
-		return MenteeGoalApi.super.getMenteeGoalComments(goalId);
-	}
+	private final MenteeGoalService menteeGoalService;
 
 	@Override
-	public ResponseEntity<Void> getMenteeGoalDetails(Integer goalId, LocalDate date) throws Exception {
-		return MenteeGoalApi.super.getMenteeGoalDetails(goalId, date);
-	}
-
-	@Override
-	public ResponseEntity<Void> getMenteeGoals() throws Exception {
-		return MenteeGoalApi.super.getMenteeGoals();
-	}
-
-	@Override
-	public ResponseEntity<Void> updateMenteeGoalTodoStatus(Integer goalId, Integer todoId) throws Exception {
-		return MenteeGoalApi.super.updateMenteeGoalTodoStatus(goalId, todoId);
+	public ResponseEntity getMenteeGoals(Integer page, Integer size) {
+		Long menteeId = SecurityUtil.getCurrentUserId();
+		MenteeGoalSummaryPagingResponse response = menteeGoalService.getMenteeGoals(menteeId, page, size);
+		return ResponseEntity.ok(response);
 	}
 }

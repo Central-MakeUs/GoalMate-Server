@@ -3,9 +3,8 @@ package com.goalmate.mapper;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.data.domain.Page;
-
 import com.goalmate.api.model.GoalDetailResponse;
+import com.goalmate.api.model.GoalStatusEnum;
 import com.goalmate.api.model.GoalSummaryPagingResponse;
 import com.goalmate.api.model.GoalSummaryResponse;
 import com.goalmate.api.model.MidObjectiveResponse;
@@ -16,76 +15,54 @@ import com.goalmate.domain.goal.GoalEntity;
 import com.goalmate.domain.goal.ThumbnailImageEntity;
 
 public class GoalResponseMapper {
-	public static GoalSummaryResponse mapToSummaryResponse(GoalEntity goalEntity) {
-		GoalSummaryResponse response = new GoalSummaryResponse();
-		response.setId(goalEntity.getId().intValue());
-		response.setTitle(goalEntity.getTitle());
-		response.setTopic(goalEntity.getTopic());
-		response.setDescription(goalEntity.getDescription());
-		response.setPeriod(goalEntity.getPeriod());
-		response.setStartDate(goalEntity.getStartDate());
-		response.setEndDate(goalEntity.getEndDate());
-		response.setPrice(goalEntity.getPrice());
-		response.setDiscountPrice(goalEntity.getDiscountPrice());
-		response.setParticipantsLimit(goalEntity.getParticipantsLimit());
-		response.setFreeParticipantsLimit(goalEntity.getFreeParticipantsLimit());
-		response.setGoalStatus(goalEntity.getGoalStatus().name());
-		response.setMainImage(goalEntity.getThumbnailImages().stream()
+	public static GoalSummaryResponse mapToSummaryResponse(GoalEntity goal) {
+		GoalSummaryResponse summary = new GoalSummaryResponse();
+		summary.setId(goal.getId().intValue());
+		summary.setTitle(goal.getTitle());
+		summary.setTopic(goal.getTopic());
+		summary.setDescription(goal.getDescription());
+		summary.setPeriod(goal.getPeriod());
+		summary.setPrice(goal.getPrice());
+		summary.setDiscountPrice(goal.getDiscountPrice());
+		summary.setParticipantsLimit(goal.getParticipantsLimit());
+		summary.setCurrentParticipants(goal.getCurrentParticipants());
+		summary.setGoalStatus(GoalStatusEnum.fromValue(goal.getGoalStatus().getValue()));
+		summary.setMentorName(goal.getMentorEntity().getName());
+		summary.setCreatedAt(goal.getCreatedAt().atOffset(java.time.ZoneOffset.UTC));
+		summary.setUpdatedAt(goal.getUpdatedAt().atOffset(java.time.ZoneOffset.UTC));
+		summary.setMainImage(goal.getThumbnailImages().stream()
 			.findFirst().orElse(null).getImageUrl());
-		response.setMentorName(goalEntity.getMentorEntity().getName());
-		response.setCreatedAt(goalEntity.getCreatedAt().atOffset(java.time.ZoneOffset.UTC));
-		response.setUpdatedAt(goalEntity.getUpdatedAt().atOffset(java.time.ZoneOffset.UTC));
-
-		return response;
+		return summary;
 	}
 
-	public static GoalSummaryPagingResponse mapToSummaryPagingResponse(Page<GoalEntity> goals) {
-		if (goals == null) {
-			return null;
-		}
-
-		List<GoalSummaryResponse> content = goals.getContent().stream()
-			.map(GoalResponseMapper::mapToSummaryResponse)
-			.collect(Collectors.toList());
-
-		PageResponse page = PageResponseMapper.mapToPageResponse(goals);
-
-		GoalSummaryPagingResponse response = new GoalSummaryPagingResponse();
-		response.setGoals(content);
-		response.setPage(page);
-		return response;
-	}
-
-	public static GoalDetailResponse mapToDetailResponse(GoalEntity goalEntity) {
-		if (goalEntity == null) {
-			return null;
-		}
-
-		GoalDetailResponse response = new GoalDetailResponse();
-		response.setId(goalEntity.getId().intValue());
-		response.setTitle(goalEntity.getTitle());
-		response.setTopic(goalEntity.getTopic());
-		response.setDescription(goalEntity.getDescription());
-		response.setPeriod(goalEntity.getPeriod());
-		response.setStartDate(goalEntity.getStartDate());
-		response.setEndDate(goalEntity.getEndDate());
-		response.setPrice(goalEntity.getPrice());
-		response.setDiscountPrice(goalEntity.getDiscountPrice());
-		response.setParticipantsLimit(goalEntity.getParticipantsLimit());
-		response.setFreeParticipantsLimit(goalEntity.getFreeParticipantsLimit());
-		response.setGoalStatus(goalEntity.getGoalStatus().name());
-		response.setThumbnailImages(goalEntity.getThumbnailImages().stream()
+	public static GoalDetailResponse mapToDetailResponse(GoalEntity goal) {
+		GoalDetailResponse detail = new GoalDetailResponse();
+		detail.setId(goal.getId().intValue());
+		detail.setTitle(goal.getTitle());
+		detail.setTopic(goal.getTopic());
+		detail.setDescription(goal.getDescription());
+		detail.setPeriod(goal.getPeriod());
+		detail.setPrice(goal.getPrice());
+		detail.setDiscountPrice(goal.getDiscountPrice());
+		detail.setParticipantsLimit(goal.getParticipantsLimit());
+		detail.setCurrentParticipants(goal.getCurrentParticipants());
+		detail.setGoalStatus(GoalStatusEnum.fromValue(goal.getGoalStatus().getValue()));
+		detail.setMentorName(goal.getMentorEntity().getName());
+		detail.setCreatedAt(goal.getCreatedAt().atOffset(java.time.ZoneOffset.UTC));
+		detail.setUpdatedAt(goal.getUpdatedAt().atOffset(java.time.ZoneOffset.UTC));
+		// ThumbnailImages
+		detail.setThumbnailImages(goal.getThumbnailImages().stream()
 			.map(ThumbnailImageEntity::getImageUrl)
 			.collect(Collectors.toList()));
-		// Images
-		response.setContentImages(goalEntity.getContentImages().stream()
+		// ContentImages
+		detail.setContentImages(goal.getContentImages().stream()
 			.map(ContentImageEntity::getImageUrl)
 			.collect(Collectors.toList()));
-		response.setThumbnailImages(goalEntity.getThumbnailImages().stream()
+		detail.setThumbnailImages(goal.getThumbnailImages().stream()
 			.map(ThumbnailImageEntity::getImageUrl)
 			.collect(Collectors.toList()));
-		// Objectives
-		response.setWeeklyObjectives(goalEntity.getWeeklyObjective().stream()
+		// Weekly Objectives
+		detail.setWeeklyObjectives(goal.getWeeklyObjective().stream()
 			.map(weeklyObjective -> {
 				WeeklyObjectiveResponse weeklyObjectiveResponse = new WeeklyObjectiveResponse();
 				weeklyObjectiveResponse.setWeekNumber(weeklyObjective.getWeekNumber());
@@ -93,7 +70,8 @@ public class GoalResponseMapper {
 				return weeklyObjectiveResponse;
 			})
 			.collect(Collectors.toList()));
-		response.setMidObjectives(goalEntity.getMidObjective().stream()
+		// Mid-Objectives
+		detail.setMidObjectives(goal.getMidObjective().stream()
 			.map(midObjective -> {
 				MidObjectiveResponse midObjectiveResponse = new MidObjectiveResponse();
 				midObjectiveResponse.setDescription(midObjective.getDescription());
@@ -101,7 +79,7 @@ public class GoalResponseMapper {
 			})
 			.collect(Collectors.toList()));
 		// Daily Todos
-		response.setDailyTodos(goalEntity.getDailyTodos().stream()
+		detail.setDailyTodos(goal.getDailyTodos().stream()
 			.map(dailyTodo -> {
 				com.goalmate.api.model.DailyTodoResponse dailyTodoResponse = new com.goalmate.api.model.DailyTodoResponse();
 				dailyTodoResponse.setTodoDate(dailyTodo.getTodoDate());
@@ -109,11 +87,16 @@ public class GoalResponseMapper {
 				return dailyTodoResponse;
 			})
 			.collect(Collectors.toList()));
-		response.setMentorName(goalEntity.getMentorEntity().getName());
-		response.setCreatedAt(goalEntity.getCreatedAt().atOffset(java.time.ZoneOffset.UTC));
-		response.setUpdatedAt(goalEntity.getUpdatedAt().atOffset(java.time.ZoneOffset.UTC));
-
-		return response;
+		return detail;
 	}
 
+	public static GoalSummaryPagingResponse mapToSummaryPagingResponse(
+		List<GoalSummaryResponse> summaries,
+		PageResponse pageResponse) {
+
+		GoalSummaryPagingResponse response = new GoalSummaryPagingResponse();
+		response.setGoals(summaries);
+		response.setPage(pageResponse);
+		return response;
+	}
 }

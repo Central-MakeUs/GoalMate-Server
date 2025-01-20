@@ -28,7 +28,7 @@ public class MenteeService {
 	@Transactional(readOnly = true)
 	public MenteeInfoResponse getMenteeInfo(Long menteeId) {
 		MenteeEntity mentee = getMenteeById(menteeId);
-		List<MenteeGoalEntity> menteeGoals = menteeGoalRepository.findByMenteeEntityId(menteeId);
+		List<MenteeGoalEntity> menteeGoals = menteeGoalRepository.findByMenteeId(menteeId);
 		return MenteeResponseMapper.mapToMenteeInfoResponse(mentee, menteeGoals);
 	}
 

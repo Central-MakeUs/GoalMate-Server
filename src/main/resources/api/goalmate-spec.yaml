@@ -279,7 +279,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
         '403':
-          description: 이미 마감된 목표
+          description: 참여 인원 초과 또는 무료 참여 횟수 초과
         '404':
           description: 존재하지 않는 목표
         '409':
@@ -295,9 +295,36 @@ paths:
       summary: 멘티 목표 리스트 조회
       description: 멘티가 참여한 목표들을 조회합니다.
       operationId: getMenteeGoals
+      parameters:
+        - name: page
+          in: query
+          description: 페이지 번호 (1부터 시작)
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: size
+          in: query
+          description: 페이지당 아이템 수
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
       responses:
         '200':
-          description: 조회 성공. (리스트) 목표별 멘토명, 진행기간, 달성율을 포함합니다.
+          description: 조회 성공. 목표 요약정보, 달성율을 포함합니다.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/MenteeGoalSummaryPagingResponse'
   /mentees/my/goals/{goalId}:
     get:
       security:
@@ -324,6 +351,15 @@ paths:
       responses:
         '200':
           description: 조회 성공. 오늘 할 일 리스트, 진척도 정보(오늘, 전체), 멘토 코멘트, 목표명, 멘토를 포함합니다.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/MenteeGoalDailyResponse'
   /mentees/my/goal/{goalId}/todos/{todoId}:
     post:
       security:
@@ -348,7 +384,16 @@ paths:
           description: 조회할 투두 ID
       responses:
         '200':
-          description: 업데이트 성공. 투두 상태, 진척도가 업데이트된 목표 세부정보를 재반환합니다.
+          description: 업데이트 성공. 업데이트된 투두 정보를 반환합니다.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/MenteeGoalDailyTodoResponse'
   /mentees/my/goal/{goalId}/comments:
     get:
       security:
@@ -418,6 +463,12 @@ components:
           type: integer
         free_participation_count:
           type: integer
+        mentee_status:
+          type: string
+          enum:
+            - PENDING
+            - ACTIVE
+            - DELETED
 
     GoalCommonInfo:
       type: object
@@ -468,12 +519,13 @@ components:
         - CLOSED
     GoalSummaryResponse:
       type: object
-      properties:
-        info:
-          $ref: '#/components/schemas/GoalCommonInfo'
-        main_image:
-          type: string
-          example: "https://image.url"
+      allOf:
+        - $ref: '#/components/schemas/GoalCommonInfo'
+        - type: object
+          properties:
+            main_image:
+              type: string
+              example: "https://image.url"
     GoalSummaryPagingResponse:
       type: object
       properties:
@@ -485,31 +537,32 @@ components:
           $ref: '#/components/schemas/PageResponse'
     GoalDetailResponse:
       type: object
-      properties:
-        info:
-          $ref: '#/components/schemas/GoalCommonInfo'
-        mid_objectives:
-          type: array
-          items:
-            $ref: '#/components/schemas/MidObjectiveResponse'
-        weekly_objectives:
-          type: array
-          items:
-            $ref: '#/components/schemas/WeeklyObjectiveResponse'
-        thumbnail_images:
-          type: array
-          items:
-            type: string
-            example: "https://image.url"
-        content_images:
-          type: array
-          items:
-            type: string
-            example: "https://image.url"
-        daily_todos:
-          type: array
-          items:
-            $ref: '#/components/schemas/DailyTodoResponse'
+      allOf:
+        - $ref: '#/components/schemas/GoalCommonInfo'
+        - type: object
+          properties:
+            mid_objectives:
+              type: array
+              items:
+                $ref: '#/components/schemas/MidObjectiveResponse'
+            weekly_objectives:
+              type: array
+              items:
+                $ref: '#/components/schemas/WeeklyObjectiveResponse'
+            thumbnail_images:
+              type: array
+              items:
+                type: string
+                example: "https://image.url"
+            content_images:
+              type: array
+              items:
+                type: string
+                example: "https://image.url"
+            daily_todos:
+              type: array
+              items:
+                $ref: '#/components/schemas/DailyTodoResponse'
     MidObjectiveResponse:
       type: object
       properties:
@@ -538,29 +591,43 @@ components:
         description:
           type: string
           example: "오늘의 커밋 진행하기"
-
+    #    MenteeGoalSummaryResponse:
+    #      type: object
+    #      properties:
+    #        id:
+    #          type: integer
+    #        total_objective_count:
+    #          type: integer
+    #        completed_objective_count:
+    #          type: integer
+    #        mentee_goal_status:
+    #          type: string
+    #          enum:
+    #            - IN_PROGRESS
+    #            - COMPLETED
+    #            - CANCELED
+    #        goal:
+    #          $ref: '#/components/schemas/GoalSummaryResponse'
     MenteeGoalSummaryResponse:
       type: object
+      allOf:
+        - $ref: '#/components/schemas/GoalSummaryResponse'
+        - $ref: '#/components/schemas/MenteeGoalProgressResponse'
+    MenteeGoalSummaryPagingResponse:
+      type: object
       properties:
-        id:
-          type: integer
-        total_objective_count:
-          type: integer
-        completed_objective_count:
-          type: integer
-        mentee_goal_status:
-          type: string
-          enum:
-            - IN_PROGRESS
-            - COMPLETED
-            - CANCELED
-        goal:
-          $ref: '#/components/schemas/GoalSummaryResponse'
+        mentee_goals:
+          type: array
+          items:
+            $ref: '#/components/schemas/MenteeGoalSummaryResponse'
+        page:
+          $ref: '#/components/schemas/PageResponse'
     MenteeGoalDailyResponse:
       type: object
       properties:
-        id:
-          type: integer
+        date:
+          type: string
+          format: date
         goal:
           $ref: '#/components/schemas/GoalSummaryResponse'
         todos:
@@ -572,6 +639,8 @@ components:
     MenteeGoalDailyTodoResponse:
       type: object
       properties:
+        id:
+          type: integer
         todo_date:
           type: string
           format: date
@@ -582,6 +651,22 @@ components:
           enum:
             - TODO
             - COMPLETED
+    MenteeGoalProgressResponse:
+      type: object
+      properties:
+        total_todos:
+          type: integer
+        completed_todos:
+          type: integer
+        mentee_goal_status:
+          $ref: '#/components/schemas/MenteeGoalStatusEnum'
+    MenteeGoalStatusEnum:
+      type: string
+      enum:
+        - IN_PROGRESS
+        - COMPLETED
+        - FAILED
+        - CANCELED
 
     # Paging
     PageResponse:
