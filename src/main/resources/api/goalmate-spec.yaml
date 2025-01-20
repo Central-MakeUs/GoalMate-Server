@@ -292,7 +292,7 @@ paths:
         - bearerAuth: [ ]
       tags:
         - MenteeGoal
-      summary: 멘티 목표 리스트 조회
+      summary: 멘티 목표 리스트 조회 | DONE
       description: 멘티가 참여한 목표들을 조회합니다.
       operationId: getMenteeGoals
       parameters:
@@ -508,9 +508,11 @@ components:
         created_at:
           type: string
           format: date-time
+          example: 2025-01-20T10:18:15.158
         updated_at:
           type: string
           format: date-time
+          example: 2025-01-20T10:18:15.158
     GoalStatusEnum:
       type: string
       enum:
