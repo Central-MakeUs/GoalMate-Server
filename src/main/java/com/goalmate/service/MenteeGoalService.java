@@ -1,5 +1,6 @@
 package com.goalmate.service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -7,13 +8,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.goalmate.api.model.MenteeGoalProgressResponse;
 import com.goalmate.api.model.MenteeGoalSummaryPagingResponse;
 import com.goalmate.api.model.MenteeGoalSummaryResponse;
 import com.goalmate.api.model.PageResponse;
-import com.goalmate.domain.goal.GoalEntity;
 import com.goalmate.domain.menteeGoal.MenteeGoalDailyTodoEntity;
 import com.goalmate.domain.menteeGoal.MenteeGoalEntity;
+import com.goalmate.domain.menteeGoal.TodoProgress;
 import com.goalmate.mapper.MenteeGoalResponseMapper;
 import com.goalmate.mapper.PageResponseMapper;
 import com.goalmate.repository.MenteeGoalDailyTodoRepository;
@@ -28,21 +28,21 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @Transactional
 public class MenteeGoalService {
-	// private final GoalService goalService;
+	private final GoalService goalService;
+	private final CommentService commentService;
 	private final MenteeGoalRepository menteeGoalRepository;
 	private final MenteeGoalDailyTodoRepository dailyTodoRepository;
 
 	public MenteeGoalSummaryPagingResponse getMenteeGoals(Long menteeId, Integer page, Integer size) {
-		// 멘티의 ID 로 멘티의 목표를 조회
 		Pageable pageable = PageRequestUtil.createPageRequest(page, size);
 		Page<MenteeGoalEntity> menteeGoals = menteeGoalRepository.findByMenteeId(menteeId, pageable);
-		// 해당 목표 id 로 달성율 조회
-		List<MenteeGoalSummaryResponse> summaries = menteeGoals.stream().map(menteeGoal -> {
-			// 1개의 목표에 대한 목표 정보, 달성율을 담은 객체 생성
-			GoalEntity goal = menteeGoal.getGoalEntity();
-			MenteeGoalProgressResponse progressResponse = getProgressResponse(menteeGoal);
-			return MenteeGoalResponseMapper.mapToSummaryResponse(goal, menteeGoal, progressResponse);
-		}).toList();
+		List<MenteeGoalSummaryResponse> summaries = menteeGoals.stream()
+			.map(menteeGoal -> MenteeGoalResponseMapper
+				.mapToSummaryResponse(
+					menteeGoal,
+					getTodoProgress(menteeGoal),
+					commentService.hasNewComment(menteeGoal.getId())))
+			.toList();
 
 		// 페이징 정보를 담은 객체 생성
 		PageResponse pageResponse = PageResponseMapper.mapToPageResponse(menteeGoals);
@@ -50,21 +50,32 @@ public class MenteeGoalService {
 		return MenteeGoalResponseMapper.mapToSummaryPagingResponse(summaries, pageResponse);
 	}
 
-	public MenteeGoalProgressResponse getProgressResponse(MenteeGoalEntity menteeGoal) {
-		// 전체 투두 조회 후, 완료된 투두의 수를 구하여 달성률을 계산
-		int completedCount = 0;
-		List<MenteeGoalDailyTodoEntity> todos = dailyTodoRepository.findByMenteeGoalId(menteeGoal.getId());
-		for (MenteeGoalDailyTodoEntity todo : todos) {
-			if (todo.isCompleted()) {
-				completedCount++;
+	private TodoProgress getTodoProgress(MenteeGoalEntity menteeGoal) {
+		// 전체 투두를 조회하며, 완료된 투두개수, 전체 투두개수, 오늘 할 투두 개수, 오늘 완료한 투두 개수를 구한다.
+		List<MenteeGoalDailyTodoEntity> dailyTodos = dailyTodoRepository.findByMenteeGoalId(menteeGoal.getId());
+		final LocalDate today = LocalDate.now();
+		int totalCount = dailyTodos.size();
+		int totalCompletedCount = 0;
+		int todayCount = 0;
+		int todayCompletedCount = 0;
+		for (MenteeGoalDailyTodoEntity dailyTodo : dailyTodos) {
+			if (dailyTodo.getTodoDate().isEqual(today)) {
+				todayCount++;
+				if (dailyTodo.isCompleted()) {
+					todayCompletedCount++;
+				}
+			}
+			if (dailyTodo.isCompleted()) {
+				totalCompletedCount++;
 			}
 		}
-		int totalCount = todos.size();
 
-		return MenteeGoalResponseMapper.mapToProgressResponse(
-			completedCount,
-			totalCount,
-			menteeGoal.getStatus().getValue());
-
+		return TodoProgress.builder()
+			.totalCount(totalCount)
+			.totalCompletedCount(totalCompletedCount)
+			.todayCount(todayCount)
+			.todayCompletedCount(todayCompletedCount)
+			.build();
 	}
+
 }

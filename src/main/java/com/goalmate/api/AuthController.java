@@ -15,8 +15,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 public class AuthController implements AuthApi {
 	private final AuthService authService;
-
-	// 로직처리는 최대한 서비스에서하고, 컨트롤러에서 조합. 매핑이 복잡하다면 별도 매퍼로 넘기기
+	
 	@Override
 	public ResponseEntity loginOrSignUp(OAuthRequest oauthRequest) {
 		LoginResult result = authService.authenticateWithOauth(
@@ -47,4 +46,5 @@ public class AuthController implements AuthApi {
 	public ResponseEntity<Void> withdraw() throws Exception {
 		return AuthApi.super.withdraw();
 	}
+
 }

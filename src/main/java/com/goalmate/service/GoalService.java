@@ -1,6 +1,6 @@
 package com.goalmate.service;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -67,7 +67,8 @@ public class GoalService {
 
 		// MenteeGoalEntity 생성, 저장
 		MenteeGoalEntity menteeGoal = MenteeGoalEntity.builder()
-			.joinedAt(LocalDateTime.now())
+			.startDate(LocalDate.now())
+			.endDate(LocalDate.now().plusDays(goal.getPeriod()))
 			.menteeEntity(mentee)
 			.goalEntity(goal)
 			.build();

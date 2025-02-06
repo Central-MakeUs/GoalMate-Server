@@ -17,13 +17,13 @@ public class GoalController implements GoalApi {
 	private final GoalService goalService;
 
 	@Override
-	public ResponseEntity getGoals(Integer page, Integer size) throws Exception {
+	public ResponseEntity getGoals(Integer page, Integer size) {
 		GoalSummaryPagingResponse response = goalService.getGoals(page, size);
 		return ResponseEntity.ok(ApiResponse.success(response));
 	}
 
 	@Override
-	public ResponseEntity getGoalDetails(Integer goalId) throws Exception {
+	public ResponseEntity getGoalDetails(Integer goalId) {
 		GoalDetailResponse response = goalService.getGoalDetails(goalId.longValue());
 		return ResponseEntity.ok(ApiResponse.success(response));
 	}

@@ -1,6 +1,6 @@
 package com.goalmate.domain.menteeGoal;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 import com.goalmate.domain.BaseEntity;
 import com.goalmate.domain.goal.GoalEntity;
@@ -35,7 +35,10 @@ public class MenteeGoalEntity extends BaseEntity {
 	private Long id;
 
 	@Column(nullable = false)
-	private LocalDateTime joinedAt;
+	private LocalDate startDate;
+
+	@Column(nullable = false)
+	private LocalDate endDate;
 
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
@@ -54,8 +57,9 @@ public class MenteeGoalEntity extends BaseEntity {
 	private GoalEntity goalEntity;
 
 	@Builder
-	public MenteeGoalEntity(LocalDateTime joinedAt, MenteeEntity menteeEntity, GoalEntity goalEntity) {
-		this.joinedAt = joinedAt;
+	public MenteeGoalEntity(LocalDate startDate, LocalDate endDate, MenteeEntity menteeEntity, GoalEntity goalEntity) {
+		this.startDate = startDate;
+		this.endDate = endDate;
 		this.status = MenteeGoalStatus.IN_PROGRESS;
 		this.finalComment = null;
 		this.menteeEntity = menteeEntity;

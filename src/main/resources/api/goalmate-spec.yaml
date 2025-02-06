@@ -914,13 +914,13 @@ components:
             today_todo_count:
               type: integer
               example: 5
-            completed_today_todo_count:
+            today_completed_count:
               type: integer
               example: 3
             total_todo_count:
               type: integer
               example: 100
-            completed_total_todo_count:
+            total_completed_count:
               type: integer
               example: 50
             daily_remaining_count:
@@ -1027,9 +1027,7 @@ components:
         comment_date:
           type: string
           format: date-time
-        from:
-          type: string
-        to:
+        writer:
           type: string
     HasNewCommentsResponse:
       type: object

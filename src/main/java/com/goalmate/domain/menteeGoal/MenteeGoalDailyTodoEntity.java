@@ -39,14 +39,14 @@ public class MenteeGoalDailyTodoEntity extends BaseEntity {
 
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
-	private TodoStatus status;
+	private com.goalmate.domain.menteeGoal.TodoStatus status;
 
 	@Column
 	private LocalDateTime completedAt;
 
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "mentee_goal_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-	private MenteeGoalEntity menteeGoalEntity;
+	private com.goalmate.domain.menteeGoal.MenteeGoalEntity menteeGoalEntity;
 
 	@Builder
 	public MenteeGoalDailyTodoEntity(LocalDate todoDate, String description, MenteeGoalEntity menteeGoalEntity) {

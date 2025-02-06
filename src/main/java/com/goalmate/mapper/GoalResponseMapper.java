@@ -22,16 +22,16 @@ public class GoalResponseMapper {
 		summary.setTopic(goal.getTopic());
 		summary.setDescription(goal.getDescription());
 		summary.setPeriod(goal.getPeriod());
-		summary.setPrice(goal.getPrice());
-		summary.setDiscountPrice(goal.getDiscountPrice());
+		// summary.setPrice(goal.getPrice());
+		// summary.setDiscountPrice(goal.getDiscountPrice());
 		summary.setParticipantsLimit(goal.getParticipantsLimit());
 		summary.setCurrentParticipants(goal.getCurrentParticipants());
 		summary.setGoalStatus(GoalStatusEnum.fromValue(goal.getGoalStatus().getValue()));
 		summary.setMentorName(goal.getMentorEntity().getName());
 		summary.setCreatedAt(goal.getCreatedAt().atOffset(java.time.ZoneOffset.UTC));
 		summary.setUpdatedAt(goal.getUpdatedAt().atOffset(java.time.ZoneOffset.UTC));
-		summary.setMainImage(goal.getThumbnailImages().stream()
-			.findFirst().orElse(null).getImageUrl());
+		goal.getThumbnailImages().stream()
+			.findFirst().ifPresent(thumbnailImage -> summary.setMainImage(thumbnailImage.getImageUrl()));
 		return summary;
 	}
 
@@ -42,8 +42,8 @@ public class GoalResponseMapper {
 		detail.setTopic(goal.getTopic());
 		detail.setDescription(goal.getDescription());
 		detail.setPeriod(goal.getPeriod());
-		detail.setPrice(goal.getPrice());
-		detail.setDiscountPrice(goal.getDiscountPrice());
+		// detail.setPrice(goal.getPrice());
+		// detail.setDiscountPrice(goal.getDiscountPrice());
 		detail.setParticipantsLimit(goal.getParticipantsLimit());
 		detail.setCurrentParticipants(goal.getCurrentParticipants());
 		detail.setGoalStatus(GoalStatusEnum.fromValue(goal.getGoalStatus().getValue()));
@@ -76,15 +76,6 @@ public class GoalResponseMapper {
 				MidObjectiveResponse midObjectiveResponse = new MidObjectiveResponse();
 				midObjectiveResponse.setDescription(midObjective.getDescription());
 				return midObjectiveResponse;
-			})
-			.collect(Collectors.toList()));
-		// Daily Todos
-		detail.setDailyTodos(goal.getDailyTodos().stream()
-			.map(dailyTodo -> {
-				com.goalmate.api.model.DailyTodoResponse dailyTodoResponse = new com.goalmate.api.model.DailyTodoResponse();
-				dailyTodoResponse.setTodoDate(dailyTodo.getTodoDate());
-				dailyTodoResponse.setDescription(dailyTodo.getDescription());
-				return dailyTodoResponse;
 			})
 			.collect(Collectors.toList()));
 		return detail;

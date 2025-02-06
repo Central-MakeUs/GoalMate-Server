@@ -34,4 +34,5 @@ public class MenteeController implements MenteeApi {
 		menteeService.validateMenteeName(name);
 		return ResponseEntity.ok(ApiResponse.success());
 	}
+
 }
