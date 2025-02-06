@@ -30,7 +30,13 @@ public class DailyTodoEntity {
 	private LocalDate todoDate;
 
 	@Column(nullable = false)
+	private Integer estimatedMinutes;
+
+	@Column(nullable = false)
 	private String description;
+
+	@Column
+	private String mentorTip;
 
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "goal_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))

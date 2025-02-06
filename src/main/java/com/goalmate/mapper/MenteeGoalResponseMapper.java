@@ -1,13 +1,17 @@
 package com.goalmate.mapper;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import com.goalmate.api.model.GoalSummaryResponse;
+import com.goalmate.api.model.MenteeGoalDailyDetailResponse;
 import com.goalmate.api.model.MenteeGoalStatusEnum;
 import com.goalmate.api.model.MenteeGoalSummaryPagingResponse;
 import com.goalmate.api.model.MenteeGoalSummaryResponse;
+import com.goalmate.api.model.MenteeGoalTodoResponse;
 import com.goalmate.api.model.PageResponse;
 import com.goalmate.domain.goal.GoalEntity;
+import com.goalmate.domain.menteeGoal.MenteeGoalDailyTodoEntity;
 import com.goalmate.domain.menteeGoal.MenteeGoalEntity;
 import com.goalmate.domain.menteeGoal.TodoProgress;
 
@@ -22,8 +26,6 @@ public class MenteeGoalResponseMapper {
 
 		MenteeGoalSummaryResponse response = new MenteeGoalSummaryResponse();
 		response.setId(menteeGoal.getId().intValue());
-
-		response.setId(menteeGoal.getId().intValue()); // 멘티 목표 ID
 		response.setTitle(goalSummary.getTitle());
 		response.setTopic(goalSummary.getTopic());
 		response.setMentorName(goalSummary.getMentorName());
@@ -52,6 +54,28 @@ public class MenteeGoalResponseMapper {
 		MenteeGoalSummaryPagingResponse response = new MenteeGoalSummaryPagingResponse();
 		response.setMenteeGoals(menteeGoals);
 		response.setPage(pageResponse);
+		return response;
+	}
+
+	public static MenteeGoalDailyDetailResponse mapToDailyDetailResponse(
+		MenteeGoalSummaryResponse summary,
+		LocalDate date,
+		List<MenteeGoalTodoResponse> todos) {
+		MenteeGoalDailyDetailResponse response = new MenteeGoalDailyDetailResponse();
+		response.setMenteeGoal(summary);
+		response.setDate(date);
+		response.setTodos(todos);
+		return response;
+	}
+
+	public static MenteeGoalTodoResponse mapToTodoResponse(MenteeGoalDailyTodoEntity todo) {
+		MenteeGoalTodoResponse response = new MenteeGoalTodoResponse();
+		response.setId(todo.getId());
+		response.setDescription(todo.getDescription());
+		response.setEstimatedMinutes(todo.getEstimatedMinutes());
+		response.setTodoDate(todo.getTodoDate());
+		response.setMentorTip(todo.getMentorTip());
+		response.setTodoStatus(todo.getStatus().getValue());
 		return response;
 	}
 }

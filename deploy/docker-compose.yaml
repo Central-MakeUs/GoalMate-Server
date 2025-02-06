@@ -10,6 +10,7 @@ services:
         delay: 10s                # 업데이트 사이 간격
       restart_policy:
         condition: on-failure     # 실패 시 재시작
+        max_attempts: 5          # 최대 재시작 횟수
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8080/swagger-ui/index.html" ]
       interval: 30s

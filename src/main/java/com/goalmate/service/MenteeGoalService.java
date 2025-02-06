@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.goalmate.api.model.MenteeGoalSummaryPagingResponse;
 import com.goalmate.api.model.MenteeGoalSummaryResponse;
+import com.goalmate.api.model.MenteeGoalTodoResponse;
 import com.goalmate.api.model.PageResponse;
 import com.goalmate.domain.menteeGoal.MenteeGoalDailyTodoEntity;
 import com.goalmate.domain.menteeGoal.MenteeGoalEntity;
@@ -18,6 +19,8 @@ import com.goalmate.mapper.MenteeGoalResponseMapper;
 import com.goalmate.mapper.PageResponseMapper;
 import com.goalmate.repository.MenteeGoalDailyTodoRepository;
 import com.goalmate.repository.MenteeGoalRepository;
+import com.goalmate.support.error.CoreApiException;
+import com.goalmate.support.error.ErrorType;
 import com.goalmate.util.PageRequestUtil;
 
 import lombok.RequiredArgsConstructor;
@@ -50,6 +53,10 @@ public class MenteeGoalService {
 		return MenteeGoalResponseMapper.mapToSummaryPagingResponse(summaries, pageResponse);
 	}
 
+	public boolean hasRemainingTodosToday(Long menteeId) {
+		return dailyTodoRepository.existsByMenteeIdAndDateAndIsNotCompleted(menteeId, LocalDate.now());
+	}
+
 	private TodoProgress getTodoProgress(MenteeGoalEntity menteeGoal) {
 		// 전체 투두를 조회하며, 완료된 투두개수, 전체 투두개수, 오늘 할 투두 개수, 오늘 완료한 투두 개수를 구한다.
 		List<MenteeGoalDailyTodoEntity> dailyTodos = dailyTodoRepository.findByMenteeGoalId(menteeGoal.getId());
@@ -78,4 +85,32 @@ public class MenteeGoalService {
 			.build();
 	}
 
+	public Object getMenteeGoalDailyDetails(Long menteeGoalId, LocalDate date) {
+		MenteeGoalEntity menteeGoal = getMenteeGoal(menteeGoalId);
+		MenteeGoalSummaryResponse summary = MenteeGoalResponseMapper
+			.mapToSummaryResponse(
+				menteeGoal,
+				getTodoProgress(menteeGoal),
+				commentService.hasNewComment(menteeGoal.getId()));
+		List<MenteeGoalTodoResponse> todos = dailyTodoRepository.findByMenteeGoalIdAndDate(menteeGoalId, date)
+			.stream()
+			.map(MenteeGoalResponseMapper::mapToTodoResponse)
+			.toList();
+		return MenteeGoalResponseMapper.mapToDailyDetailResponse(summary, date, todos);
+	}
+
+	public MenteeGoalTodoResponse updateTodoStatus(Long menteeGoalId, Long todoId) {
+		MenteeGoalDailyTodoEntity todo = dailyTodoRepository.findById(todoId)
+			.orElseThrow(() -> new CoreApiException(ErrorType.NOT_FOUND, "Todo not found"));
+		if (!todo.getTodoDate().isEqual(LocalDate.now())) {
+			throw new CoreApiException(ErrorType.BAD_REQUEST, "Cannot update past todo");
+		}
+		todo.toggleStatus();
+		return MenteeGoalResponseMapper.mapToTodoResponse(todo);
+	}
+
+	private MenteeGoalEntity getMenteeGoal(Long menteeGoalId) {
+		return menteeGoalRepository.findById(menteeGoalId)
+			.orElseThrow(() -> new CoreApiException(ErrorType.NOT_FOUND, "MenteeGoal not found"));
+	}
 }

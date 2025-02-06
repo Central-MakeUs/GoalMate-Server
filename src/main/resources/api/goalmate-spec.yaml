@@ -355,11 +355,11 @@ paths:
         - bearerAuth: [ ]
       tags:
         - MenteeGoal
-      summary: 멘티의 목표 세부정보 조회
+      summary: 멘티의 목표 일일 세부정보 조회
       description: >
         ## 개요
         
-        멘티의 목표의 세부정보를 조회합니다. 쿼리 파라미터로 날짜가 필요하며, 기본값으로 오늘의 정보를 가져옵니다.
+        멘티의 목표의 일일 세부정보를 조회합니다. 쿼리 파라미터로 날짜가 필요하며, 해당 날짜의 투두 정보를 포함합니다.
         
         ## 응답 설명
         
@@ -372,14 +372,15 @@ paths:
         `goal`의 id 값과 `mentee_goal`의 id 값은 서로 다른 값입니다.
         
         
-        일반적인 목표를 조회하는 경우 `goal`의 id를 사용하고, mentee의 목표를 조회하는 경우 `mentee_goal`의 id를 사용합니다.
-      operationId: getMenteeGoalDetails
+        일반적인 목표(홈화면)를 조회하는 경우 `goal`의 id를 사용하고, 멘티의 목표를 조회하는 경우 `mentee_goal`의 id를 사용합니다.
+      operationId: getMenteeGoalDailyDetails
       parameters:
         - name: menteeGoalId
           in: path
           required: true
           schema:
             type: integer
+            format: int64
           description: 멘티목표 ID
         - name: date
           in: query
@@ -399,7 +400,7 @@ paths:
                   - type: object
                     properties:
                       data:
-                        $ref: '#/components/schemas/MenteeGoalDailyResponse'
+                        $ref: '#/components/schemas/MenteeGoalDailyDetailResponse'
   /mentees/my/goals/{menteeGoalId}/weekly-progress:
     get:
       security:
@@ -480,19 +481,21 @@ paths:
         - MenteeGoal
       summary: 멘티의 목표 투두 업데이트
       description: 멘티의 목표에 대해 투두 상태를 업데이트 합니다.
-      operationId: updateMenteeGoalTodoStatus
+      operationId: updateTodoStatus
       parameters:
         - name: menteeGoalId
           in: path
           required: true
           schema:
             type: integer
-          description: 업데이트할 멘티목표 ID
+            format: int64
+          description: 멘티목표 ID
         - name: todoId
           in: path
           required: true
           schema:
             type: integer
+            format: int64
           description: 투두 ID
       responses:
         '200':
@@ -973,7 +976,7 @@ components:
         page:
           $ref: '#/components/schemas/PageResponse'
 
-    MenteeGoalDailyResponse:
+    MenteeGoalDailyDetailResponse:
       type: object
       properties:
         date:
@@ -990,6 +993,7 @@ components:
       properties:
         id:
           type: integer
+          format: int64
         todo_date:
           type: string
           format: date
@@ -1008,9 +1012,6 @@ components:
           example: "예문을 반드시 5회 이상 읽어보세요!"
         todo_status:
           type: string
-          enum:
-            - TODO
-            - COMPLETED
     HasTodayTodosResponse:
       type: object
       properties:

@@ -11,13 +11,10 @@ import org.springframework.data.jpa.repository.Query;
 import com.goalmate.domain.menteeGoal.MenteeGoalEntity;
 
 public interface MenteeGoalRepository extends JpaRepository<MenteeGoalEntity, Long> {
-	@Query("SELECT COUNT(m) FROM MenteeGoalEntity m WHERE m.goalEntity.id = :goalId")
-	Long countByGoalId(Long goalId);
-
-	@Query("SELECT m FROM MenteeGoalEntity m WHERE m.menteeEntity.id = :menteeId")
+	@Query("SELECT m FROM MenteeGoalEntity m WHERE m.menteeEntity.id = :menteeId ORDER BY m.createdAt DESC")
 	List<MenteeGoalEntity> findByMenteeId(Long menteeId);
 
-	@Query("SELECT m FROM MenteeGoalEntity m WHERE m.menteeEntity.id = :menteeId")
+	@Query("SELECT m FROM MenteeGoalEntity m WHERE m.menteeEntity.id = :menteeId ORDER BY m.createdAt DESC")
 	Page<MenteeGoalEntity> findByMenteeId(Long menteeId, Pageable pageable);
 
 	@Query("SELECT m FROM MenteeGoalEntity m WHERE m.menteeEntity.id = :menteeId AND m.goalEntity.id = :goalId")

@@ -78,7 +78,9 @@ public class GoalService {
 		List<MenteeGoalDailyTodoEntity> menteeDailyTodos = goal.getDailyTodos().stream()
 			.map(dailyTodo -> MenteeGoalDailyTodoEntity.builder()
 				.todoDate(dailyTodo.getTodoDate())
+				.estimatedMinutes(dailyTodo.getEstimatedMinutes())
 				.description(dailyTodo.getDescription())
+				.mentorTip(dailyTodo.getMentorTip())
 				.menteeGoalEntity(menteeGoal)
 				.build())
 			.toList();

@@ -35,25 +35,34 @@ public class MenteeGoalDailyTodoEntity extends BaseEntity {
 	private LocalDate todoDate;
 
 	@Column(nullable = false)
+	private Integer estimatedMinutes;
+
+	@Column(nullable = false)
 	private String description;
+
+	@Column
+	private String mentorTip;
 
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
-	private com.goalmate.domain.menteeGoal.TodoStatus status;
+	private TodoStatus status;
 
 	@Column
 	private LocalDateTime completedAt;
 
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "mentee_goal_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-	private com.goalmate.domain.menteeGoal.MenteeGoalEntity menteeGoalEntity;
+	private MenteeGoalEntity menteeGoalEntity;
 
 	@Builder
-	public MenteeGoalDailyTodoEntity(LocalDate todoDate, String description, MenteeGoalEntity menteeGoalEntity) {
+	public MenteeGoalDailyTodoEntity(LocalDate todoDate, Integer estimatedMinutes, String description,
+		String mentorTip, MenteeGoalEntity menteeGoalEntity) {
 		this.todoDate = todoDate;
+		this.estimatedMinutes = estimatedMinutes;
 		this.description = description;
-		this.menteeGoalEntity = menteeGoalEntity;
+		this.mentorTip = mentorTip;
 		this.status = TodoStatus.TODO;
+		this.menteeGoalEntity = menteeGoalEntity;
 	}
 
 	public boolean isCompleted() {
