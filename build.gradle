@@ -75,6 +75,7 @@ swaggerSources {
         def apiYaml = "${rootDir}/src/main/resources/api/goalmate-spec.yaml"
         def configJson = "${rootDir}/src/main/resources/api/config.json"
         inputFile = file(apiYaml)
+//        def templateDir = "${rootDir}/src/main/resources/api/templates"
         def ignoreFile = file("${rootDir}/src/main/resources/api/.openapi-generator-ignore")
         code {
             language = 'spring'

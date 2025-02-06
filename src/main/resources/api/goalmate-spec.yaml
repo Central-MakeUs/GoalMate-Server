@@ -25,6 +25,8 @@ tags:
     description: 목표 API
   - name: MenteeGoal
     description: 멘티 목표 API
+  - name: Comment
+    description: 코멘트 관련 API
 
 paths:
   # Auth
@@ -32,7 +34,7 @@ paths:
     post:
       tags:
         - Auth
-      summary: 소셜 로그인 (회원가입) | DONE
+      summary: 소셜 로그인 (회원가입)
       description: 소셜 로그인을 통해 로그인 또는 회원가입을 진행합니다. 로그인 완료 시 200, 회원가입 성공 시 201이 응답됩니다.
       operationId: loginOrSignUp
       requestBody:
@@ -113,7 +115,7 @@ paths:
         - bearerAuth: [ ]
       tags:
         - Mentee
-      summary: 멘티 기본 정보 | DONE
+      summary: 멘티 기본 정보
       description: 멘티 기본 정보 및 간단한 목표 현황을 조회합니다.
       operationId: getMenteeInfo
       responses:
@@ -134,7 +136,7 @@ paths:
         - bearerAuth: [ ]
       tags:
         - Mentee
-      summary: 멘티 이름 설정 | DONE
+      summary: 멘티 이름 설정
       description: 멘티 이름을 설정합니다.
       operationId: updateMenteeName
       parameters:
@@ -166,7 +168,7 @@ paths:
         - bearerAuth: [ ]
       tags:
         - Mentee
-      summary: 멘티 이름 중복 확인 | DONE
+      summary: 멘티 이름 중복 확인
       description: 멘티 이름의 중복 확인을 진행합니다.
       operationId: validateMenteeName
       parameters:
@@ -187,15 +189,25 @@ paths:
                   - $ref: '#/components/schemas/ApiResponse'
         '409':
           description: 중복된 이름
+
   # Goals
   /goals:
     get:
-      security:
-        - bearerAuth: [ ]
       tags:
         - Goal
-      summary: 목표 리스트 조회 | DONE
-      description: 목표를 최신순으로 조회합니다.
+      summary: 목표 목록 조회
+      description: >
+        ## 개요
+        
+        목표 목록을 페이지네이션하여 조회합니다.  
+        
+        ## 응답 설명
+        
+        ### goal_status: 목표의 현재 상태
+          - `NOT_STARTED`: 아직 시작되지 않은 목표  
+          - `IN_PROGRESS`: 현재 신청 가능한 목표  
+          - `CLOSED`: 마감된 목표  
+
       operationId: getGoals
       parameters:
         - name: page
@@ -233,7 +245,7 @@ paths:
         - bearerAuth: [ ]
       tags:
         - Goal
-      summary: 목표 세부정보 조회 | DONE
+      summary: 목표 세부정보 조회
       description: 목표 세부정보를 조회합니다.
       operationId: getGoalDetails
       parameters:
@@ -242,7 +254,7 @@ paths:
           required: true
           schema:
             type: integer
-          description: 조회할 목표의 ID
+          description: 목표 ID
       responses:
         '200':
           description: 조회 성공
@@ -261,7 +273,7 @@ paths:
         - bearerAuth: [ ]
       tags:
         - Goal
-      summary: 목표 참여 | DONE
+      summary: 목표 참여
       description: 멘티가 목표 시작하기 버튼을 눌러 참여합니다.
       operationId: participateInGoal
       parameters:
@@ -292,8 +304,20 @@ paths:
         - bearerAuth: [ ]
       tags:
         - MenteeGoal
-      summary: 멘티 목표 리스트 조회 | DONE
-      description: 멘티가 참여한 목표들을 조회합니다.
+      summary: 멘티 목표 리스트 조회
+      description: >
+        ## 개요
+        
+        멘티가 참여한 목표들을 조회합니다.
+        
+        ## 응답 설명
+        
+        ### mentee_goal_status: 멘티 목표의 상태
+          - `IN_PROGRESS`: 진행 중인 멘티목표
+          - `COMPLETED`: 완료된 멘티목표
+          - `FAILED`: 실패한 멘티목표
+          - `CANCELED`: 취소된 멘티목표
+
       operationId: getMenteeGoals
       parameters:
         - name: page
@@ -315,7 +339,7 @@ paths:
             default: 10
       responses:
         '200':
-          description: 조회 성공. 목표 요약정보, 달성율을 포함합니다.
+          description: 조회 성공
           content:
             application/json:
               schema:
@@ -325,32 +349,48 @@ paths:
                     properties:
                       data:
                         $ref: '#/components/schemas/MenteeGoalSummaryPagingResponse'
-  /mentees/my/goals/{goalId}:
+  /mentees/my/goals/{menteeGoalId}:
     get:
       security:
         - bearerAuth: [ ]
       tags:
         - MenteeGoal
       summary: 멘티의 목표 세부정보 조회
-      description: 멘티의 목표의 세부정보를 조회합니다. 쿼리 파라미터로 날짜가 필요합니다. 존재하지 않을 시, 오늘의 정보를 가져옵니다.
+      description: >
+        ## 개요
+        
+        멘티의 목표의 세부정보를 조회합니다. 쿼리 파라미터로 날짜가 필요하며, 기본값으로 오늘의 정보를 가져옵니다.
+        
+        ## 응답 설명
+        
+        ### `todo_status`
+          - `TODO`: 진행 중인 투두
+          - `COMPLETED`: 완료된 투두
+        
+        ## 🚨 주의사항
+        
+        `goal`의 id 값과 `mentee_goal`의 id 값은 서로 다른 값입니다.
+        
+        
+        일반적인 목표를 조회하는 경우 `goal`의 id를 사용하고, mentee의 목표를 조회하는 경우 `mentee_goal`의 id를 사용합니다.
       operationId: getMenteeGoalDetails
       parameters:
-        - name: goalId
+        - name: menteeGoalId
           in: path
           required: true
           schema:
             type: integer
-          description: 조회할 멘티목표 ID
+          description: 멘티목표 ID
         - name: date
           in: query
           required: false
           schema:
             type: string
             format: date
-          description: 조회할 날짜
+          description: 날짜
       responses:
         '200':
-          description: 조회 성공. 오늘 할 일 리스트, 진척도 정보(오늘, 전체), 멘토 코멘트, 목표명, 멘토를 포함합니다.
+          description: 조회 성공
           content:
             application/json:
               schema:
@@ -360,7 +400,79 @@ paths:
                     properties:
                       data:
                         $ref: '#/components/schemas/MenteeGoalDailyResponse'
-  /mentees/my/goal/{goalId}/todos/{todoId}:
+  /mentees/my/goals/{menteeGoalId}/weekly-progress:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - MenteeGoal
+      summary: 멘티의 목표 진척도 조회
+      description: >
+        ## 개요
+        
+        멘티의 목표 진척도를 주 단위로 조회합니다.
+        
+        일~월 순으로 진척도가 제공되며, 페이지 크기는 7로 고정됩니다.
+      operationId: getMenteeGoalWeeklyProgress
+      parameters:
+        - name: menteeGoalId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 멘티목표 ID
+        - name: date
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+          description: 날짜
+      responses:
+        '200':
+          description: 조회 성공
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          progress:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/MenteeGoalDailyProgressResponse'
+                          has_last_week:
+                            type: boolean
+                          has_next_week:
+                            type: boolean
+  /mentees/my/todos:
+    # 오늘 해야할 일이 남았는지 확인용
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - MenteeGoal
+      summary: 멘티의 오늘 할 일 확인
+      description: 멘티의 오늘 할 일이 남았는지 확인합니다.
+      operationId: hasTodayTodos
+      responses:
+        '200':
+          description: 조회 성공
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/HasTodayTodosResponse'
+
+  /mentees/my/goals/{menteeGoalId}/todos/{todoId}:
     post:
       security:
         - bearerAuth: [ ]
@@ -370,7 +482,7 @@ paths:
       description: 멘티의 목표에 대해 투두 상태를 업데이트 합니다.
       operationId: updateMenteeGoalTodoStatus
       parameters:
-        - name: goalId
+        - name: menteeGoalId
           in: path
           required: true
           schema:
@@ -381,7 +493,7 @@ paths:
           required: true
           schema:
             type: integer
-          description: 조회할 투두 ID
+          description: 투두 ID
       responses:
         '200':
           description: 업데이트 성공. 업데이트된 투두 정보를 반환합니다.
@@ -393,30 +505,194 @@ paths:
                   - type: object
                     properties:
                       data:
-                        $ref: '#/components/schemas/MenteeGoalDailyTodoResponse'
-  /mentees/my/goal/{goalId}/comments:
+                        $ref: '#/components/schemas/MenteeGoalTodoResponse'
+
+  # Comments
+  /mentees/my/goals/{menteeGoalId}/comments:
     get:
       security:
         - bearerAuth: [ ]
       tags:
-        - MenteeGoal
-      summary: 멘티의 목표 멘토 코멘트 조회
-      description: 멘티의 목표에 대해 멘토가 작성한 코멘트를 날짜 내림차순으로 조회합니다.
-      operationId: getMenteeGoalComments
+        - Comment
+      summary: 멘티의 목표 코멘트 조회
+      description: >
+        ## 개요
+        
+        멘티의 목표에 대해 멘토와 주고받은 코멘트를 조회합니다.
+        
+        코멘트는 최신 날짜부터 내림차순으로 정렬되며, 페이지네이션이 적용됩니다.
+
+      operationId: getComments
       parameters:
-        - name: goalId
+        - name: menteeGoalId
           in: path
           required: true
           schema:
             type: integer
-          description: 조회할 멘티목표 ID
+          description: 멘티목표 ID
       responses:
         '200':
-          description: 조회 성공. (리스트) 멘티의 코멘트를 날짜 내림차순으로 반환합니다.
+          description: 조회 성공
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/CommentResponse'
+    post:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Comment
+      summary: 멘티의 목표 코멘트 작성
+      description: >
+        ## 개요
+        
+        멘티의 목표에 대해 코멘트를 작성합니다. 코멘트 최대 길이는 300자이며, 하루 1회만 작성 가능합니다.
+
+      operationId: addComment
+      parameters:
+        - name: menteeGoalId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 멘티목표 ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentRequest'
+      responses:
+        '200':
+          description: 조회 성공
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/CommentResponse'
+  /mentees/my/goals/{menteeGoalId}/final-comment:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Comment
+      summary: 멘티의 목표 최종 코멘트 조회
+      description: 멘티의 목표에 대해 멘토가 작성한 최종 코멘트를 조회합니다.
+      operationId: getFinalComment
+      parameters:
+        - name: menteeGoalId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 멘티목표 ID
+      responses:
+        '200':
+          description: 조회 성공
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/CommentResponse'
+
+  /mentees/my/comments:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Comment
+      summary: 멘티의 새로운 코멘트 여부 조회
+      description: 멘티에게 온 새로운 코멘트가 있는지 확인합니다.
+      operationId: hasNewComments
+      responses:
+        '200':
+          description: 조회 성공
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/HasNewCommentsResponse'
+  /mentees/my/comments/{commentId}:
+    patch:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Comment
+      summary: 멘티의 목표 코멘트 수정
+      description: >
+        ## 개요
+        
+        멘티의 목표에 대해 코멘트를 수정합니다. 코멘트 최대 길이는 300자 입니다.
+      operationId: updateComment
+      parameters:
+        - name: commentId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 코멘트 ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentRequest'
+      responses:
+        '200':
+          description: 수정 성공
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/CommentResponse'
+    delete:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Comment
+      summary: 멘티의 목표 코멘트 삭제
+      description: 멘티의 목표에 대한 코멘트를 삭제합니다.
+      operationId: deleteComment
+      parameters:
+        - name: commentId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 코멘트 ID
+      responses:
+        '200':
+          description: 삭제 성공
+
 
 components:
   schemas:
-    # Request DTO
+    # Request Dto
     OAuthRequest:
       type: object
       properties:
@@ -436,6 +712,17 @@ components:
         identity_token: identity_token
         nonce: 임의의 nonce 값
         provider: KAKAO
+
+    CommentRequest:
+      type: object
+      properties:
+        comment:
+          type: string
+          description: 코멘트 내용
+          maxLength: 300
+          example: "멘토님, 오늘은 어떤 공부를 해야 할까요?"
+      required:
+        - comment
 
     # Response Dto
     LoginResponse:
@@ -470,6 +757,7 @@ components:
             - ACTIVE
             - DELETED
 
+    # Goal 관련
     GoalCommonInfo:
       type: object
       properties:
@@ -478,56 +766,63 @@ components:
           example: 1
         title:
           type: string
-          example: 목표 제목
+          description: 목표 제목
+          example: "다온과 함께하는 영어 완전 정복 30일 목표"
         topic:
           type: string
-          example: 코딩/운동/독서 등
+          description: 목표 주제
+          example: "영어"
         description:
           type: string
-          example: 목표에 대한 설명
+          description: 목표에 대한 설명
+          example: "영어를 하고 싶었지만 어떤 방법으로 해야 할 지, 루틴을 세우지만 어떤 방법이 효율적일지 고민이 많지 않았나요?"
         period:
           type: integer
           example: 30
-        price:
+        daily_duration:
           type: integer
-          example: 100000
-        discount_price:
-          type: integer
-          example: 85000
+          example: 4
         participants_limit:
           type: integer
-          example: 100
+          example: 10
         current_participants:
           type: integer
-          example: 50
+          example: 5
+        is_closing_soon:
+          type: boolean
+          example: true
         goal_status:
           $ref: '#/components/schemas/GoalStatusEnum'
         mentor_name:
           type: string
-          example: 멘토 이름
+          description: 멘토 이름
+          example: "다온"
         created_at:
           type: string
           format: date-time
-          example: 2025-01-20T10:18:15.158
         updated_at:
           type: string
           format: date-time
-          example: 2025-01-20T10:18:15.158
     GoalStatusEnum:
       type: string
       enum:
         - NOT_STARTED
         - IN_PROGRESS
         - CLOSED
+      example:
+        IN_PROGRESS
+
+    # GoalSummary
     GoalSummaryResponse:
       type: object
       allOf:
         - $ref: '#/components/schemas/GoalCommonInfo'
         - type: object
           properties:
+
             main_image:
               type: string
-              example: "https://image.url"
+              example: "https://main-image.url"
     GoalSummaryPagingResponse:
       type: object
       properties:
@@ -537,20 +832,22 @@ components:
             $ref: '#/components/schemas/GoalSummaryResponse'
         page:
           $ref: '#/components/schemas/PageResponse'
+
+    # GoalDetail
     GoalDetailResponse:
       type: object
       allOf:
         - $ref: '#/components/schemas/GoalCommonInfo'
         - type: object
           properties:
-            mid_objectives:
-              type: array
-              items:
-                $ref: '#/components/schemas/MidObjectiveResponse'
             weekly_objectives:
               type: array
               items:
                 $ref: '#/components/schemas/WeeklyObjectiveResponse'
+            mid_objectives:
+              type: array
+              items:
+                $ref: '#/components/schemas/MidObjectiveResponse'
             thumbnail_images:
               type: array
               items:
@@ -561,17 +858,6 @@ components:
               items:
                 type: string
                 example: "https://image.url"
-            daily_todos:
-              type: array
-              items:
-                $ref: '#/components/schemas/DailyTodoResponse'
-    MidObjectiveResponse:
-      type: object
-      properties:
-        description:
-          type: string
-          description: 중간 목표 설명
-          example: "깃허브 세팅 및 프로젝트 관리법에 대해 학습한다."
     WeeklyObjectiveResponse:
       type: object
       properties:
@@ -582,39 +868,101 @@ components:
         description:
           type: string
           description: 목표 주차별 상세 설명
-          example: "깃허브 기본 사용법 숙지 및 리포지토리 생성"
-    DailyTodoResponse:
+          example: "간단한 단어부터 시작하기"
+    MidObjectiveResponse:
       type: object
       properties:
-        todo_date:
-          type: string
-          format: date
-          example: "2025-01-02"
+        number:
+          type: integer
+          description: 현재 주차
+          example: 1
         description:
           type: string
-          example: "오늘의 커밋 진행하기"
-    #    MenteeGoalSummaryResponse:
-    #      type: object
-    #      properties:
-    #        id:
-    #          type: integer
-    #        total_objective_count:
-    #          type: integer
-    #        completed_objective_count:
-    #          type: integer
-    #        mentee_goal_status:
-    #          type: string
-    #          enum:
-    #            - IN_PROGRESS
-    #            - COMPLETED
-    #            - CANCELED
-    #        goal:
-    #          $ref: '#/components/schemas/GoalSummaryResponse'
+          description: 중간 목표 설명
+          example: "영어로 원어민과 편안하게 대화하는 법"
+
+    # MenteeGoal 관련
     MenteeGoalSummaryResponse:
       type: object
       allOf:
-        - $ref: '#/components/schemas/GoalSummaryResponse'
-        - $ref: '#/components/schemas/MenteeGoalProgressResponse'
+        - type: object
+          properties:
+            id:
+              type: integer
+              example: 1
+            title:
+              type: string
+              description: 목표 제목
+              example: "다온과 함께하는 영어 완전 정복 30일 목표"
+            topic:
+              type: string
+              description: 목표 주제
+              example: "영어"
+            mentor_name:
+              type: string
+              description: 멘토 이름
+              example: "다온"
+            main_image:
+              type: string
+              example: "https://main-image.url"
+            start_date:
+              type: string
+              format: date
+            end_date:
+              type: string
+              format: date
+            today_todo_count:
+              type: integer
+              example: 5
+            completed_today_todo_count:
+              type: integer
+              example: 3
+            total_todo_count:
+              type: integer
+              example: 100
+            completed_total_todo_count:
+              type: integer
+              example: 50
+            daily_remaining_count:
+              type: integer
+              example: 2
+            has_new_comments:
+              type: boolean
+              example: true
+            mentee_goal_status:
+              $ref: '#/components/schemas/MenteeGoalStatusEnum'
+            created_at:
+              type: string
+              format: date-time
+            updated_at:
+              type: string
+              format: date-time
+    MenteeGoalDailyProgressResponse:
+      type: object
+      properties:
+        daily_todo_count:
+          type: integer
+          example: 5
+        completed_daily_todo_count:
+          type: integer
+          example: 3
+        date:
+          type: string
+          format: date
+        day_of_week:
+          type: string
+          example: MON
+        is_valid:
+          type: boolean
+          example: true
+
+    MenteeGoalStatusEnum:
+      type: string
+      enum:
+        - IN_PROGRESS
+        - COMPLETED
+        - FAILED
+        - CANCELED
     MenteeGoalSummaryPagingResponse:
       type: object
       properties:
@@ -624,21 +972,20 @@ components:
             $ref: '#/components/schemas/MenteeGoalSummaryResponse'
         page:
           $ref: '#/components/schemas/PageResponse'
+
     MenteeGoalDailyResponse:
       type: object
       properties:
         date:
           type: string
           format: date
-        goal:
-          $ref: '#/components/schemas/GoalSummaryResponse'
+        mentee_goal:
+          $ref: '#/components/schemas/MenteeGoalSummaryResponse'
         todos:
           type: array
           items:
-            $ref: '#/components/schemas/MenteeGoalDailyTodoResponse'
-        comment:
-          type: string
-    MenteeGoalDailyTodoResponse:
+            $ref: '#/components/schemas/MenteeGoalTodoResponse'
+    MenteeGoalTodoResponse:
       type: object
       properties:
         id:
@@ -646,29 +993,49 @@ components:
         todo_date:
           type: string
           format: date
+          description: 투두 진행 날짜
+        estimated_minutes:
+          type: integer
+          description: 예상 소요 시간
+          example: 50
         description:
           type: string
-        status:
+          description: 투두 설명
+          example: "영어 단어 보카 30개 암기"
+        mentor_tip:
+          type: string
+          description: 멘토 팁
+          example: "예문을 반드시 5회 이상 읽어보세요!"
+        todo_status:
           type: string
           enum:
             - TODO
             - COMPLETED
-    MenteeGoalProgressResponse:
+    HasTodayTodosResponse:
       type: object
       properties:
-        total_todos:
-          type: integer
-        completed_todos:
-          type: integer
-        mentee_goal_status:
-          $ref: '#/components/schemas/MenteeGoalStatusEnum'
-    MenteeGoalStatusEnum:
-      type: string
-      enum:
-        - IN_PROGRESS
-        - COMPLETED
-        - FAILED
-        - CANCELED
+        hasTodayTodos:
+          type: boolean
+
+    CommentResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        comment:
+          type: string
+        comment_date:
+          type: string
+          format: date-time
+        from:
+          type: string
+        to:
+          type: string
+    HasNewCommentsResponse:
+      type: object
+      properties:
+        hasNewComment:
+          type: boolean
 
     # Paging
     PageResponse:
@@ -698,11 +1065,23 @@ components:
           type: integer
           description: 이전 페이지 번호 (이전 페이지가 없으면 null)
           example: 1
+        hasNext:
+          type: boolean
+          description: 다음 페이지 존재 여부
+          example: true
+        hasPrev:
+          type: boolean
+          description: 이전 페이지 존재 여부
+          example: true
       required:
         - totalElements
         - totalPages
         - currentPage
         - pageSize
+        - nextPage
+        - prevPage
+        - hasNext
+        - hasPrev
 
     # 공통응답. Data 필드를 제외한 부분이며, Data 필드에 들어갈 정보는 Response component에 정의
     ApiResponse:
