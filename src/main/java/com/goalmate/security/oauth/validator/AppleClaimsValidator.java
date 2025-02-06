@@ -4,7 +4,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import io.jsonwebtoken.Claims;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Component
 public class AppleClaimsValidator {
 
@@ -22,8 +24,11 @@ public class AppleClaimsValidator {
 	}
 
 	public boolean isValid(Claims claims, String nonce) {
+		log.info(
+			claims.getIssuer().contains(iss) + " " + claims.getAudience().contains(clientId) + " " + claims.get(
+				NONCE_KEY, String.class).equals(nonce));
 		return claims.getIssuer().contains(iss) &&
-			claims.getAudience().equals(clientId) &&
+			claims.getAudience().stream().findFirst().equals(clientId) &&
 			claims.get(NONCE_KEY, String.class).equals(nonce);
 	}
 }
