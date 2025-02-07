@@ -1,5 +1,6 @@
 package com.goalmate.mapper;
 
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,8 +29,8 @@ public class GoalResponseMapper {
 		summary.setCurrentParticipants(goal.getCurrentParticipants());
 		summary.setGoalStatus(GoalStatusEnum.fromValue(goal.getGoalStatus().getValue()));
 		summary.setMentorName(goal.getMentorEntity().getName());
-		summary.setCreatedAt(goal.getCreatedAt().atOffset(java.time.ZoneOffset.UTC));
-		summary.setUpdatedAt(goal.getUpdatedAt().atOffset(java.time.ZoneOffset.UTC));
+		summary.setCreatedAt(goal.getCreatedAt().atOffset(ZoneOffset.UTC));
+		summary.setUpdatedAt(goal.getUpdatedAt().atOffset(ZoneOffset.UTC));
 		goal.getThumbnailImages().stream()
 			.findFirst().ifPresent(thumbnailImage -> summary.setMainImage(thumbnailImage.getImageUrl()));
 		return summary;
@@ -48,8 +49,8 @@ public class GoalResponseMapper {
 		detail.setCurrentParticipants(goal.getCurrentParticipants());
 		detail.setGoalStatus(GoalStatusEnum.fromValue(goal.getGoalStatus().getValue()));
 		detail.setMentorName(goal.getMentorEntity().getName());
-		detail.setCreatedAt(goal.getCreatedAt().atOffset(java.time.ZoneOffset.UTC));
-		detail.setUpdatedAt(goal.getUpdatedAt().atOffset(java.time.ZoneOffset.UTC));
+		detail.setCreatedAt(goal.getCreatedAt().atOffset(ZoneOffset.UTC));
+		detail.setUpdatedAt(goal.getUpdatedAt().atOffset(ZoneOffset.UTC));
 		// ThumbnailImages
 		detail.setThumbnailImages(goal.getThumbnailImages().stream()
 			.map(ThumbnailImageEntity::getImageUrl)

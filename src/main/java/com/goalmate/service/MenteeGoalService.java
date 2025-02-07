@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.goalmate.api.model.MenteeGoalDailyDetailResponse;
 import com.goalmate.api.model.MenteeGoalSummaryPagingResponse;
 import com.goalmate.api.model.MenteeGoalSummaryResponse;
 import com.goalmate.api.model.MenteeGoalTodoResponse;
@@ -36,7 +37,7 @@ public class MenteeGoalService {
 	private final MenteeGoalRepository menteeGoalRepository;
 	private final MenteeGoalDailyTodoRepository dailyTodoRepository;
 
-	public MenteeGoalSummaryPagingResponse getMenteeGoals(Long menteeId, Integer page, Integer size) {
+	public MenteeGoalSummaryPagingResponse getMenteeGoalSummaries(Long menteeId, Integer page, Integer size) {
 		Pageable pageable = PageRequestUtil.createPageRequest(page, size);
 		Page<MenteeGoalEntity> menteeGoals = menteeGoalRepository.findByMenteeId(menteeId, pageable);
 		List<MenteeGoalSummaryResponse> summaries = menteeGoals.stream()
@@ -85,7 +86,7 @@ public class MenteeGoalService {
 			.build();
 	}
 
-	public Object getMenteeGoalDailyDetails(Long menteeGoalId, LocalDate date) {
+	public MenteeGoalDailyDetailResponse getMenteeGoalDailyDetails(Long menteeGoalId, LocalDate date) {
 		MenteeGoalEntity menteeGoal = getMenteeGoal(menteeGoalId);
 		MenteeGoalSummaryResponse summary = MenteeGoalResponseMapper
 			.mapToSummaryResponse(
@@ -109,7 +110,7 @@ public class MenteeGoalService {
 		return MenteeGoalResponseMapper.mapToTodoResponse(todo);
 	}
 
-	private MenteeGoalEntity getMenteeGoal(Long menteeGoalId) {
+	public MenteeGoalEntity getMenteeGoal(Long menteeGoalId) {
 		return menteeGoalRepository.findById(menteeGoalId)
 			.orElseThrow(() -> new CoreApiException(ErrorType.NOT_FOUND, "MenteeGoal not found"));
 	}

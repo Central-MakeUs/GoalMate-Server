@@ -5,7 +5,7 @@ spring:
     import:
       - optional:classpath:env.yaml
   profiles:
-    active: dev
+    active: local
 
 server:
   tomcat:
@@ -14,6 +14,36 @@ server:
       max: 600
       min-spare: 100
   port: 8080
+---
+spring.config.activate.on-profile: local
+
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+        show_sql: true
+      hibernate.default_batch_fetch_size: 1000
+    show-sql: true
+    generate-ddl: true
+    defer-datasource-initialization: true
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/goalmate
+    username: root
+    password: local1234!
+  sql:
+    init:
+      mode: never
+      data-locations: classpath:db/data.sql
+      #      schema-locations: classpath:db/schema.sql
+  #  data:
+  #    redis:
+  #      host: ${REDIS_HOST}
+  #      port: ${REDIS_PORT}
 
 ---
 spring.config.activate.on-profile: dev
@@ -21,7 +51,7 @@ spring.config.activate.on-profile: dev
 spring:
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
@@ -45,32 +75,3 @@ spring:
   #    redis:
   #      host: ${REDIS_HOST}
   #      port: ${REDIS_PORT}
-
-#  security:
-#    oauth2:
-#      kakao:
-#        infoUrl: https://kapi.kakao.com
-#        baseUrl: https://kauth.kakao.com
-#        clientId: ${KAKAO_CLIENT_ID}
-#        redirectUri: https://dev.peerna.me/login/oauth2/kakao
-#        secretKey: ${KAKAO_CLIENT_SECRET}
-#      client:
-#        provider:
-#          kakao:
-#            authorization-uri: https://kauth.kakao.com/oauth/authorize
-#            token-uri: https://kauth.kakao.com/oauth/token
-#            user-info-uri: https://kapi.kakao.com/v2/user/me
-#            user-name-attribute: id
-#
-#        registration:
-#          kakao:
-#            client-id: ${KAKAO_CLIENT_ID}
-#            client-secret: ${KAKAO_CLIENT_SECRET}
-#            client-authentication-method: client_secret_post
-#            redirect-uri: https://dev.peerna.me/login/oauth2/kakao
-#            authorization-grant-type: authorization_code
-#            client-name: kakao
-#
-#web:
-#  redirect-url: ${KAKAO_REDIRECT_URL}
-#  apple-redirect-url: ${APPLE_REDIRECT_URL}

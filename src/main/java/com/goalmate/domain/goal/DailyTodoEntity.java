@@ -43,10 +43,12 @@ public class DailyTodoEntity {
 	private GoalEntity goalEntity;
 
 	@Builder
-	public DailyTodoEntity(LocalDate todoDate, String description, GoalEntity goalEntity) {
+	public DailyTodoEntity(LocalDate todoDate, Integer estimatedMinutes, String description, String mentorTip,
+		GoalEntity goalEntity) {
 		this.todoDate = todoDate;
+		this.estimatedMinutes = estimatedMinutes;
 		this.description = description;
+		this.mentorTip = mentorTip;
 		this.goalEntity = goalEntity;
 	}
-
 }

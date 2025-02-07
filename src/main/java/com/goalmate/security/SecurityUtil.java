@@ -3,6 +3,7 @@ package com.goalmate.security;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import com.goalmate.domain.mentee.Role;
 import com.goalmate.security.jwt.UserDetailsImpl;
 import com.goalmate.support.error.CoreApiException;
 import com.goalmate.support.error.ErrorType;
@@ -10,12 +11,25 @@ import com.goalmate.support.error.ErrorType;
 public class SecurityUtil {
 
 	private SecurityUtil() {
-		// Utility 클래스이므로 인스턴스화 방지
+	}
+
+	public static Role getCurrenUserRole() {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		UserDetailsImpl userDetails = getUserDetailImpl(authentication);
+		String authority = userDetails.getAuthorities().stream()
+			.findFirst()
+			.orElseThrow(() -> new CoreApiException(ErrorType.FORBIDDEN))
+			.getAuthority();
+		return Role.valueOf(authority.toUpperCase());
 	}
 
 	public static Long getCurrentUserId() {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		UserDetailsImpl userDetails = getUserDetailImpl(authentication);
+		return userDetails.getId();
+	}
 
+	private static UserDetailsImpl getUserDetailImpl(Authentication authentication) {
 		// 인증 객체가 null이거나 인증되지 않은 상태일 수 있으므로 예외 처리
 		if (authentication == null || !authentication.isAuthenticated()) {
 			throw new CoreApiException(ErrorType.UNAUTHORIZED);
@@ -26,9 +40,6 @@ public class SecurityUtil {
 		if (!(principal instanceof UserDetailsImpl)) {
 			throw new CoreApiException(ErrorType.UNAUTHORIZED);
 		}
-
-		// UserDetailsImpl로 캐스팅 후 ID 반환
-		UserDetailsImpl userDetails = (UserDetailsImpl)principal;
-		return userDetails.getId();
+		return (UserDetailsImpl)principal;
 	}
 }

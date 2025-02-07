@@ -2,8 +2,8 @@ package com.goalmate.domain.mentee;
 
 public enum Role {
 	ROLE_ADMIN("ADMIN"),
-	ROLE_MENTEE("ROLE_MENTEE"),
-	ROLE_MENTOR("ROLE_MENTOR");
+	ROLE_MENTEE("MENTEE"),
+	ROLE_MENTOR("MENTOR");
 
 	private final String value;
 

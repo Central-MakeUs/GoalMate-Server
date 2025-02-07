@@ -70,7 +70,7 @@ public class AuthService {
 		return jwtProvider.generateTokenPair(
 			UserDetailsImpl.builder()
 				.id(menteeEntity.getId())
-				.authorities(List.of(new SimpleGrantedAuthority(menteeEntity.getRole().getValue())))
+				.authorities(List.of(new SimpleGrantedAuthority(menteeEntity.getRole().name())))
 				.build());
 	}
 }

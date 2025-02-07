@@ -457,9 +457,12 @@ paths:
         - bearerAuth: [ ]
       tags:
         - MenteeGoal
-      summary: 멘티의 오늘 할 일 확인
-      description: 멘티의 오늘 할 일이 남았는지 확인합니다.
-      operationId: hasTodayTodos
+      summary: (알림용) 멘티 미완료 투두 확인
+      description: >
+        ## 개요
+        
+        멘티의 미완료 투두가 남아있는지 확인합니다. 오늘(조회일)의 투두만을 대상으로 하며, 오늘 이전의 투두는 미완료에 포함하지 않습니다.
+      operationId: hasRemainingTodosToday
       responses:
         '200':
           description: 조회 성공
@@ -471,7 +474,7 @@ paths:
                   - type: object
                     properties:
                       data:
-                        $ref: '#/components/schemas/HasTodayTodosResponse'
+                        $ref: '#/components/schemas/RemainingTodosResponse'
 
   /mentees/my/goals/{menteeGoalId}/todos/{todoId}:
     post:
@@ -532,7 +535,25 @@ paths:
           required: true
           schema:
             type: integer
+            format: int64
           description: 멘티목표 ID
+        - name: page
+          in: query
+          description: 페이지 번호 (1부터 시작)
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: size
+          in: query
+          description: 페이지당 아이템 수
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
       responses:
         '200':
           description: 조회 성공
@@ -544,27 +565,26 @@ paths:
                   - type: object
                     properties:
                       data:
-                        type: array
-                        items:
-                          $ref: '#/components/schemas/CommentResponse'
+                        $ref: '#/components/schemas/CommentPagingResponse'
     post:
       security:
         - bearerAuth: [ ]
       tags:
         - Comment
-      summary: 멘티의 목표 코멘트 작성
+      summary: 멘티의 목표 코멘트 작성 (멘티용)
       description: >
         ## 개요
         
-        멘티의 목표에 대해 코멘트를 작성합니다. 코멘트 최대 길이는 300자이며, 하루 1회만 작성 가능합니다.
+        멘티가 목표에 대해 코멘트를 작성합니다. 코멘트 최대 길이는 300자이며, 하루 1회만 작성 가능합니다.
 
-      operationId: addComment
+      operationId: addMenteeComment
       parameters:
         - name: menteeGoalId
           in: path
           required: true
           schema:
             type: integer
+            format: int64
           description: 멘티목표 ID
       requestBody:
         required: true
@@ -599,6 +619,7 @@ paths:
           required: true
           schema:
             type: integer
+            format: int64
           description: 멘티목표 ID
       responses:
         '200':
@@ -654,6 +675,7 @@ paths:
           required: true
           schema:
             type: integer
+            format: int64
           description: 코멘트 ID
       requestBody:
         required: true
@@ -687,11 +709,11 @@ paths:
           required: true
           schema:
             type: integer
+            format: int64
           description: 코멘트 ID
       responses:
         '200':
           description: 삭제 성공
-
 
 components:
   schemas:
@@ -1012,24 +1034,37 @@ components:
           example: "예문을 반드시 5회 이상 읽어보세요!"
         todo_status:
           type: string
-    HasTodayTodosResponse:
+    RemainingTodosResponse:
       type: object
       properties:
-        hasTodayTodos:
+        hasRemainingTodosToday:
           type: boolean
 
     CommentResponse:
       type: object
       properties:
         id:
-          type: string
+          type: integer
+          format: int64
         comment:
           type: string
-        comment_date:
+        commented_at:
           type: string
           format: date-time
         writer:
           type: string
+        writer_role:
+          type: string
+    CommentPagingResponse:
+      type: object
+      properties:
+        comments:
+          type: array
+          items:
+            $ref: '#/components/schemas/CommentResponse'
+        page:
+          $ref: '#/components/schemas/PageResponse'
+
     HasNewCommentsResponse:
       type: object
       properties:

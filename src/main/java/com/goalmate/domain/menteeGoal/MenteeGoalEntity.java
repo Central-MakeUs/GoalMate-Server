@@ -17,7 +17,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Builder;
@@ -29,7 +28,6 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "mentee_goal")
 public class MenteeGoalEntity extends BaseEntity {
-
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -44,10 +42,6 @@ public class MenteeGoalEntity extends BaseEntity {
 	@Column(nullable = false)
 	private MenteeGoalStatus status;
 
-	@Lob
-	@Column(nullable = true)
-	private String finalComment;
-
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "mentee_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
 	private MenteeEntity menteeEntity;
@@ -61,7 +55,6 @@ public class MenteeGoalEntity extends BaseEntity {
 		this.startDate = startDate;
 		this.endDate = endDate;
 		this.status = MenteeGoalStatus.IN_PROGRESS;
-		this.finalComment = null;
 		this.menteeEntity = menteeEntity;
 		this.goalEntity = goalEntity;
 	}

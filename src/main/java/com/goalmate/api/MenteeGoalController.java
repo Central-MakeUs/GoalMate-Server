@@ -6,8 +6,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.goalmate.api.model.GetMenteeGoalWeeklyProgress200Response;
-import com.goalmate.api.model.HasTodayTodosResponse;
 import com.goalmate.api.model.MenteeGoalSummaryPagingResponse;
+import com.goalmate.api.model.RemainingTodosResponse;
 import com.goalmate.security.SecurityUtil;
 import com.goalmate.service.MenteeGoalService;
 
@@ -21,7 +21,7 @@ public class MenteeGoalController implements MenteeGoalApi {
 	@Override
 	public ResponseEntity getMenteeGoals(Integer page, Integer size) {
 		final Long menteeId = SecurityUtil.getCurrentUserId();
-		final MenteeGoalSummaryPagingResponse response = menteeGoalService.getMenteeGoals(menteeId, page, size);
+		final MenteeGoalSummaryPagingResponse response = menteeGoalService.getMenteeGoalSummaries(menteeId, page, size);
 		return ResponseEntity.ok(response);
 	}
 
@@ -33,10 +33,10 @@ public class MenteeGoalController implements MenteeGoalApi {
 	}
 
 	@Override
-	public ResponseEntity hasTodayTodos() {
+	public ResponseEntity hasRemainingTodosToday() {
 		final Long menteeId = SecurityUtil.getCurrentUserId();
-		final HasTodayTodosResponse response = new HasTodayTodosResponse();
-		response.setHasTodayTodos(menteeGoalService.hasRemainingTodosToday(menteeId));
+		final RemainingTodosResponse response = new RemainingTodosResponse();
+		response.setHasRemainingTodosToday(menteeGoalService.hasRemainingTodosToday(menteeId));
 		return ResponseEntity.ok(response);
 	}
 

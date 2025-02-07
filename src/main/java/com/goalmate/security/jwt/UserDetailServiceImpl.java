@@ -42,7 +42,7 @@ public class UserDetailServiceImpl implements UserDetailsService {
 
 	private List<GrantedAuthority> getAuthorities(MenteeEntity menteeEntity) {
 		return menteeEntity.getRole() != null ?
-			List.of(new SimpleGrantedAuthority(menteeEntity.getRole().getValue()))
+			List.of(new SimpleGrantedAuthority(menteeEntity.getRole().name()))
 			: List.of();
 	}
 }
