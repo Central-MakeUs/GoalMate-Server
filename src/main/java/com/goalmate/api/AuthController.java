@@ -8,6 +8,7 @@ import com.goalmate.api.model.LoginResponse;
 import com.goalmate.api.model.OAuthRequest;
 import com.goalmate.service.AuthService;
 import com.goalmate.service.LoginResult;
+import com.goalmate.support.response.ApiResponse;
 
 import lombok.RequiredArgsConstructor;
 
@@ -15,7 +16,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 public class AuthController implements AuthApi {
 	private final AuthService authService;
-	
+
 	@Override
 	public ResponseEntity loginOrSignUp(OAuthRequest oauthRequest) {
 		LoginResult result = authService.authenticateWithOauth(
@@ -27,9 +28,9 @@ public class AuthController implements AuthApi {
 		response.setRefreshToken(result.refreshToken());
 		// 회원가입: 201
 		if (result.isPending())
-			return ResponseEntity.status(HttpStatus.CREATED).body(response);
+			return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(response));
 		// 로그인: 200
-		return ResponseEntity.status(HttpStatus.OK).body(response);
+		return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(response));
 	}
 
 	@Override

@@ -48,6 +48,9 @@ public class GoalEntity extends BaseEntity {
 	private Integer period;
 
 	@Column(nullable = false)
+	private Integer dailyDuration;
+
+	@Column(nullable = false)
 	private Integer price;
 
 	@Column(nullable = false)
@@ -88,6 +91,7 @@ public class GoalEntity extends BaseEntity {
 		String topic,
 		String description,
 		Integer period,
+		Integer dailyDuration,
 		Integer price,
 		Integer discountPrice,
 		Integer participantsLimit,
@@ -96,6 +100,7 @@ public class GoalEntity extends BaseEntity {
 		this.topic = topic;
 		this.description = description;
 		this.period = period;
+		this.dailyDuration = dailyDuration;
 		this.price = price;
 		this.discountPrice = discountPrice;
 		this.participantsLimit = participantsLimit;

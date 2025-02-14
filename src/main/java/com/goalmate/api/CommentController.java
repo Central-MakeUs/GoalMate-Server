@@ -9,6 +9,7 @@ import com.goalmate.api.model.CommentRoomPagingResponse;
 import com.goalmate.security.util.CurrentUserContext;
 import com.goalmate.security.util.SecurityUtil;
 import com.goalmate.service.CommentService;
+import com.goalmate.support.response.ApiResponse;
 
 import lombok.RequiredArgsConstructor;
 
@@ -20,19 +21,19 @@ public class CommentController implements CommentApi {
 	public ResponseEntity getCommentRooms(Integer page, Integer size) {
 		CurrentUserContext userContext = SecurityUtil.getCurrentUser();
 		CommentRoomPagingResponse response = commentService.getCommentRooms(userContext, page, size);
-		return ResponseEntity.ok(response);
+		return ResponseEntity.ok(ApiResponse.success(response));
 	}
 
 	@Override
 	public ResponseEntity addCommentFromMentee(Long roomId, CommentRequest commentRequest) {
 		CommentResponse response = commentService.addMenteeComment(roomId, commentRequest.getComment());
-		return ResponseEntity.ok(response);
+		return ResponseEntity.ok(ApiResponse.success(response));
 	}
 
 	@Override
 	public ResponseEntity getComments(Long roomId, Integer page, Integer size) {
 		CommentPagingResponse response = commentService.getComments(roomId, page, size);
-		return ResponseEntity.ok(response);
+		return ResponseEntity.ok(ApiResponse.success(response));
 	}
 
 	@Override
@@ -41,8 +42,8 @@ public class CommentController implements CommentApi {
 	}
 
 	@Override
-	public ResponseEntity<Void> deleteCommentFromMentee(Long commentId) {
+	public ResponseEntity deleteCommentFromMentee(Long commentId) {
 		commentService.deleteComment(commentId);
-		return ResponseEntity.ok(null);
+		return ResponseEntity.ok(ApiResponse.success());
 	}
 }

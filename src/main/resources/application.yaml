@@ -37,7 +37,7 @@ spring:
     password: local1234!
   sql:
     init:
-      mode: never
+      mode: always
       data-locations: classpath:db/data.sql
       #      schema-locations: classpath:db/schema.sql
   #  data:

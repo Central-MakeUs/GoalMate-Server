@@ -16,6 +16,8 @@ import com.goalmate.domain.goal.GoalEntity;
 import com.goalmate.domain.goal.ThumbnailImageEntity;
 
 public class GoalResponseMapper {
+	private static final int CLOSING_SOON_THRESHOLD = 10;
+
 	public static GoalSummaryResponse mapToSummaryResponse(GoalEntity goal) {
 		GoalSummaryResponse summary = new GoalSummaryResponse();
 		summary.setId(goal.getId().intValue());
@@ -23,10 +25,12 @@ public class GoalResponseMapper {
 		summary.setTopic(goal.getTopic());
 		summary.setDescription(goal.getDescription());
 		summary.setPeriod(goal.getPeriod());
+		summary.setDailyDuration(goal.getDailyDuration());
 		// summary.setPrice(goal.getPrice());
 		// summary.setDiscountPrice(goal.getDiscountPrice());
 		summary.setParticipantsLimit(goal.getParticipantsLimit());
 		summary.setCurrentParticipants(goal.getCurrentParticipants());
+		summary.setIsClosingSoon(goal.getCurrentParticipants() <= CLOSING_SOON_THRESHOLD);
 		summary.setGoalStatus(GoalStatusEnum.fromValue(goal.getGoalStatus().getValue()));
 		summary.setMentorName(goal.getMentorEntity().getName());
 		summary.setCreatedAt(goal.getCreatedAt().atOffset(ZoneOffset.UTC));
