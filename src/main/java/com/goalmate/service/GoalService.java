@@ -12,13 +12,14 @@ import com.goalmate.api.model.GoalDetailResponse;
 import com.goalmate.api.model.GoalSummaryPagingResponse;
 import com.goalmate.api.model.GoalSummaryResponse;
 import com.goalmate.api.model.PageResponse;
+import com.goalmate.domain.comment.CommentRoomEntity;
 import com.goalmate.domain.goal.GoalEntity;
-import com.goalmate.domain.goal.GoalStatus;
 import com.goalmate.domain.mentee.MenteeEntity;
 import com.goalmate.domain.menteeGoal.MenteeGoalDailyTodoEntity;
 import com.goalmate.domain.menteeGoal.MenteeGoalEntity;
 import com.goalmate.mapper.GoalResponseMapper;
 import com.goalmate.mapper.PageResponseMapper;
+import com.goalmate.repository.CommentRoomRepository;
 import com.goalmate.repository.GoalRepository;
 import com.goalmate.repository.MenteeGoalDailyTodoRepository;
 import com.goalmate.repository.MenteeGoalRepository;
@@ -37,6 +38,7 @@ public class GoalService {
 	private final MenteeService menteeService;
 	private final GoalRepository goalRepository;
 	private final MenteeGoalRepository menteeGoalRepository;
+	private final CommentRoomRepository commentRoomRepository;
 	private final MenteeGoalDailyTodoRepository dailyTodoRepository;
 
 	@Transactional(readOnly = true)
@@ -63,9 +65,9 @@ public class GoalService {
 		MenteeEntity mentee = menteeService.getMenteeById(currentUserId);
 		GoalEntity goal = getGoalById(goalId);
 
-		validateGoalParticipation(goal, mentee);
+		validateGoal(goal);
+		validateParticipator(goal, mentee);
 
-		// MenteeGoalEntity 생성, 저장
 		MenteeGoalEntity menteeGoal = MenteeGoalEntity.builder()
 			.startDate(LocalDate.now())
 			.endDate(LocalDate.now().plusDays(goal.getPeriod()))
@@ -74,7 +76,10 @@ public class GoalService {
 			.build();
 		menteeGoalRepository.save(menteeGoal);
 
-		// GoalEntity로부터 DailyTodoEntity를 모두 가져와서 MenteeDailyTodoEntity로 변환하여 저장
+		CommentRoomEntity commentRoom = new CommentRoomEntity(goal.getMentorEntity(), mentee, menteeGoal);
+		commentRoomRepository.save(commentRoom);
+
+		// 할일 복사
 		List<MenteeGoalDailyTodoEntity> menteeDailyTodos = goal.getDailyTodos().stream()
 			.map(dailyTodo -> MenteeGoalDailyTodoEntity.builder()
 				.todoDate(dailyTodo.getTodoDate())
@@ -85,7 +90,7 @@ public class GoalService {
 				.build())
 			.toList();
 
-		// TODO: Bulk insert로 개선 필요
+		// TODO: Bulk insert로 개선
 		dailyTodoRepository.saveAll(menteeDailyTodos);
 		mentee.decreaseFreeParticipationCount(); // 무료 참여 횟수 차감
 		goal.increaseCurrentParticipants(); // 현재 참여자 수 증가
@@ -95,12 +100,18 @@ public class GoalService {
 		return goalRepository.findById(goalId).orElseThrow(() -> new CoreApiException(ErrorType.NOT_FOUND));
 	}
 
-	private void validateGoalParticipation(GoalEntity goalEntity, MenteeEntity menteeEntity) {
-		if (!menteeEntity.isFreeParticipationAvailable()) {
+	private void validateGoal(GoalEntity goal) {
+		if (goal.isFull()) {
+			throw new CoreApiException(ErrorType.FORBIDDEN, "There is no free participation count");
+		}
+	}
+
+	private void validateParticipator(GoalEntity goalEntity, MenteeEntity menteeEntity) {
+		if (!menteeEntity.hasFreeCount()) {
 			throw new CoreApiException(ErrorType.FORBIDDEN, "No free participation available.");
 		}
-		if (goalEntity.getGoalStatus().equals(GoalStatus.CLOSED)) {
-			throw new CoreApiException(ErrorType.FORBIDDEN, "Goal is closed.");
+		if (!goalEntity.isOpen()) {
+			throw new CoreApiException(ErrorType.FORBIDDEN, "Goal is not started or closed");
 		}
 		menteeGoalRepository.findByMenteeIdAndGoalId(menteeEntity.getId(), goalEntity.getId())
 			.ifPresent(menteeGoalEntity -> {

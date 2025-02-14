@@ -2,12 +2,12 @@ package com.goalmate.api;
 
 import org.springframework.http.ResponseEntity;
 
-import com.goalmate.api.model.AddMenteeComment200Response;
 import com.goalmate.api.model.CommentPagingResponse;
 import com.goalmate.api.model.CommentRequest;
 import com.goalmate.api.model.CommentResponse;
-import com.goalmate.api.model.GetFinalComment200Response;
-import com.goalmate.api.model.HasNewComments200Response;
+import com.goalmate.api.model.CommentRoomPagingResponse;
+import com.goalmate.security.util.CurrentUserContext;
+import com.goalmate.security.util.SecurityUtil;
 import com.goalmate.service.CommentService;
 
 import lombok.RequiredArgsConstructor;
@@ -17,35 +17,31 @@ public class CommentController implements CommentApi {
 	private final CommentService commentService;
 
 	@Override
-	public ResponseEntity addMenteeComment(Long menteeGoalId, CommentRequest commentRequest) {
-		CommentResponse response = commentService.addMenteeComment(menteeGoalId, commentRequest.getComment());
+	public ResponseEntity getCommentRooms(Integer page, Integer size) {
+		CurrentUserContext userContext = SecurityUtil.getCurrentUser();
+		CommentRoomPagingResponse response = commentService.getCommentRooms(userContext, page, size);
 		return ResponseEntity.ok(response);
 	}
 
 	@Override
-	public ResponseEntity getComments(Long menteeGoalId, Integer page, Integer size) {
-		CommentPagingResponse response = commentService.getComments(menteeGoalId, page, size);
+	public ResponseEntity addCommentFromMentee(Long roomId, CommentRequest commentRequest) {
+		CommentResponse response = commentService.addMenteeComment(roomId, commentRequest.getComment());
 		return ResponseEntity.ok(response);
 	}
 
 	@Override
-	public ResponseEntity<GetFinalComment200Response> getFinalComment(Long menteeGoalId) throws Exception {
-		return CommentApi.super.getFinalComment(menteeGoalId);
+	public ResponseEntity getComments(Long roomId, Integer page, Integer size) {
+		CommentPagingResponse response = commentService.getComments(roomId, page, size);
+		return ResponseEntity.ok(response);
 	}
 
 	@Override
-	public ResponseEntity<AddMenteeComment200Response> updateComment(Long commentId,
-		CommentRequest commentRequest) throws Exception {
-		return CommentApi.super.updateComment(commentId, commentRequest);
+	public ResponseEntity updateCommentFromMentee(Long commentId, CommentRequest commentRequest) throws Exception {
+		return CommentApi.super.updateCommentFromMentee(commentId, commentRequest);
 	}
 
 	@Override
-	public ResponseEntity<HasNewComments200Response> hasNewComments() throws Exception {
-		return CommentApi.super.hasNewComments();
-	}
-
-	@Override
-	public ResponseEntity<Void> deleteComment(Long commentId) {
+	public ResponseEntity<Void> deleteCommentFromMentee(Long commentId) {
 		commentService.deleteComment(commentId);
 		return ResponseEntity.ok(null);
 	}

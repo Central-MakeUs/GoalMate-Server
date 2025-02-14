@@ -19,8 +19,7 @@ public class MenteeGoalResponseMapper {
 
 	public static MenteeGoalSummaryResponse mapToSummaryResponse(
 		MenteeGoalEntity menteeGoal,
-		TodoProgress progress,
-		boolean hasNewComments) {
+		TodoProgress progress) {
 		GoalEntity goal = menteeGoal.getGoalEntity();
 		GoalSummaryResponse goalSummary = GoalResponseMapper.mapToSummaryResponse(goal);
 
@@ -36,10 +35,10 @@ public class MenteeGoalResponseMapper {
 
 		response.setTodayTodoCount(progress.getTodayCount());
 		response.setTodayCompletedCount(progress.getTodayCompletedCount());
-		response.setDailyRemainingCount(progress.getTodayCount() - progress.getTodayCompletedCount());
+		response.setTodayRemainingCount(progress.getTodayCount() - progress.getTodayCompletedCount());
+		
 		response.setTotalTodoCount(progress.getTotalCount());
 		response.setTotalCompletedCount(progress.getTotalCompletedCount());
-		response.setHasNewComments(hasNewComments);
 
 		response.setMenteeGoalStatus(MenteeGoalStatusEnum.valueOf(menteeGoal.getStatus().getValue()));
 

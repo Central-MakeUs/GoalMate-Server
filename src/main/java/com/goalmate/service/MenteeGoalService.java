@@ -32,8 +32,6 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @Transactional
 public class MenteeGoalService {
-	private final GoalService goalService;
-	private final CommentService commentService;
 	private final MenteeGoalRepository menteeGoalRepository;
 	private final MenteeGoalDailyTodoRepository dailyTodoRepository;
 
@@ -44,8 +42,7 @@ public class MenteeGoalService {
 			.map(menteeGoal -> MenteeGoalResponseMapper
 				.mapToSummaryResponse(
 					menteeGoal,
-					getTodoProgress(menteeGoal),
-					commentService.hasNewComment(menteeGoal.getId())))
+					getTodoProgress(menteeGoal)))
 			.toList();
 
 		// 페이징 정보를 담은 객체 생성
@@ -91,8 +88,7 @@ public class MenteeGoalService {
 		MenteeGoalSummaryResponse summary = MenteeGoalResponseMapper
 			.mapToSummaryResponse(
 				menteeGoal,
-				getTodoProgress(menteeGoal),
-				commentService.hasNewComment(menteeGoal.getId()));
+				getTodoProgress(menteeGoal));
 		List<MenteeGoalTodoResponse> todos = dailyTodoRepository.findByMenteeGoalIdAndDate(menteeGoalId, date)
 			.stream()
 			.map(MenteeGoalResponseMapper::mapToTodoResponse)

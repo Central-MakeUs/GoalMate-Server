@@ -1,4 +1,4 @@
-package com.goalmate.security;
+package com.goalmate.security.util;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -13,6 +13,16 @@ public class SecurityUtil {
 	private SecurityUtil() {
 	}
 
+	public static CurrentUserContext getCurrentUser() {
+		return new CurrentUserContext(getCurrentUserId(), getCurrenUserRole());
+	}
+
+	public static Long getCurrentUserId() {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		UserDetailsImpl userDetails = getUserDetailImpl(authentication);
+		return userDetails.getId();
+	}
+
 	public static Role getCurrenUserRole() {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		UserDetailsImpl userDetails = getUserDetailImpl(authentication);
@@ -21,12 +31,6 @@ public class SecurityUtil {
 			.orElseThrow(() -> new CoreApiException(ErrorType.FORBIDDEN))
 			.getAuthority();
 		return Role.valueOf(authority.toUpperCase());
-	}
-
-	public static Long getCurrentUserId() {
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		UserDetailsImpl userDetails = getUserDetailImpl(authentication);
-		return userDetails.getId();
 	}
 
 	private static UserDetailsImpl getUserDetailImpl(Authentication authentication) {

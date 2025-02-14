@@ -359,7 +359,7 @@ paths:
       description: >
         ## 개요
         
-        멘티의 목표의 일일 세부정보를 조회합니다. 쿼리 파라미터로 날짜가 필요하며, 해당 날짜의 투두 정보를 포함합니다.
+        멘티의 목표의 일일 세부정보를 조회합니다. 쿼리 파라미터로 날짜(default: 오늘)가 필요하며, 해당 날짜의 투두 정보를 포함합니다.
         
         ## 응답 설명
         
@@ -514,7 +514,7 @@ paths:
                         $ref: '#/components/schemas/MenteeGoalTodoResponse'
 
   # Comments
-  /mentees/my/goals/{menteeGoalId}/comments:
+  /comment-rooms/{roomId}/comments:
     get:
       security:
         - bearerAuth: [ ]
@@ -524,19 +524,19 @@ paths:
       description: >
         ## 개요
         
-        멘티의 목표에 대해 멘토와 주고받은 코멘트를 조회합니다.
+        멘토-멘티 간 주고받은 코멘트를 조회합니다.
         
         코멘트는 최신 날짜부터 내림차순으로 정렬되며, 페이지네이션이 적용됩니다.
 
       operationId: getComments
       parameters:
-        - name: menteeGoalId
+        - name: roomId
           in: path
           required: true
           schema:
             type: integer
             format: int64
-          description: 멘티목표 ID
+          description: 코멘트 룸 ID
         - name: page
           in: query
           description: 페이지 번호 (1부터 시작)
@@ -571,21 +571,21 @@ paths:
         - bearerAuth: [ ]
       tags:
         - Comment
-      summary: 멘티의 목표 코멘트 작성 (멘티용)
+      summary: 코멘트 작성 (멘티)
       description: >
         ## 개요
         
         멘티가 목표에 대해 코멘트를 작성합니다. 코멘트 최대 길이는 300자이며, 하루 1회만 작성 가능합니다.
 
-      operationId: addMenteeComment
+      operationId: addCommentFromMentee
       parameters:
-        - name: menteeGoalId
+        - name: roomId
           in: path
           required: true
           schema:
             type: integer
             format: int64
-          description: 멘티목표 ID
+          description: 코멘트 ID
       requestBody:
         required: true
         content:
@@ -604,23 +604,68 @@ paths:
                     properties:
                       data:
                         $ref: '#/components/schemas/CommentResponse'
-  /mentees/my/goals/{menteeGoalId}/final-comment:
+  # /mentees/my/goals/{menteeGoalId}/final-comment:
+  #   get:
+  #     security:
+  #       - bearerAuth: [ ]
+  #     tags:
+  #       - Comment
+  #     summary: 최종 코멘트 조회
+  #     description: 멘티의 목표에 대해 멘토가 작성한 최종 코멘트를 조회합니다.
+  #     operationId: getFinalComment
+  #     parameters:
+  #       - name: menteeGoalId
+  #         in: path
+  #         required: true
+  #         schema:
+  #           type: integer
+  #           format: int64
+  #         description: 멘티목표 ID
+  #     responses:
+  #       '200':
+  #         description: 조회 성공
+  #         content:
+  #           application/json:
+  #             schema:
+  #               allOf:
+  #                 - $ref: '#/components/schemas/ApiResponse'
+  #                 - type: object
+  #                   properties:
+  #                     data:
+  #                       type: array
+  #                       items:
+  #                         $ref: '#/components/schemas/CommentResponse'
+
+  /comment-rooms/my:
     get:
       security:
         - bearerAuth: [ ]
       tags:
         - Comment
-      summary: 멘티의 목표 최종 코멘트 조회
-      description: 멘티의 목표에 대해 멘토가 작성한 최종 코멘트를 조회합니다.
-      operationId: getFinalComment
+      summary: 코멘트 리스트 조회
+      description: >
+        ## 개요
+        
+        멘티에게 온 코멘트 리스트를 조회합니다. 페이지네이션이 적용되며, 최신 코멘트 순으로 정렬됩니다.
+      operationId: getCommentRooms
       parameters:
-        - name: menteeGoalId
-          in: path
-          required: true
+        - name: page
+          in: query
+          description: 페이지 번호 (1부터 시작)
+          required: false
           schema:
             type: integer
-            format: int64
-          description: 멘티목표 ID
+            minimum: 1
+            default: 1
+        - name: size
+          in: query
+          description: 페이지당 아이템 수
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
       responses:
         '200':
           description: 조회 성공
@@ -632,43 +677,19 @@ paths:
                   - type: object
                     properties:
                       data:
-                        type: array
-                        items:
-                          $ref: '#/components/schemas/CommentResponse'
-
-  /mentees/my/comments:
-    get:
-      security:
-        - bearerAuth: [ ]
-      tags:
-        - Comment
-      summary: 멘티의 새로운 코멘트 여부 조회
-      description: 멘티에게 온 새로운 코멘트가 있는지 확인합니다.
-      operationId: hasNewComments
-      responses:
-        '200':
-          description: 조회 성공
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/ApiResponse'
-                  - type: object
-                    properties:
-                      data:
-                        $ref: '#/components/schemas/HasNewCommentsResponse'
-  /mentees/my/comments/{commentId}:
+                        $ref: '#/components/schemas/CommentRoomPagingResponse'
+  /comments/{commentId}:
     patch:
       security:
         - bearerAuth: [ ]
       tags:
         - Comment
-      summary: 멘티의 목표 코멘트 수정
+      summary: 멘티가 작성한 코멘트 수정
       description: >
         ## 개요
         
-        멘티의 목표에 대해 코멘트를 수정합니다. 코멘트 최대 길이는 300자 입니다.
-      operationId: updateComment
+        멘티가 작성한 코멘트를 수정합니다. 코멘트 최대 길이는 300자 입니다.
+      operationId: updateCommentFromMentee
       parameters:
         - name: commentId
           in: path
@@ -702,7 +723,7 @@ paths:
         - Comment
       summary: 멘티의 목표 코멘트 삭제
       description: 멘티의 목표에 대한 코멘트를 삭제합니다.
-      operationId: deleteComment
+      operationId: deleteCommentFromMentee
       parameters:
         - name: commentId
           in: path
@@ -936,24 +957,23 @@ components:
             end_date:
               type: string
               format: date
+            final_comment:
+              type: string
             today_todo_count:
               type: integer
               example: 5
             today_completed_count:
               type: integer
               example: 3
+            today_remaining_count:
+              type: integer
+              example: 2
             total_todo_count:
               type: integer
               example: 100
             total_completed_count:
               type: integer
               example: 50
-            daily_remaining_count:
-              type: integer
-              example: 2
-            has_new_comments:
-              type: boolean
-              example: true
             mentee_goal_status:
               $ref: '#/components/schemas/MenteeGoalStatusEnum'
             created_at:
@@ -1034,6 +1054,7 @@ components:
           example: "예문을 반드시 5회 이상 읽어보세요!"
         todo_status:
           type: string
+          example: "TODO"
     RemainingTodosResponse:
       type: object
       properties:
@@ -1065,12 +1086,36 @@ components:
         page:
           $ref: '#/components/schemas/PageResponse'
 
-    HasNewCommentsResponse:
+    CommentRoomPagingResponse:
       type: object
       properties:
-        hasNewComment:
-          type: boolean
+        comment_rooms:
+          type: array
+          items:
+            $ref: '#/components/schemas/CommentRoomResponse'
+        page:
+          $ref: '#/components/schemas/PageResponse'
+    CommentRoomResponse:
+      type: object
+      properties:
+        mentee_goal_id:
+          type: integer
+          format: int64
+        mentee_goal_title:
+          type: string
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        mentor_name:
+          type: string
+        new_comments_count:
+          type: integer
+          format: int64
 
+    
     # Paging
     PageResponse:
       type: object

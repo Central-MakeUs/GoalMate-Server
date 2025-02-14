@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.goalmate.api.model.GetMenteeGoalWeeklyProgress200Response;
 import com.goalmate.api.model.MenteeGoalSummaryPagingResponse;
 import com.goalmate.api.model.RemainingTodosResponse;
-import com.goalmate.security.SecurityUtil;
+import com.goalmate.security.util.SecurityUtil;
 import com.goalmate.service.MenteeGoalService;
 
 import lombok.RequiredArgsConstructor;

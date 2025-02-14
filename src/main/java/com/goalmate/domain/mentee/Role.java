@@ -12,6 +12,7 @@ public enum Role {
 	}
 
 	public String getValue() {
+		// DTO 에서만 사용
 		return value;
 	}
 }

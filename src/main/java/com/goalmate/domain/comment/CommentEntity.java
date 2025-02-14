@@ -2,7 +2,6 @@ package com.goalmate.domain.comment;
 
 import com.goalmate.domain.BaseEntity;
 import com.goalmate.domain.mentee.Role;
-import com.goalmate.domain.menteeGoal.MenteeGoalEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.ConstraintMode;
@@ -51,8 +50,8 @@ public class CommentEntity extends BaseEntity {
 	private CommentType commentType;
 
 	@ManyToOne(optional = false)
-	@JoinColumn(name = "mentee_goal_id", foreignKey = @ForeignKey(ConstraintMode.CONSTRAINT))
-	private MenteeGoalEntity menteeGoalEntity;
+	@JoinColumn(name = "comment_room_id", foreignKey = @ForeignKey(ConstraintMode.CONSTRAINT))
+	private CommentRoomEntity commentRoom;
 
 	@Builder
 	public CommentEntity(
@@ -61,13 +60,13 @@ public class CommentEntity extends BaseEntity {
 		String writerName,
 		Role writerRole,
 		CommentType commentType,
-		MenteeGoalEntity menteeGoalEntity) {
+		CommentRoomEntity commentRoom) {
 		this.comment = comment;
 		this.writerId = writerId;
 		this.writerName = writerName;
 		this.writerRole = writerRole;
 		this.commentType = commentType;
-		this.menteeGoalEntity = menteeGoalEntity;
+		this.commentRoom = commentRoom;
 		this.isRead = false;
 	}
 
