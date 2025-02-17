@@ -10,7 +10,7 @@ VALUES ('2025-02-13 14:00:00', '2025-02-13 14:00:00', 'mentor2@example.com', 'Ja
 INSERT INTO goal
 (current_participants, discount_price, participants_limit, period, daily_duration, price, created_at, updated_at, mentor_id, description, title, topic, goal_status)
 VALUES
-    (0, 10000, 20, 30, 30, 50000, '2025-02-14 10:00:00', '2025-02-14 10:00:00', 1, 'A comprehensive Java bootcamp for beginners.', 'Java Bootcamp', 'Programming', 'IN_PROGRESS');
+    (0, 10000, 20, 30, 30, 50000, '2025-02-14 10:00:00', '2025-02-14 10:00:00', 1, 'A comprehensive Java bootcamp for beginners.', 'Java Bootcamp', 'Programming', 'OPEN');
 
 -- 삽입된 Goal의 ID를 변수에 저장
 SET @goal1_id = LAST_INSERT_ID();
@@ -22,17 +22,22 @@ INSERT INTO goal_content_image (goal_id, sequence, image_url)
 VALUES (@goal1_id, 2, 'https://picsum.photos/seed/102/156/214');
 
 -- 3. Goal_Thumbnail_Image 테이블에 데이터 삽입 (랜덤 seed: 103)
-INSERT INTO goal_thumbnail_image (goal_id, sequence, image_url)
-VALUES (@goal1_id, 1, 'https://picsum.photos/seed/103/156/214');
-INSERT INTO goal_thumbnail_image (goal_id, sequence, image_url)
-VALUES (@goal1_id, 2, 'https://picsum.photos/seed/104/156/214');
+-- INSERT INTO goal_thumbnail_image (goal_id, sequence, image_url)
+-- VALUES (@goal1_id, 1, 'https://picsum.photos/seed/103/156/214');
+-- INSERT INTO goal_thumbnail_image (goal_id, sequence, image_url)
+-- VALUES (@goal1_id, 2, 'https://picsum.photos/seed/104/156/214');
 
 
 -- 4. Goal_Daily_Todo 테이블에 데이터 삽입
-INSERT INTO goal_daily_todo (estimated_minutes, todo_date, goal_id, description, mentor_tip)
-VALUES (60, '2025-02-15', @goal1_id, 'Introduction to Java and setup environment', 'Install JDK and configure your IDE.');
-INSERT INTO goal_daily_todo (estimated_minutes, todo_date, goal_id, description, mentor_tip)
-VALUES (90, '2025-02-16', @goal1_id, 'Dive into OOP: Classes, Objects, and Inheritance', 'Review class structures and practice coding exercises.');
+INSERT INTO goal_daily_todo (estimated_minutes, day_number, goal_id, description, mentor_tip)
+VALUES (60, 1, @goal1_id, 'Introduction to Java and setup environment', 'Install JDK and configure your IDE.'),
+       (90, 1, @goal1_id, 'Learn Java syntax and basic programming concepts', 'Practice coding exercises and review Java documentation.'),
+       (75, 2, @goal1_id, 'Explore Java data types and control structures', 'Write code snippets to understand loops and conditional statements.'),
+       (120, 2, @goal1_id, 'Create a simple Java application', 'Build a console-based program to apply your knowledge.'),
+       (90, 3, @goal1_id, 'Understand object-oriented programming principles in Java', 'Implement classes and objects in your projects.'),
+       (120, 3, @goal1_id, 'Develop a Java project with multiple classes', 'Design a program with inheritance and polymorphism.'),
+       (90, 4, @goal1_id, 'Learn Java exception handling and file I/O', 'Practice error handling and read/write operations in Java.'),
+       (120, 4, @goal1_id, 'Complete a Java project with a GUI', 'Create a graphical user interface for your application.');
 
 -- 5. Goal_Mid_Objective 테이블에 데이터 삽입
 INSERT INTO goal_mid_objective (goal_id, sequence, description)
@@ -52,7 +57,7 @@ VALUES (1, @goal1_id, 'Learn Java syntax and core libraries.'),
 INSERT INTO goal
 (current_participants, discount_price, participants_limit, period, daily_duration, price, created_at, updated_at, mentor_id, description, title, topic, goal_status)
 VALUES
-    (5, 5000, 15, 60, 20,75000, '2025-02-13 15:30:00', '2025-02-13 15:30:00', 2, 'Learn the fundamentals of photography and enhance your skills.', 'Photography Basics', 'Art', 'NOT_STARTED');
+    (5, 5000, 15, 60, 20,75000, '2025-02-13 15:30:00', '2025-02-13 15:30:00', 2, 'Learn the fundamentals of photography and enhance your skills.', 'Photography Basics', 'Art', 'UPCOMING');
 
 -- 삽입된 Goal의 ID를 변수에 저장
 SET @goal2_id = LAST_INSERT_ID();
@@ -70,10 +75,10 @@ INSERT INTO goal_thumbnail_image (goal_id, sequence, image_url)
 VALUES (@goal2_id, 2, 'https://picsum.photos/seed/14/156/214');
 
 -- 4. Goal_Daily_Todo 테이블에 데이터 삽입
-INSERT INTO goal_daily_todo (estimated_minutes, todo_date, goal_id, description, mentor_tip)
-VALUES (45, '2025-02-15', @goal2_id, 'Introduction to camera settings: aperture, shutter speed, and ISO', 'Study your camera manual for detailed info.');
-INSERT INTO goal_daily_todo (estimated_minutes, todo_date, goal_id, description, mentor_tip)
-VALUES (60, '2025-02-16', @goal2_id, 'Practice basic composition and framing techniques', 'Apply the rule of thirds in your shots.');
+INSERT INTO goal_daily_todo (estimated_minutes, day_number, goal_id, description, mentor_tip)
+VALUES (45, 1, @goal2_id, 'Introduction to camera settings: aperture, shutter speed, and ISO', 'Study your camera manual for detailed info.');
+INSERT INTO goal_daily_todo (estimated_minutes, day_number, goal_id, description, mentor_tip)
+VALUES (60, 2, @goal2_id, 'Practice basic composition and framing techniques', 'Apply the rule of thirds in your shots.');
 
 -- 5. Goal_Mid_Objective 테이블에 데이터 삽입
 INSERT INTO goal_mid_objective (goal_id, sequence, description)

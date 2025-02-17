@@ -1,7 +1,5 @@
 package com.goalmate.domain.goal;
 
-import java.time.LocalDate;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
@@ -27,7 +25,7 @@ public class DailyTodoEntity {
 	private Long id;
 
 	@Column(nullable = false)
-	private LocalDate todoDate;
+	private Integer dayNumber;
 
 	@Column(nullable = false)
 	private Integer estimatedMinutes;
@@ -44,12 +42,12 @@ public class DailyTodoEntity {
 
 	@Builder
 	public DailyTodoEntity(
-		LocalDate todoDate,
+		Integer dayNumber,
 		Integer estimatedMinutes,
 		String description,
 		String mentorTip,
 		GoalEntity goal) {
-		this.todoDate = todoDate;
+		this.dayNumber = dayNumber;
 		this.estimatedMinutes = estimatedMinutes;
 		this.description = description;
 		this.mentorTip = mentorTip;
