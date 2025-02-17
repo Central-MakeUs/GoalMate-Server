@@ -175,7 +175,7 @@ paths:
         
         ### 응답 설명
         
-        - `is_available`: 이름 중복 여부
+        - `is_available`: 이름 사용 가능 여부 (중복 여부)
           - `true`: 사용 가능한 이름
           - `false`: 이미 사용 중인 이름
       operationId: checkNameAvailability
@@ -189,13 +189,16 @@ paths:
             example: 김멘티
       responses:
         '200':
-          description: 이름 중복 확인 성공
+          description: 조회 성공
           content:
             application/json:
               schema:
                 allOf:
                   - $ref: '#/components/schemas/ApiResponse'
-                  - $ref: '#/components/schemas/NameAvailabilityResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/NameAvailabilityResponse'
         '409':
           description: 중복된 이름
 
