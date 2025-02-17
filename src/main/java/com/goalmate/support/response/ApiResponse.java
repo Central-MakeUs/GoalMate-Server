@@ -1,5 +1,7 @@
 package com.goalmate.support.response;
 
+import org.springframework.http.HttpStatus;
+
 import com.goalmate.support.error.ErrorType;
 
 public class ApiResponse<S> {
@@ -24,6 +26,10 @@ public class ApiResponse<S> {
 
 	public static <S> ApiResponse<S> success(S data) {
 		return new ApiResponse<>(ResponseStatus.SUCCESS, "200", "정상적으로 처리되었습니다.", data);
+	}
+
+	public static <S> ApiResponse<S> success(HttpStatus httpStatus, S data) {
+		return new ApiResponse<>(ResponseStatus.SUCCESS, String.valueOf(httpStatus.value()), "정상적으로 처리되었습니다.", data);
 	}
 
 	public static ApiResponse<?> error(ErrorType error) {

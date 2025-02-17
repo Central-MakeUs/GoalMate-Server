@@ -8,12 +8,11 @@ import com.goalmate.api.model.GoalDetailResponse;
 import com.goalmate.api.model.GoalStatusEnum;
 import com.goalmate.api.model.GoalSummaryPagingResponse;
 import com.goalmate.api.model.GoalSummaryResponse;
+import com.goalmate.api.model.ImageResponse;
 import com.goalmate.api.model.MidObjectiveResponse;
 import com.goalmate.api.model.PageResponse;
 import com.goalmate.api.model.WeeklyObjectiveResponse;
-import com.goalmate.domain.goal.ContentImageEntity;
 import com.goalmate.domain.goal.GoalEntity;
-import com.goalmate.domain.goal.ThumbnailImageEntity;
 
 public class GoalResponseMapper {
 	private static final int CLOSING_SOON_THRESHOLD = 10;
@@ -32,7 +31,7 @@ public class GoalResponseMapper {
 		summary.setCurrentParticipants(goal.getCurrentParticipants());
 		summary.setIsClosingSoon(goal.getCurrentParticipants() <= CLOSING_SOON_THRESHOLD);
 		summary.setGoalStatus(GoalStatusEnum.fromValue(goal.getGoalStatus().getValue()));
-		summary.setMentorName(goal.getMentorEntity().getName());
+		summary.setMentorName(goal.getMentor().getName());
 		summary.setCreatedAt(goal.getCreatedAt().atOffset(ZoneOffset.UTC));
 		summary.setUpdatedAt(goal.getUpdatedAt().atOffset(ZoneOffset.UTC));
 		goal.getThumbnailImages().stream()
@@ -52,20 +51,18 @@ public class GoalResponseMapper {
 		detail.setParticipantsLimit(goal.getParticipantsLimit());
 		detail.setCurrentParticipants(goal.getCurrentParticipants());
 		detail.setGoalStatus(GoalStatusEnum.fromValue(goal.getGoalStatus().getValue()));
-		detail.setMentorName(goal.getMentorEntity().getName());
+		detail.setMentorName(goal.getMentor().getName());
 		detail.setCreatedAt(goal.getCreatedAt().atOffset(ZoneOffset.UTC));
 		detail.setUpdatedAt(goal.getUpdatedAt().atOffset(ZoneOffset.UTC));
 		// ThumbnailImages
 		detail.setThumbnailImages(goal.getThumbnailImages().stream()
-			.map(ThumbnailImageEntity::getImageUrl)
-			.collect(Collectors.toList()));
+			.map(thumbnailImage -> mapToImageResponse(thumbnailImage.getSequence(), thumbnailImage.getImageUrl()))
+			.toList());
 		// ContentImages
 		detail.setContentImages(goal.getContentImages().stream()
-			.map(ContentImageEntity::getImageUrl)
-			.collect(Collectors.toList()));
-		detail.setThumbnailImages(goal.getThumbnailImages().stream()
-			.map(ThumbnailImageEntity::getImageUrl)
-			.collect(Collectors.toList()));
+			.map(contentImage -> mapToImageResponse(contentImage.getSequence(), contentImage.getImageUrl()))
+			.toList());
+
 		// Weekly Objectives
 		detail.setWeeklyObjectives(goal.getWeeklyObjective().stream()
 			.map(weeklyObjective -> {
@@ -94,5 +91,12 @@ public class GoalResponseMapper {
 		response.setGoals(summaries);
 		response.setPage(pageResponse);
 		return response;
+	}
+
+	private static ImageResponse mapToImageResponse(Integer sequence, String imageUrl) {
+		ImageResponse imageResponse = new ImageResponse();
+		imageResponse.setSequence(sequence);
+		imageResponse.setImageUrl(imageUrl);
+		return imageResponse;
 	}
 }

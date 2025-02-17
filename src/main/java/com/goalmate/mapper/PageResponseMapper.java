@@ -14,6 +14,8 @@ public class PageResponseMapper {
 		pageResponse.setPageSize(page.getPageable().getPageSize());
 		pageResponse.setNextPage(page.hasNext() ? page.getPageable().getPageNumber() + 2 : null);
 		pageResponse.setPrevPage(page.hasPrevious() ? page.getPageable().getPageNumber() : null);
+		pageResponse.setHasNext(page.hasNext());
+		pageResponse.setHasPrev(page.hasPrevious());
 		return pageResponse;
 	}
 

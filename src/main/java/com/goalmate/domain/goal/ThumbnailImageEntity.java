@@ -24,14 +24,18 @@ public class ThumbnailImageEntity {
 	private Long id;
 
 	@Column(nullable = false)
+	private Integer sequence;
+
+	@Column(nullable = false)
 	private String imageUrl;
 
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "goal_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-	private GoalEntity goalEntity;
+	private GoalEntity goal;
 
-	public ThumbnailImageEntity(String imageUrl, GoalEntity goalEntity) {
+	public ThumbnailImageEntity(Integer sequence, String imageUrl, GoalEntity goal) {
+		this.sequence = sequence;
 		this.imageUrl = imageUrl;
-		this.goalEntity = goalEntity;
+		this.goal = goal;
 	}
 }

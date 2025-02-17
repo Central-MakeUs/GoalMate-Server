@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import com.goalmate.domain.BaseEntity;
+import com.goalmate.domain.goal.DailyTodoEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.ConstraintMode;
@@ -18,7 +19,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -54,15 +54,13 @@ public class MenteeGoalDailyTodoEntity extends BaseEntity {
 	@JoinColumn(name = "mentee_goal_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
 	private MenteeGoalEntity menteeGoalEntity;
 
-	@Builder
-	public MenteeGoalDailyTodoEntity(LocalDate todoDate, Integer estimatedMinutes, String description,
-		String mentorTip, MenteeGoalEntity menteeGoalEntity) {
-		this.todoDate = todoDate;
-		this.estimatedMinutes = estimatedMinutes;
-		this.description = description;
-		this.mentorTip = mentorTip;
-		this.status = TodoStatus.TODO;
-		this.menteeGoalEntity = menteeGoalEntity;
+	public MenteeGoalDailyTodoEntity(DailyTodoEntity dailyTodo, MenteeGoalEntity menteeGoal) {
+		this.todoDate = dailyTodo.getTodoDate();
+		this.estimatedMinutes = dailyTodo.getEstimatedMinutes();
+		this.description = dailyTodo.getDescription();
+		this.mentorTip = dailyTodo.getMentorTip();
+		this.status = TodoStatus.TODO; // 초기상태
+		this.menteeGoalEntity = menteeGoal;
 	}
 
 	public boolean isCompleted() {

@@ -1,8 +1,6 @@
 package com.goalmate.domain.mentee;
 
 import com.goalmate.domain.BaseEntity;
-import com.goalmate.support.error.CoreApiException;
-import com.goalmate.support.error.ErrorType;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -75,9 +73,6 @@ public class MenteeEntity extends BaseEntity {
 	}
 
 	public void decreaseFreeParticipationCount() {
-		if (freeParticipationCount <= 0) {
-			throw new CoreApiException(ErrorType.FORBIDDEN, "Free participation count limit");
-		}
 		freeParticipationCount--;
 	}
 

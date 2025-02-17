@@ -28,7 +28,7 @@ public class AuthController implements AuthApi {
 		response.setRefreshToken(result.refreshToken());
 		// 회원가입: 201
 		if (result.isPending())
-			return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(response));
+			return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(HttpStatus.CREATED, response));
 		// 로그인: 200
 		return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(response));
 	}

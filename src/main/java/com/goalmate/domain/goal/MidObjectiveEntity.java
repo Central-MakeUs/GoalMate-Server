@@ -24,14 +24,18 @@ public class MidObjectiveEntity {
 	private Long id;
 
 	@Column(nullable = false)
+	private int sequence;
+
+	@Column(nullable = false)
 	private String description;
 
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "goal_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-	private GoalEntity goalEntity;
+	private GoalEntity goal;
 
-	public MidObjectiveEntity(String description, GoalEntity goalEntity) {
+	public MidObjectiveEntity(int sequence, String description, GoalEntity goal) {
+		this.sequence = sequence;
 		this.description = description;
-		this.goalEntity = goalEntity;
+		this.goal = goal;
 	}
 }

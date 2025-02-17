@@ -31,11 +31,11 @@ public class WeeklyObjectiveEntity {
 
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "goal_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-	private GoalEntity goalEntity;
+	private GoalEntity goal;
 
-	public WeeklyObjectiveEntity(Integer weekNumber, String description, GoalEntity goalEntity) {
+	public WeeklyObjectiveEntity(Integer weekNumber, String description, GoalEntity goal) {
 		this.weekNumber = weekNumber;
 		this.description = description;
-		this.goalEntity = goalEntity;
+		this.goal = goal;
 	}
 }

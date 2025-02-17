@@ -40,15 +40,19 @@ public class DailyTodoEntity {
 
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "goal_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-	private GoalEntity goalEntity;
+	private GoalEntity goal;
 
 	@Builder
-	public DailyTodoEntity(LocalDate todoDate, Integer estimatedMinutes, String description, String mentorTip,
-		GoalEntity goalEntity) {
+	public DailyTodoEntity(
+		LocalDate todoDate,
+		Integer estimatedMinutes,
+		String description,
+		String mentorTip,
+		GoalEntity goal) {
 		this.todoDate = todoDate;
 		this.estimatedMinutes = estimatedMinutes;
 		this.description = description;
 		this.mentorTip = mentorTip;
-		this.goalEntity = goalEntity;
+		this.goal = goal;
 	}
 }

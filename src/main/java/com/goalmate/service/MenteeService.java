@@ -33,17 +33,16 @@ public class MenteeService {
 	}
 
 	public String updateMenteeName(Long menteeId, String name) {
-		validateMenteeName(name);
+		if (!isNameAvailable(name)) {
+			throw new CoreApiException(ErrorType.CONFLICT, "Mentee name already exists: " + name);
+		}
 		getMenteeById(menteeId).updateName(name);
 		return name;
 	}
 
 	@Transactional(readOnly = true)
-	public void validateMenteeName(String name) {
-		menteeRepository.findByName(name).ifPresent(menteeEntity -> {
-			log.warn(">>>>> Mentee name already exists: " + name);
-			throw new CoreApiException(ErrorType.CONFLICT, "Mentee name already exists: " + name);
-		});
+	public boolean isNameAvailable(String name) {
+		return !menteeRepository.existsByName(name);
 	}
 
 	public MenteeEntity getMenteeById(Long menteeId) {

@@ -168,9 +168,17 @@ paths:
         - bearerAuth: [ ]
       tags:
         - Mentee
-      summary: 멘티 이름 중복 확인
-      description: 멘티 이름의 중복 확인을 진행합니다.
-      operationId: validateMenteeName
+      summary: 멘티 이름 유효성 확인
+      description: >
+        ## 개요
+        멘티 이름의 중복 확인을 진행합니다.
+        
+        ### 응답 설명
+        
+        - `is_available`: 이름 중복 여부
+          - `true`: 사용 가능한 이름
+          - `false`: 이미 사용 중인 이름
+      operationId: checkNameAvailability
       parameters:
         - name: name
           in: query
@@ -187,8 +195,48 @@ paths:
               schema:
                 allOf:
                   - $ref: '#/components/schemas/ApiResponse'
+                  - $ref: '#/components/schemas/NameAvailabilityResponse'
         '409':
           description: 중복된 이름
+
+  /uploads:
+    post:
+      tags:
+        - File
+      summary: 이미지 업로드
+      description: >
+        ## 개요
+        
+        이미지를 업로드합니다. 업로드된 이미지 URL이 반환되며, 24시간 안에 사용되지 않은 이미지는 자동 삭제됩니다.
+        
+        ## 요청 설명
+        
+        - `file`: 이미지 파일 (멀티파트)
+
+      operationId: uploadImage
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '201':
+          description: 업로드 성공
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: string
+                        example: "https://image.url"
 
   # Goals
   /goals:
@@ -239,6 +287,46 @@ paths:
                     properties:
                       data:
                         $ref: '#/components/schemas/GoalSummaryPagingResponse'
+    post:
+      tags:
+        - Goal
+      summary: "[멘토] 목표 생성"
+      description: >
+        ## 개요
+        
+        새로운 목표를 생성합니다. 목표가 생성되면 목표 ID가 반환됩니다.
+        
+        ## 요청 설명
+        
+        아래의 필드들은 배열로 여러 개의 값을 받을 수 있습니다.
+        
+          - `mid_objectives`: 중간 목표 설명 (1부터 시작)
+          - `weekly_objectives`: 주차별 목표 설명 (1주차부터 시작)
+          - `thumbnail_images`: 썸네일 이미지 URL. 첫 번째 이미지가 메인 이미지로 사용됩니다.
+          - `content_images`: 목표 상세 이미지 URL
+
+      operationId: createGoal
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GoalCreateRequest'
+      responses:
+        '201':
+          description: 생성 성공
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: integer
+                        format: int64
+                        example: 1
+                        description: 생성된 목표의 ID
   /goals/{goalId}:
     get:
       security:
@@ -571,7 +659,7 @@ paths:
         - bearerAuth: [ ]
       tags:
         - Comment
-      summary: 코멘트 작성 (멘티)
+      summary: "[멘티] 코멘트 작성"
       description: >
         ## 개요
         
@@ -604,37 +692,6 @@ paths:
                     properties:
                       data:
                         $ref: '#/components/schemas/CommentResponse'
-  # /mentees/my/goals/{menteeGoalId}/final-comment:
-  #   get:
-  #     security:
-  #       - bearerAuth: [ ]
-  #     tags:
-  #       - Comment
-  #     summary: 최종 코멘트 조회
-  #     description: 멘티의 목표에 대해 멘토가 작성한 최종 코멘트를 조회합니다.
-  #     operationId: getFinalComment
-  #     parameters:
-  #       - name: menteeGoalId
-  #         in: path
-  #         required: true
-  #         schema:
-  #           type: integer
-  #           format: int64
-  #         description: 멘티목표 ID
-  #     responses:
-  #       '200':
-  #         description: 조회 성공
-  #         content:
-  #           application/json:
-  #             schema:
-  #               allOf:
-  #                 - $ref: '#/components/schemas/ApiResponse'
-  #                 - type: object
-  #                   properties:
-  #                     data:
-  #                       type: array
-  #                       items:
-  #                         $ref: '#/components/schemas/CommentResponse'
 
   /comment-rooms/my:
     get:
@@ -759,6 +816,92 @@ components:
         nonce: 임의의 nonce 값
         provider: KAKAO
 
+    GoalCreateRequest:
+      type: object
+      properties:
+        mentor_id:
+          type: integer
+          format: int64
+          example: 1
+        title:
+          type: string
+          description: 목표 제목
+          example: "다온과 함께하는 영어 완전 정복 30일 목표"
+        participants_limit:
+          type: integer
+          example: 10
+        topic:
+          type: string
+          description: 목표 주제
+          example: "영어"
+        period:
+          type: integer
+          example: 30
+        daily_duration:
+          type: integer
+          example: 4
+        description:
+          type: string
+          description: 목표에 대한 설명
+          example: "영어를 하고 싶었지만 어떤 방법으로 해야 할지 고민이 많지 않았나요?"
+        mid_objectives:
+          type: array
+          items:
+            $ref: '#/components/schemas/MidObjectiveRequest'
+        weekly_objectives:
+          type: array
+          items:
+            $ref: '#/components/schemas/WeeklyObjectiveRequest'
+        thumbnail_images:
+          type: array
+          items:
+            $ref: '#/components/schemas/ImageRequest'
+        content_images:
+          type: array
+          items:
+            $ref: '#/components/schemas/ImageRequest'
+      required:
+        - mentor_id
+        - title
+        - participants_limit
+        - topic
+        - period
+        - daily_duration
+        - description
+        - mid_objectives
+        - weekly_objectives
+        - thumbnail_images
+        - content_images
+    MidObjectiveRequest:
+      type: object
+      properties:
+        sequence:
+          type: integer
+          example: 1
+        description:
+          type: string
+          description: 중간 목표 설명
+          example: "영어로 원어민과 편안하게 대화하는 법"
+    WeeklyObjectiveRequest:
+      type: object
+      properties:
+        week_number:
+          type: integer
+          example: 1
+        description:
+          type: string
+          description: 목표 주차별 상세 설명
+          example: "간단한 단어부터 시작하기"
+    ImageRequest:
+      type: object
+      properties:
+        sequence:
+          type: integer
+          example: 1
+        imageUrl:
+          type: string
+          example: "https://image.url"
+
     CommentRequest:
       type: object
       properties:
@@ -802,6 +945,12 @@ components:
             - PENDING
             - ACTIVE
             - DELETED
+    NameAvailabilityResponse:
+      type: object
+      properties:
+        is_available:
+          type: boolean
+          example: false  # false면 닉네임이 이미 사용 중
 
     # Goal 관련
     GoalCommonInfo:
@@ -897,13 +1046,11 @@ components:
             thumbnail_images:
               type: array
               items:
-                type: string
-                example: "https://image.url"
+                $ref: '#/components/schemas/ImageResponse'
             content_images:
               type: array
               items:
-                type: string
-                example: "https://image.url"
+                $ref: '#/components/schemas/ImageResponse'
     WeeklyObjectiveResponse:
       type: object
       properties:
@@ -926,6 +1073,15 @@ components:
           type: string
           description: 중간 목표 설명
           example: "영어로 원어민과 편안하게 대화하는 법"
+    ImageResponse:
+      type: object
+      properties:
+        sequence:
+          type: integer
+          example: 1
+        imageUrl:
+          type: string
+          example: "https://image.url"
 
     # MenteeGoal 관련
     MenteeGoalSummaryResponse:
@@ -1115,7 +1271,6 @@ components:
           type: integer
           format: int64
 
-    
     # Paging
     PageResponse:
       type: object

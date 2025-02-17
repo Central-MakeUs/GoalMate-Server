@@ -8,21 +8,35 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.goalmate.api.model.GoalCreateRequest;
 import com.goalmate.api.model.GoalDetailResponse;
 import com.goalmate.api.model.GoalSummaryPagingResponse;
 import com.goalmate.api.model.GoalSummaryResponse;
+import com.goalmate.api.model.ImageRequest;
+import com.goalmate.api.model.MidObjectiveRequest;
 import com.goalmate.api.model.PageResponse;
+import com.goalmate.api.model.WeeklyObjectiveRequest;
 import com.goalmate.domain.comment.CommentRoomEntity;
+import com.goalmate.domain.goal.ContentImageEntity;
 import com.goalmate.domain.goal.GoalEntity;
+import com.goalmate.domain.goal.GoalStatus;
+import com.goalmate.domain.goal.MidObjectiveEntity;
+import com.goalmate.domain.goal.ThumbnailImageEntity;
+import com.goalmate.domain.goal.WeeklyObjectiveEntity;
 import com.goalmate.domain.mentee.MenteeEntity;
 import com.goalmate.domain.menteeGoal.MenteeGoalDailyTodoEntity;
 import com.goalmate.domain.menteeGoal.MenteeGoalEntity;
+import com.goalmate.domain.mentor.MentorEntity;
 import com.goalmate.mapper.GoalResponseMapper;
 import com.goalmate.mapper.PageResponseMapper;
 import com.goalmate.repository.CommentRoomRepository;
+import com.goalmate.repository.ContentImageRepository;
 import com.goalmate.repository.GoalRepository;
 import com.goalmate.repository.MenteeGoalDailyTodoRepository;
 import com.goalmate.repository.MenteeGoalRepository;
+import com.goalmate.repository.MidObjectiveRepository;
+import com.goalmate.repository.ThumbnailImageRepository;
+import com.goalmate.repository.WeeklyObjectiveRepository;
 import com.goalmate.support.error.CoreApiException;
 import com.goalmate.support.error.ErrorType;
 import com.goalmate.util.PageRequestUtil;
@@ -36,10 +50,37 @@ import lombok.extern.slf4j.Slf4j;
 @Transactional
 public class GoalService {
 	private final MenteeService menteeService;
+	private final MentorService mentorService;
+
 	private final GoalRepository goalRepository;
 	private final MenteeGoalRepository menteeGoalRepository;
 	private final CommentRoomRepository commentRoomRepository;
 	private final MenteeGoalDailyTodoRepository dailyTodoRepository;
+	private final MidObjectiveRepository midObjectiveRepository;
+	private final WeeklyObjectiveRepository weeklyObjectiveRepository;
+	private final ThumbnailImageRepository thumbnailImageRepository;
+	private final ContentImageRepository contentImageRepository;
+
+	public Long createGoal(GoalCreateRequest request) {
+		MentorEntity mentor = mentorService.getMentorById(request.getMentorId());
+		GoalEntity goal = GoalEntity.builder()
+			.title(request.getTitle())
+			.topic(request.getTopic())
+			.description(request.getDescription())
+			.period(request.getPeriod())
+			.dailyDuration(request.getDailyDuration())
+			.participantsLimit(request.getParticipantsLimit())
+			.goalStatus(GoalStatus.NOT_STARTED)
+			.mentor(mentor)
+			.build();
+		goalRepository.save(goal);
+
+		saveAllMidObjectives(request.getMidObjectives(), goal);
+		saveAllWeeklyObjectives(request.getWeeklyObjectives(), goal);
+		saveAllThumbnailImages(request.getThumbnailImages(), goal);
+		saveAllContentImages(request.getContentImages(), goal);
+		return goal.getId();
+	}
 
 	@Transactional(readOnly = true)
 	public GoalSummaryPagingResponse getGoals(Integer page, Integer size) {
@@ -65,57 +106,99 @@ public class GoalService {
 		MenteeEntity mentee = menteeService.getMenteeById(currentUserId);
 		GoalEntity goal = getGoalById(goalId);
 
-		validateGoal(goal);
-		validateParticipator(goal, mentee);
+		validateParticipation(goal, mentee);
+		mentee.decreaseFreeParticipationCount(); // 무료 참여 횟수 차감
+		goal.increaseCurrentParticipants(); // 현재 참여자 수 증가
 
+		MenteeGoalEntity menteeGoal = createMenteeGoal(goal, mentee);
+		createCommentRoom(goal.getMentor(), mentee, menteeGoal);
+
+		// DailyTodo 복사
+		copyAndSaveDailyTodos(goal, menteeGoal);
+	}
+
+	@Transactional(readOnly = true)
+	public GoalEntity getGoalById(Long goalId) {
+		return goalRepository.findById(goalId).orElseThrow(() ->
+			new CoreApiException(ErrorType.NOT_FOUND, "Goal not found"));
+	}
+
+	private void validateParticipation(GoalEntity goal, MenteeEntity menteeEntity) {
+		if (goal.isFull()) {
+			throw new CoreApiException(ErrorType.FORBIDDEN, "There is no free participation count");
+		}
+		if (!menteeEntity.hasFreeCount()) {
+			throw new CoreApiException(ErrorType.FORBIDDEN, "No free participation available.");
+		}
+		if (!goal.isOpen()) {
+			throw new CoreApiException(ErrorType.FORBIDDEN, "Goal is not started or closed");
+		}
+		menteeGoalRepository.findByMenteeIdAndGoalId(menteeEntity.getId(), goal.getId())
+			.ifPresent(menteeGoalEntity -> {
+				throw new CoreApiException(ErrorType.FORBIDDEN, "Already participated.");
+			});
+	}
+
+	private MenteeGoalEntity createMenteeGoal(GoalEntity goal, MenteeEntity mentee) {
 		MenteeGoalEntity menteeGoal = MenteeGoalEntity.builder()
 			.startDate(LocalDate.now())
 			.endDate(LocalDate.now().plusDays(goal.getPeriod()))
 			.menteeEntity(mentee)
 			.goalEntity(goal)
 			.build();
-		menteeGoalRepository.save(menteeGoal);
+		return menteeGoalRepository.save(menteeGoal);
+	}
 
-		CommentRoomEntity commentRoom = new CommentRoomEntity(goal.getMentorEntity(), mentee, menteeGoal);
+	private void createCommentRoom(MentorEntity mentor, MenteeEntity mentee, MenteeGoalEntity menteeGoal) {
+		CommentRoomEntity commentRoom = new CommentRoomEntity(mentor, mentee, menteeGoal);
 		commentRoomRepository.save(commentRoom);
+	}
 
-		// 할일 복사
-		List<MenteeGoalDailyTodoEntity> menteeDailyTodos = goal.getDailyTodos().stream()
-			.map(dailyTodo -> MenteeGoalDailyTodoEntity.builder()
-				.todoDate(dailyTodo.getTodoDate())
-				.estimatedMinutes(dailyTodo.getEstimatedMinutes())
-				.description(dailyTodo.getDescription())
-				.mentorTip(dailyTodo.getMentorTip())
-				.menteeGoalEntity(menteeGoal)
-				.build())
+	private void copyAndSaveDailyTodos(GoalEntity goal, MenteeGoalEntity menteeGoal) {
+		List<MenteeGoalDailyTodoEntity> dailyTodoSnapshots = goal.getDailyTodos().stream()
+			.map(dailyTodo -> new MenteeGoalDailyTodoEntity(dailyTodo, menteeGoal))
 			.toList();
 
 		// TODO: Bulk insert로 개선
-		dailyTodoRepository.saveAll(menteeDailyTodos);
-		mentee.decreaseFreeParticipationCount(); // 무료 참여 횟수 차감
-		goal.increaseCurrentParticipants(); // 현재 참여자 수 증가
+		dailyTodoRepository.saveAll(dailyTodoSnapshots);
 	}
 
-	public GoalEntity getGoalById(Long goalId) {
-		return goalRepository.findById(goalId).orElseThrow(() -> new CoreApiException(ErrorType.NOT_FOUND));
+	private void saveAllMidObjectives(List<MidObjectiveRequest> request, GoalEntity goal) {
+		List<MidObjectiveEntity> midObjectiveEntities = request.stream()
+			.map(midObjective -> new MidObjectiveEntity(
+				midObjective.getSequence(),
+				midObjective.getDescription(),
+				goal))
+			.toList();
+		midObjectiveRepository.saveAll(midObjectiveEntities);
 	}
 
-	private void validateGoal(GoalEntity goal) {
-		if (goal.isFull()) {
-			throw new CoreApiException(ErrorType.FORBIDDEN, "There is no free participation count");
-		}
+	private void saveAllWeeklyObjectives(List<WeeklyObjectiveRequest> request, GoalEntity goal) {
+		List<WeeklyObjectiveEntity> weeklyObjectiveEntities = request.stream()
+			.map(weeklyObjective -> new WeeklyObjectiveEntity(
+				weeklyObjective.getWeekNumber(),
+				weeklyObjective.getDescription(),
+				goal))
+			.toList();
+		weeklyObjectiveRepository.saveAll(weeklyObjectiveEntities);
 	}
 
-	private void validateParticipator(GoalEntity goalEntity, MenteeEntity menteeEntity) {
-		if (!menteeEntity.hasFreeCount()) {
-			throw new CoreApiException(ErrorType.FORBIDDEN, "No free participation available.");
-		}
-		if (!goalEntity.isOpen()) {
-			throw new CoreApiException(ErrorType.FORBIDDEN, "Goal is not started or closed");
-		}
-		menteeGoalRepository.findByMenteeIdAndGoalId(menteeEntity.getId(), goalEntity.getId())
-			.ifPresent(menteeGoalEntity -> {
-				throw new CoreApiException(ErrorType.FORBIDDEN, "Already participated.");
-			});
+	private void saveAllThumbnailImages(List<ImageRequest> images, GoalEntity goal) {
+		List<ThumbnailImageEntity> thumbnailImages = images.stream()
+			.map(image -> new ThumbnailImageEntity(
+				image.getSequence(),
+				image.getImageUrl(),
+				goal))
+			.toList();
+		thumbnailImageRepository.saveAll(thumbnailImages);
+	}
+
+	private void saveAllContentImages(List<ImageRequest> images, GoalEntity goal) {
+		List<ContentImageEntity> contentImages = images.stream()
+			.map(image -> new ContentImageEntity(
+				image.getSequence(),
+				image.getImageUrl(),
+				goal))
+			.toList();
 	}
 }

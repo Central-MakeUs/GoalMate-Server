@@ -30,6 +30,9 @@ public class MentorEntity extends BaseEntity {
 	@Column(nullable = false)
 	private String email;
 
+	@Column
+	private String profileImage;
+
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
 	private Role role;

@@ -50,17 +50,17 @@ public class GoalEntity extends BaseEntity {
 	@Column(nullable = false)
 	private Integer dailyDuration;
 
-	@Column(nullable = false)
+	@Column
 	private Integer price;
 
-	@Column(nullable = false)
+	@Column
 	private Integer discountPrice;
 
 	@Column(nullable = false)
 	private Integer participantsLimit;
 
 	@Column(nullable = false)
-	private Integer currentParticipants = 0; // TODO : 참여자 수를 Goal 에도 추가, 동기화 로직 필요
+	private Integer currentParticipants = 0;
 
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
@@ -68,21 +68,21 @@ public class GoalEntity extends BaseEntity {
 
 	@ManyToOne(optional = false, fetch = FetchType.EAGER)
 	@JoinColumn(name = "mentor_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-	private MentorEntity mentorEntity;
+	private MentorEntity mentor;
 
-	@OneToMany(mappedBy = "goalEntity", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<WeeklyObjectiveEntity> weeklyObjective;
-
-	@OneToMany(mappedBy = "goalEntity", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "goal", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<MidObjectiveEntity> midObjective;
 
-	@OneToMany(mappedBy = "goalEntity", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "goal", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<WeeklyObjectiveEntity> weeklyObjective;
+
+	@OneToMany(mappedBy = "goal", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<ThumbnailImageEntity> thumbnailImages;
 
-	@OneToMany(mappedBy = "goalEntity", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "goal", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<ContentImageEntity> contentImages;
 
-	@OneToMany(mappedBy = "goalEntity", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "goal", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<DailyTodoEntity> dailyTodos;
 
 	@Builder
@@ -92,19 +92,22 @@ public class GoalEntity extends BaseEntity {
 		String description,
 		Integer period,
 		Integer dailyDuration,
-		Integer price,
-		Integer discountPrice,
 		Integer participantsLimit,
-		GoalStatus goalStatus) {
+		GoalStatus goalStatus,
+		MentorEntity mentor) {
 		this.title = title;
 		this.topic = topic;
 		this.description = description;
 		this.period = period;
 		this.dailyDuration = dailyDuration;
-		this.price = price;
-		this.discountPrice = discountPrice;
 		this.participantsLimit = participantsLimit;
 		this.goalStatus = goalStatus;
+		this.mentor = mentor;
+		this.midObjective = List.of();
+		this.weeklyObjective = List.of();
+		this.thumbnailImages = List.of();
+		this.contentImages = List.of();
+		this.dailyTodos = List.of();
 	}
 
 	public void increaseCurrentParticipants() {

@@ -16,14 +16,17 @@ VALUES
 SET @goal1_id = LAST_INSERT_ID();
 
 -- 2. Goal_Content_Image 테이블에 데이터 삽입 (랜덤 seed: 101, 102)
-INSERT INTO goal_content_image (goal_id, image_url)
-VALUES (@goal1_id, 'https://picsum.photos/seed/101/156/214');
-INSERT INTO goal_content_image (goal_id, image_url)
-VALUES (@goal1_id, 'https://picsum.photos/seed/102/156/214');
+INSERT INTO goal_content_image (goal_id, sequence, image_url)
+VALUES (@goal1_id, 1,'https://picsum.photos/seed/101/156/214');
+INSERT INTO goal_content_image (goal_id, sequence, image_url)
+VALUES (@goal1_id, 2, 'https://picsum.photos/seed/102/156/214');
 
 -- 3. Goal_Thumbnail_Image 테이블에 데이터 삽입 (랜덤 seed: 103)
-INSERT INTO goal_thumbnail_image (goal_id, image_url)
-VALUES (@goal1_id, 'https://picsum.photos/seed/103/156/214');
+INSERT INTO goal_thumbnail_image (goal_id, sequence, image_url)
+VALUES (@goal1_id, 1, 'https://picsum.photos/seed/103/156/214');
+INSERT INTO goal_thumbnail_image (goal_id, sequence, image_url)
+VALUES (@goal1_id, 2, 'https://picsum.photos/seed/104/156/214');
+
 
 -- 4. Goal_Daily_Todo 테이블에 데이터 삽입
 INSERT INTO goal_daily_todo (estimated_minutes, todo_date, goal_id, description, mentor_tip)
@@ -32,14 +35,18 @@ INSERT INTO goal_daily_todo (estimated_minutes, todo_date, goal_id, description,
 VALUES (90, '2025-02-16', @goal1_id, 'Dive into OOP: Classes, Objects, and Inheritance', 'Review class structures and practice coding exercises.');
 
 -- 5. Goal_Mid_Objective 테이블에 데이터 삽입
-INSERT INTO goal_mid_objective (goal_id, description)
-VALUES (@goal1_id, 'Complete the Java fundamentals module.');
+INSERT INTO goal_mid_objective (goal_id, sequence, description)
+VALUES (@goal1_id, 1, 'Complete the Java fundamentals module.'),
+       (@goal1_id, 2, 'Develop a simple Java application.');
 
 -- 6. Goal_Weekly_Objective 테이블에 데이터 삽입
 INSERT INTO goal_weekly_objective (week_number, goal_id, description)
-VALUES (1, @goal1_id, 'Learn Java syntax and core libraries.');
-INSERT INTO goal_weekly_objective (week_number, goal_id, description)
-VALUES (2, @goal1_id, 'Build and deploy a small Java application.');
+VALUES (1, @goal1_id, 'Learn Java syntax and core libraries.'),
+       (2, @goal1_id, 'Build and deploy a small Java application.'),
+       (3, @goal1_id, 'Create a Java project with multiple classes.'),
+       (4, @goal1_id, 'Implement inheritance and polymorphism in Java.'),
+       (5, @goal1_id, 'Understand Java exception handling and file I/O.'),
+       (6, @goal1_id, 'Complete a Java project with a GUI.');
 
 -- 1. Goal 테이블에 데이터 삽입 (Photography Basics)
 INSERT INTO goal
@@ -51,14 +58,16 @@ VALUES
 SET @goal2_id = LAST_INSERT_ID();
 
 -- 2. Goal_Content_Image 테이블에 데이터 삽입 (랜덤 seed: 201, 202)
-INSERT INTO goal_content_image (goal_id, image_url)
-VALUES (@goal2_id, 'https://picsum.photos/seed/201/156/214');
-INSERT INTO goal_content_image (goal_id, image_url)
-VALUES (@goal2_id, 'https://picsum.photos/seed/202/156/214');
+INSERT INTO goal_content_image (goal_id, sequence, image_url)
+VALUES (@goal2_id, 1,'https://picsum.photos/seed/99/156/214');
+INSERT INTO goal_content_image (goal_id, sequence, image_url)
+VALUES (@goal2_id, 2, 'https://picsum.photos/seed/902/156/214');
 
--- 3. Goal_Thumbnail_Image 테이블에 데이터 삽입 (랜덤 seed: 203)
-INSERT INTO goal_thumbnail_image (goal_id, image_url)
-VALUES (@goal2_id, 'https://picsum.photos/seed/203/156/214');
+-- 3. Goal_Thumbnail_Image 테이블에 데이터 삽입 (랜덤 seed: 103)
+INSERT INTO goal_thumbnail_image (goal_id, sequence, image_url)
+VALUES (@goal2_id, 1, 'https://picsum.photos/seed/11/156/214');
+INSERT INTO goal_thumbnail_image (goal_id, sequence, image_url)
+VALUES (@goal2_id, 2, 'https://picsum.photos/seed/14/156/214');
 
 -- 4. Goal_Daily_Todo 테이블에 데이터 삽입
 INSERT INTO goal_daily_todo (estimated_minutes, todo_date, goal_id, description, mentor_tip)
@@ -67,11 +76,17 @@ INSERT INTO goal_daily_todo (estimated_minutes, todo_date, goal_id, description,
 VALUES (60, '2025-02-16', @goal2_id, 'Practice basic composition and framing techniques', 'Apply the rule of thirds in your shots.');
 
 -- 5. Goal_Mid_Objective 테이블에 데이터 삽입
-INSERT INTO goal_mid_objective (goal_id, description)
-VALUES (@goal2_id, 'Master manual camera controls.');
+INSERT INTO goal_mid_objective (goal_id, sequence, description)
+VALUES (@goal2_id, 1, 'Master manual camera controls.'),
+       (@goal2_id, 2, 'Understand the principles of exposure.'),
+       (@goal2_id, 3, 'Learn to compose visually appealing photographs.');
 
 -- 6. Goal_Weekly_Objective 테이블에 데이터 삽입
 INSERT INTO goal_weekly_objective (week_number, goal_id, description)
-VALUES (1, @goal2_id, 'Familiarize yourself with camera functions and settings.');
-INSERT INTO goal_weekly_objective (week_number, goal_id, description)
-VALUES (2, @goal2_id, 'Develop skills in photo composition and natural lighting.');
+VALUES (1, @goal2_id, 'Familiarize yourself with camera functions and settings.'),
+       (2, @goal2_id, 'Develop skills in photo composition and natural lighting.'),
+       (3, @goal2_id, 'Understand the basics of exposure and metering.'),
+       (4, @goal2_id, 'Learn to capture motion and still life photography.'),
+       (5, @goal2_id, 'Explore advanced techniques in portrait and landscape photography.'),
+       (6, @goal2_id, 'Create a photography portfolio and share your work.'),
+       (7, @goal2_id, 'Review your progress and set new photography goals.');
