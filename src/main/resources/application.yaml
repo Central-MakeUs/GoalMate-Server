@@ -30,6 +30,7 @@ spring:
     show-sql: true
     generate-ddl: true
     defer-datasource-initialization: true
+    open-in-view: false
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/goalmate
@@ -61,6 +62,7 @@ spring:
     show-sql: true
     generate-ddl: true
     defer-datasource-initialization: true
+    open-in-view: false
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://${aws.rds.url}

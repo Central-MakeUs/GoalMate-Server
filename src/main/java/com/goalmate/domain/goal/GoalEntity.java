@@ -119,6 +119,6 @@ public class GoalEntity extends BaseEntity {
 	}
 
 	public boolean isOpen() {
-		return this.goalStatus.equals(GoalStatus.IN_PROGRESS);
+		return this.goalStatus.equals(GoalStatus.OPEN);
 	}
 }

@@ -19,7 +19,7 @@ public class GoalResponseMapper {
 
 	public static GoalSummaryResponse mapToSummaryResponse(GoalEntity goal) {
 		GoalSummaryResponse summary = new GoalSummaryResponse();
-		summary.setId(goal.getId().intValue());
+		summary.setId(goal.getId());
 		summary.setTitle(goal.getTitle());
 		summary.setTopic(goal.getTopic());
 		summary.setDescription(goal.getDescription());
@@ -41,17 +41,19 @@ public class GoalResponseMapper {
 
 	public static GoalDetailResponse mapToDetailResponse(GoalEntity goal) {
 		GoalDetailResponse detail = new GoalDetailResponse();
-		detail.setId(goal.getId().intValue());
+		detail.setId(goal.getId());
 		detail.setTitle(goal.getTitle());
 		detail.setTopic(goal.getTopic());
 		detail.setDescription(goal.getDescription());
 		detail.setPeriod(goal.getPeriod());
+		detail.setDailyDuration(goal.getDailyDuration());
 		// detail.setPrice(goal.getPrice());
 		// detail.setDiscountPrice(goal.getDiscountPrice());
 		detail.setParticipantsLimit(goal.getParticipantsLimit());
 		detail.setCurrentParticipants(goal.getCurrentParticipants());
 		detail.setGoalStatus(GoalStatusEnum.fromValue(goal.getGoalStatus().getValue()));
 		detail.setMentorName(goal.getMentor().getName());
+		detail.setIsClosingSoon(goal.getCurrentParticipants() <= CLOSING_SOON_THRESHOLD);
 		detail.setCreatedAt(goal.getCreatedAt().atOffset(ZoneOffset.UTC));
 		detail.setUpdatedAt(goal.getUpdatedAt().atOffset(ZoneOffset.UTC));
 		// ThumbnailImages
@@ -62,7 +64,6 @@ public class GoalResponseMapper {
 		detail.setContentImages(goal.getContentImages().stream()
 			.map(contentImage -> mapToImageResponse(contentImage.getSequence(), contentImage.getImageUrl()))
 			.toList());
-
 		// Weekly Objectives
 		detail.setWeeklyObjectives(goal.getWeeklyObjective().stream()
 			.map(weeklyObjective -> {
@@ -76,6 +77,7 @@ public class GoalResponseMapper {
 		detail.setMidObjectives(goal.getMidObjective().stream()
 			.map(midObjective -> {
 				MidObjectiveResponse midObjectiveResponse = new MidObjectiveResponse();
+				midObjectiveResponse.setSequence(midObjective.getSequence());
 				midObjectiveResponse.setDescription(midObjective.getDescription());
 				return midObjectiveResponse;
 			})

@@ -255,9 +255,9 @@ paths:
         ## 응답 설명
         
         ### goal_status: 목표의 현재 상태
-          - `NOT_STARTED`: 아직 시작되지 않은 목표  
-          - `IN_PROGRESS`: 현재 신청 가능한 목표  
-          - `CLOSED`: 마감된 목표  
+          - `UPCOMING`: 모집 시작 전 목표
+          - `OPEN`: 모집 중인 목표
+          - `CLOSED`: 모집 종료된 목표
 
       operationId: getGoals
       parameters:
@@ -332,8 +332,6 @@ paths:
                         description: 생성된 목표의 ID
   /goals/{goalId}:
     get:
-      security:
-        - bearerAuth: [ ]
       tags:
         - Goal
       summary: 목표 세부정보 조회
@@ -566,7 +564,6 @@ paths:
                     properties:
                       data:
                         $ref: '#/components/schemas/RemainingTodosResponse'
-
   /mentees/my/goals/{menteeGoalId}/todos/{todoId}:
     post:
       security:
@@ -961,6 +958,7 @@ components:
       properties:
         id:
           type: integer
+          format: int64
           example: 1
         title:
           type: string
@@ -1004,11 +1002,11 @@ components:
     GoalStatusEnum:
       type: string
       enum:
-        - NOT_STARTED
-        - IN_PROGRESS
+        - UPCOMING
+        - OPEN
         - CLOSED
       example:
-        IN_PROGRESS
+        OPEN
 
     # GoalSummary
     GoalSummaryResponse:
@@ -1068,7 +1066,7 @@ components:
     MidObjectiveResponse:
       type: object
       properties:
-        number:
+        sequence:
           type: integer
           description: 현재 주차
           example: 1
@@ -1094,6 +1092,7 @@ components:
           properties:
             id:
               type: integer
+              format: int64
               example: 1
             title:
               type: string

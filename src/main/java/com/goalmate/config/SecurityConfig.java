@@ -57,11 +57,12 @@ public class SecurityConfig {
 
 	private RequestMatcher[] requestPermitAll() {
 		List<RequestMatcher> requestMatchers = List.of(
-			// antMatcher("/actuator/**"),
-			antMatcher("/auth/login"),
-			antMatcher(HttpMethod.GET, "/goals/**"),
+			antMatcher("/actuator/**"),
 			antMatcher("/swagger-ui/**"),
-			antMatcher("/v3/api-docs/**")
+			antMatcher("/v3/api-docs/**"),
+			antMatcher("/auth/login"),
+			antMatcher(HttpMethod.GET, "/goals"),
+			antMatcher(HttpMethod.GET, "/goals/{goalId}")
 		);
 		return requestMatchers.toArray(RequestMatcher[]::new);
 	}

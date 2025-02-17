@@ -70,7 +70,7 @@ public class GoalService {
 			.period(request.getPeriod())
 			.dailyDuration(request.getDailyDuration())
 			.participantsLimit(request.getParticipantsLimit())
-			.goalStatus(GoalStatus.NOT_STARTED)
+			.goalStatus(GoalStatus.OPEN)
 			.mentor(mentor)
 			.build();
 		goalRepository.save(goal);
@@ -98,7 +98,6 @@ public class GoalService {
 	public GoalDetailResponse getGoalDetails(Long goalId) {
 		GoalEntity goal = goalRepository.findByIdWithDetails(goalId).orElseThrow(()
 			-> new CoreApiException(ErrorType.NOT_FOUND));
-		log.info(GoalResponseMapper.mapToDetailResponse(goal).toString());
 		return GoalResponseMapper.mapToDetailResponse(goal);
 	}
 

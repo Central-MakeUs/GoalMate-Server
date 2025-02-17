@@ -24,7 +24,7 @@ public class MenteeGoalResponseMapper {
 		GoalSummaryResponse goalSummary = GoalResponseMapper.mapToSummaryResponse(goal);
 
 		MenteeGoalSummaryResponse response = new MenteeGoalSummaryResponse();
-		response.setId(menteeGoal.getId().intValue());
+		response.setId(menteeGoal.getId());
 		response.setTitle(goalSummary.getTitle());
 		response.setTopic(goalSummary.getTopic());
 		response.setMentorName(goalSummary.getMentorName());
@@ -36,7 +36,7 @@ public class MenteeGoalResponseMapper {
 		response.setTodayTodoCount(progress.getTodayCount());
 		response.setTodayCompletedCount(progress.getTodayCompletedCount());
 		response.setTodayRemainingCount(progress.getTodayCount() - progress.getTodayCompletedCount());
-		
+
 		response.setTotalTodoCount(progress.getTotalCount());
 		response.setTotalCompletedCount(progress.getTotalCompletedCount());
 
