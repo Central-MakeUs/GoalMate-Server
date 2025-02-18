@@ -41,6 +41,7 @@ public class CommentResponseMapper {
 		GoalEntity goal = menteeGoal.getGoalEntity();
 
 		CommentRoomResponse response = new CommentRoomResponse();
+		response.setCommentRoomId(commentRoom.getId());
 		response.setMenteeGoalId(menteeGoal.getId());
 		response.setMenteeGoalTitle(goal.getTitle());
 		response.setMentorName(commentRoom.getMentor().getName());
