@@ -38,6 +38,9 @@ public class MenteeGoalEntity extends BaseEntity {
 	@Column(nullable = false)
 	private LocalDate endDate;
 
+	@Column
+	private String mentorLetter;
+
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
 	private MenteeGoalStatus status;
@@ -57,5 +60,9 @@ public class MenteeGoalEntity extends BaseEntity {
 		this.status = MenteeGoalStatus.IN_PROGRESS;
 		this.menteeEntity = menteeEntity;
 		this.goalEntity = goalEntity;
+	}
+
+	public void updateStatus(MenteeGoalStatus status) {
+		this.status = status;
 	}
 }

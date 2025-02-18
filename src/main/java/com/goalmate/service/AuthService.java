@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.goalmate.domain.mentee.MenteeEntity;
 import com.goalmate.domain.mentee.SocialProvider;
 import com.goalmate.repository.MenteeRepository;
+import com.goalmate.security.LoginResult;
 import com.goalmate.security.jwt.JwtProvider;
 import com.goalmate.security.jwt.TokenPair;
 import com.goalmate.security.jwt.UserDetailsImpl;

@@ -39,6 +39,7 @@ public class MenteeGoalResponseMapper {
 
 		response.setTotalTodoCount(progress.getTotalCount());
 		response.setTotalCompletedCount(progress.getTotalCompletedCount());
+		response.setMentorLetter(menteeGoal.getMentorLetter());
 
 		response.setMenteeGoalStatus(MenteeGoalStatusEnum.valueOf(menteeGoal.getStatus().getValue()));
 

@@ -6,8 +6,6 @@ import com.goalmate.domain.mentee.Role;
 import jakarta.persistence.Column;
 import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -45,10 +43,6 @@ public class CommentEntity extends BaseEntity {
 	@Column(nullable = false)
 	private boolean isRead = false;
 
-	@Enumerated(EnumType.STRING)
-	@Column(nullable = false)
-	private CommentType commentType;
-
 	@ManyToOne(optional = false)
 	@JoinColumn(name = "comment_room_id", foreignKey = @ForeignKey(ConstraintMode.CONSTRAINT))
 	private CommentRoomEntity commentRoom;
@@ -59,19 +53,18 @@ public class CommentEntity extends BaseEntity {
 		Long writerId,
 		String writerName,
 		Role writerRole,
-		CommentType commentType,
 		CommentRoomEntity commentRoom) {
 		this.comment = comment;
 		this.writerId = writerId;
 		this.writerName = writerName;
 		this.writerRole = writerRole;
-		this.commentType = commentType;
 		this.commentRoom = commentRoom;
 		this.isRead = false;
 	}
 
-	public void markAsRead() {
-		this.isRead = true;
+	public void markAsRead(Role readerRole) {
+		if (!readerRole.equals(this.writerRole))
+			this.isRead = true;
 	}
 
 	public boolean isWriter(Long writerId, Role role) {

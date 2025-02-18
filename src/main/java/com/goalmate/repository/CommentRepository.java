@@ -17,9 +17,8 @@ public interface CommentRepository extends JpaRepository<CommentEntity, Long> {
 	Page<CommentEntity> findLatestCommentsByRoomId(Long roomId, Pageable pageable);
 
 	@Query("SELECT c FROM CommentEntity c "
-		+ "WHERE c.writerRole = com.goalmate.domain.mentee.Role.ROLE_MENTEE "
-		+ "AND c.commentRoom.id = :roomId "
-		+ "AND c.commentType = com.goalmate.domain.comment.CommentType.DAILY "
+		+ "WHERE c.commentRoom.id = :roomId "
+		+ "AND c.writerRole = com.goalmate.domain.mentee.Role.ROLE_MENTEE "
 		+ "AND c.createdAt BETWEEN :startOfDay AND :endOfDay")
 	Optional<CommentEntity> findTodayCommentFromMentee(
 		Long roomId,
@@ -28,8 +27,8 @@ public interface CommentRepository extends JpaRepository<CommentEntity, Long> {
 	);
 
 	@Query("SELECT COUNT(c) FROM CommentEntity c "
-		+ "WHERE c.writerRole = :writerRole "
-		+ "AND c.commentRoom.id = :roomId "
+		+ "WHERE c.commentRoom.id = :roomId "
+		+ "AND c.writerRole != :readerRole "
 		+ "AND c.isRead = false")
-	Long countUnreadComments(Long roomId, Role writerRole);
+	Long countUnreadComments(Long roomId, Role readerRole);
 }

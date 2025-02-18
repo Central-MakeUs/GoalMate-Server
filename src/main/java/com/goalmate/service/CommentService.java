@@ -17,7 +17,6 @@ import com.goalmate.api.model.CommentRoomResponse;
 import com.goalmate.api.model.PageResponse;
 import com.goalmate.domain.comment.CommentEntity;
 import com.goalmate.domain.comment.CommentRoomEntity;
-import com.goalmate.domain.comment.CommentType;
 import com.goalmate.domain.mentee.Role;
 import com.goalmate.domain.menteeGoal.MenteeGoalEntity;
 import com.goalmate.mapper.CommentResponseMapper;
@@ -62,22 +61,26 @@ public class CommentService {
 			.writerId(menteeGoal.getMenteeEntity().getId())
 			.writerName(menteeGoal.getMenteeEntity().getName())
 			.writerRole(Role.ROLE_MENTEE)
-			.commentType(CommentType.DAILY)
 			.commentRoom(commentRoom)
 			.build();
 		commentRepository.save(commentEntity);
+		commentRoom.triggerUpdate();
 
 		return CommentResponseMapper.mapToCommentResponse(commentEntity);
 	}
 
 	public CommentPagingResponse getComments(Long roomId, Integer page, Integer size) {
+		Role currentUserRole = SecurityUtil.getCurrenUserRole();
 		CommentRoomEntity commentRoom = getCommentRoom(roomId);
 
 		Pageable pageable = PageRequestUtil.createPageRequest(page, size);
 		Page<CommentEntity> comments = commentRepository.findLatestCommentsByRoomId(commentRoom.getId(), pageable);
 
 		List<CommentResponse> commentResponses = comments.stream()
-			.map(CommentResponseMapper::mapToCommentResponse)
+			.map(comment -> {
+				comment.markAsRead(currentUserRole);
+				return CommentResponseMapper.mapToCommentResponse(comment);
+			})
 			.toList();
 		PageResponse pageResponse = PageResponseMapper.mapToPageResponse(comments);
 
@@ -95,20 +98,14 @@ public class CommentService {
 
 		List<CommentRoomResponse> commentRoomResponses = commentRooms.stream()
 			.map(commentRoom -> {
-				Long countedUnreadComments = commentRepository.countUnreadComments(commentRoom.getId(),
-					Role.ROLE_MENTOR);
+				Long countedUnreadComments = commentRepository
+					.countUnreadComments(commentRoom.getId(), userContext.userRole());
 				return CommentResponseMapper.mapToCommentRoomResponse(commentRoom, countedUnreadComments);
 			})
 			.toList();
 		PageResponse pageResponse = PageResponseMapper.mapToPageResponse(commentRooms);
 		return CommentResponseMapper.mapToCommentRoomPagingResponse(commentRoomResponses, pageResponse);
 	}
-
-	// public boolean countNewComments(Long commentRoomId) {
-	// 	// notRead 이면서,
-	// 	// TODO 코멘트 룸API 뚫기, 코멘트 API 마무리하기
-	// 	return !commentRepository.findNotReadMentorComment(menteeGoalId).isEmpty();
-	// }
 
 	public void deleteComment(Long commentId) {
 		CommentEntity comment = getComment(commentId);

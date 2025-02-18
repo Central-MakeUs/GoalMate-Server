@@ -2,7 +2,6 @@ openapi: 3.0.3
 info:
   title: GoalMate API
   description: >
-    # CMC GoalMate API
     
     ### 페이징 관련 설명
     
@@ -43,6 +42,8 @@ tags:
     description: 인증 API
   - name: Mentee
     description: 멘티 API
+  - name: Mentor
+    description: 멘토 API
   - name: Goal
     description: 목표 API
   - name: MenteeGoal
@@ -536,7 +537,7 @@ paths:
         
         ## Nullable Fields
           - `main_image`: 메인 이미지가 없는 경우 null
-          - `final_comment`: 최종 코멘트가 없는 경우 null
+          - `mentor_letter`: 멘토의 편지가 없는 경우 null
 
       operationId: getMenteeGoals
       parameters:
@@ -591,7 +592,7 @@ paths:
         
         ## Nullable Fields
           - `main_image`: 메인 이미지가 없는 경우 null
-          - `final_comment`: 최종 코멘트가 없는 경우 null
+          - `mentor_letter`: 멘토의 편지가 없는 경우 null
 
       operationId: getMenteeGoalDailyDetails
       parameters:
@@ -761,6 +762,41 @@ paths:
                       data:
                         $ref: '#/components/schemas/MenteeGoalTodoResponse'
 
+  /mentors/my/goals/{menteeGoalId}/mentor-letter:
+    put:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Mentor
+      summary: 멘토 레터 작성
+      description: 멘토가 특정 menteeGoal에 대해 mentor_letter를 작성합니다.
+      operationId: updateMentorLetter
+      parameters:
+        - name: menteeGoalId
+          in: path
+          required: true
+          description: 멘티 목표 ID
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MentorLetterRequest'
+      responses:
+        '200':
+          description: 멘토 레터 작성 성공
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/MenteeGoalSummaryResponse'
   # Comments
   /comment-rooms/my:
     get:
@@ -1043,6 +1079,9 @@ components:
           type: string
           description: 중간 목표 설명
           example: "영어로 원어민과 편안하게 대화하는 법"
+      required:
+        - sequence
+        - description
     WeeklyObjectiveRequest:
       type: object
       properties:
@@ -1053,6 +1092,9 @@ components:
           type: string
           description: 목표 주차별 상세 설명
           example: "간단한 단어부터 시작하기"
+      required:
+        - week_number
+        - description
     ImageRequest:
       type: object
       properties:
@@ -1062,7 +1104,9 @@ components:
         imageUrl:
           type: string
           example: "https://image.url"
-
+      required:
+        - sequence
+        - imageUrl
     CommentRequest:
       type: object
       properties:
@@ -1073,6 +1117,15 @@ components:
           example: "멘토님, 오늘은 어떤 공부를 해야 할까요?"
       required:
         - comment
+    MentorLetterRequest:
+      type: object
+      properties:
+        mentor_letter:
+          type: string
+          description: 멘토 레터 내용
+          example: "멘티에게 전하는 격려 메시지입니다."
+      required:
+        - mentor_letter
 
     # Response Dto
     LoginResponse:
@@ -1276,7 +1329,7 @@ components:
             end_date:
               type: string
               format: date
-            final_comment:
+            mentor_letter:
               type: string
             today_todo_count:
               type: integer

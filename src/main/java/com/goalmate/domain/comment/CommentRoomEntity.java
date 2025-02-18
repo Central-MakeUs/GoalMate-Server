@@ -5,6 +5,7 @@ import com.goalmate.domain.mentee.MenteeEntity;
 import com.goalmate.domain.menteeGoal.MenteeGoalEntity;
 import com.goalmate.domain.mentor.MentorEntity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ForeignKey;
@@ -27,6 +28,9 @@ public class CommentRoomEntity extends BaseEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
+	@Column(nullable = false)
+	private boolean forceUpdate = false;
+
 	@ManyToOne
 	@JoinColumn(name = "mentor_id", nullable = false)
 	private MentorEntity mentor;
@@ -43,5 +47,9 @@ public class CommentRoomEntity extends BaseEntity {
 		this.mentor = mentor;
 		this.mentee = mentee;
 		this.menteeGoal = menteeGoal;
+	}
+
+	public void triggerUpdate() {
+		this.forceUpdate = !this.forceUpdate; // 더티 체킹을 위한 변경
 	}
 }

@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.goalmate.api.model.LoginResponse;
 import com.goalmate.api.model.OAuthRequest;
 import com.goalmate.api.model.ReissueRequest;
+import com.goalmate.security.LoginResult;
 import com.goalmate.service.AuthService;
-import com.goalmate.service.LoginResult;
 import com.goalmate.support.response.ApiResponse;
 
 import lombok.RequiredArgsConstructor;
