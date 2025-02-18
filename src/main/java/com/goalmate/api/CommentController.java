@@ -1,6 +1,7 @@
 package com.goalmate.api;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.goalmate.api.model.CommentPagingResponse;
 import com.goalmate.api.model.CommentRequest;
@@ -14,6 +15,7 @@ import com.goalmate.support.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
+@RestController
 public class CommentController implements CommentApi {
 	private final CommentService commentService;
 

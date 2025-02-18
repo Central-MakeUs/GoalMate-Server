@@ -101,7 +101,7 @@ public class GoalService {
 		return GoalResponseMapper.mapToDetailResponse(goal);
 	}
 
-	public void participateInGoal(Long currentUserId, Long goalId) {
+	public Long participateInGoal(Long currentUserId, Long goalId) {
 		MenteeEntity mentee = menteeService.getMenteeById(currentUserId);
 		GoalEntity goal = getGoalById(goalId);
 
@@ -114,6 +114,8 @@ public class GoalService {
 
 		// DailyTodo 복사
 		copyAndSaveDailyTodos(goal, menteeGoal);
+
+		return menteeGoal.getId();
 	}
 
 	@Transactional(readOnly = true)

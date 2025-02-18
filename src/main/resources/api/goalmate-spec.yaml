@@ -1,10 +1,32 @@
 openapi: 3.0.3
 info:
   title: GoalMate API
-  description: |-
-    CMC GoalMate API 입니다.
+  description: >
+    # CMC GoalMate API
+    
+    ### 페이징 관련 설명
+    
+    모든 페이징 응답은 아래와 같이 통일합니다.
+    
+      - `totalElements`: 전체 아이템 수
+      - `totalPages`: 전체 페이지 수
+      - `currentPage`: 현재 페이지 번호
+      - `pageSize`: 페이지당 아이템 수
+      - `nextPage`: 다음 페이지 번호 (`다음 페이지가 없는 경우 null`)
+      - `prevPage`: 이전 페이지 번호 (`이전 페이지가 없는 경우 null`)
+      - `hasNext`: 다음 페이지 존재 여부
+      - `hasPrev`: 이전 페이지 존재 여부
+    
+    ### 기타 주의사항
+    
+      1. API 우측 상단 자물쇠 아이콘이 있는 API는 인증이 필요한 API입니다.
+      2. 인증이 필요한 API는 `bearerAuth`를 사용하며, 헤더 형식은 `Authorization: Bearer <access_token>`입니다.
+      3. 스웨거로 테스트 시에는 우측 상단의 Authorization 버튼을 이용하며, Bearer 는 생략합니다.
+      4. 인증이 필요한 API는 `401(잘못된 토큰)` 또는 `403(권한 없음)` 에러가 발생할 수 있습니다.
+      5. 응답의 `"links": []` 필드는 현재는 사용하지 않습니다.
+
   contact:
-    email: goalmate@gmail.com
+    email: dhxl50@khu.ac.kr
   license:
     name: Apache 2.0
     url: https://www.apache.org/licenses/LICENSE-2.0.html
@@ -71,7 +93,10 @@ paths:
       tags:
         - Auth
       summary: 로그아웃
-      description: 로그아웃을 진행합니다. 액세스 토큰과 리프레시 토큰이 파기됩니다. (후순위)
+      description: >
+        ## 개요
+        
+        로그아웃을 진행합니다. 액세스 토큰과 리프레시 토큰을 파기해주세요.
       operationId: logout
       security:
         - bearerAuth: [ ]
@@ -100,7 +125,10 @@ paths:
       tags:
         - Auth
       summary: 회원탈퇴
-      description: 회원 탈퇴를 진행합니다.
+      description: >
+        ## 개요
+        
+        회원탈퇴를 진행합니다. 액세스 토큰과 리프레시 토큰을 파기해주세요.
       operationId: withdraw
       security:
         - bearerAuth: [ ]
@@ -116,7 +144,22 @@ paths:
       tags:
         - Mentee
       summary: 멘티 기본 정보
-      description: 멘티 기본 정보 및 간단한 목표 현황을 조회합니다.
+      description: >
+        ## 개요
+        
+        멘티 기본 정보 및 간단한 목표 현황을 조회합니다.
+        
+        ## 응답 설명
+        
+        이름, 진행 중인 목표 수, 완료한 목표 수, 무료 참여 횟수(기본값 1), 멘티 상태를 포함합니다.
+        
+        ### 멘티 상태
+          - `PENDING`: 승인 대기 중 (닉네임 미설정) > 닉네임 설정 후 `ACTIVE`로 변경
+          - `ACTIVE`: 멘티 활동 중
+          - `DELETED`: 멘티 탈퇴
+        
+        ## Nullable Fields
+          - `name`: 이름이 설정되지 않은 경우 null
       operationId: getMenteeInfo
       responses:
         '200':
@@ -171,6 +214,7 @@ paths:
       summary: 멘티 이름 유효성 확인
       description: >
         ## 개요
+        
         멘티 이름의 중복 확인을 진행합니다.
         
         ### 응답 설명
@@ -258,6 +302,9 @@ paths:
           - `UPCOMING`: 모집 시작 전 목표
           - `OPEN`: 모집 중인 목표
           - `CLOSED`: 모집 종료된 목표
+        
+        ## Nullable Fields
+          - `main_image`: 메인 이미지가 없는 경우 null
 
       operationId: getGoals
       parameters:
@@ -335,7 +382,20 @@ paths:
       tags:
         - Goal
       summary: 목표 세부정보 조회
-      description: 목표 세부정보를 조회합니다.
+      description: >
+        ## 개요
+        
+        목표 세부정보를 조회합니다.
+        
+        ## 응답 설명
+        
+        ### goal_status: 목표의 현재 상태
+          - `UPCOMING`: 모집 시작 전 목표
+          - `OPEN`: 모집 중인 목표
+          - `CLOSED`: 모집 종료된 목표
+
+        ## Nullable Fields
+          - `main_image`: 메인 이미지가 없는 경우 null
       operationId: getGoalDetails
       parameters:
         - name: goalId
@@ -363,7 +423,15 @@ paths:
       tags:
         - Goal
       summary: 목표 참여
-      description: 멘티가 목표 시작하기 버튼을 눌러 참여합니다.
+      description: >
+        ## 개요
+        
+        멘티가 목표 시작하기 버튼을 눌러 참여합니다.
+        
+        ## 응답 설명
+        
+        생성된 멘티의 목표(mentee_goal) ID를 반환합니다. `목표 ID`와 `멘티 목표 ID`는 서로 다른 값입니다.
+
       operationId: participateInGoal
       parameters:
         - name: goalId
@@ -378,7 +446,15 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: integer
+                        format: int64
+                        example: 1
+                        description: 생성된 멘티의 목표 ID
         '403':
           description: 참여 인원 초과 또는 무료 참여 횟수 초과
         '404':
@@ -406,6 +482,10 @@ paths:
           - `COMPLETED`: 완료된 멘티목표
           - `FAILED`: 실패한 멘티목표
           - `CANCELED`: 취소된 멘티목표
+        
+        ## Nullable Fields
+          - `main_image`: 메인 이미지가 없는 경우 null
+          - `final_comment`: 최종 코멘트가 없는 경우 null
 
       operationId: getMenteeGoals
       parameters:
@@ -450,18 +530,18 @@ paths:
         
         멘티의 목표의 일일 세부정보를 조회합니다. 쿼리 파라미터로 날짜(default: 오늘)가 필요하며, 해당 날짜의 투두 정보를 포함합니다.
         
+        `mentee_goal`의 ID와 `goal`의 ID는 서로 다른 값입니다.
+        
         ## 응답 설명
         
-        ### `todo_status`
+        ### todo_status: 투두의 상태
           - `TODO`: 진행 중인 투두
           - `COMPLETED`: 완료된 투두
         
-        ## 🚨 주의사항
-        
-        `goal`의 id 값과 `mentee_goal`의 id 값은 서로 다른 값입니다.
-        
-        
-        일반적인 목표(홈화면)를 조회하는 경우 `goal`의 id를 사용하고, 멘티의 목표를 조회하는 경우 `mentee_goal`의 id를 사용합니다.
+        ## Nullable Fields
+          - `main_image`: 메인 이미지가 없는 경우 null
+          - `final_comment`: 최종 코멘트가 없는 경우 null
+
       operationId: getMenteeGoalDailyDetails
       parameters:
         - name: menteeGoalId
@@ -571,7 +651,20 @@ paths:
       tags:
         - MenteeGoal
       summary: 멘티의 목표 투두 업데이트
-      description: 멘티의 목표에 대해 투두 상태를 업데이트 합니다.
+      description: >
+        ## 개요
+        
+        멘티의 목표에 대해 투두 상태를 업데이트 합니다.
+        
+        ## 응답 설명
+        
+        현재 상태가 `TODO`라면 `COMPLETED`로, `COMPLETED`라면 `TODO`로 변경됩니다.
+        
+        또한, 변경된 투두 정보를 반환합니다.
+        
+        ### todo_status: 투두의 상태
+          - `TODO`: 진행 중인 투두
+          - `COMPLETED`: 완료된 투두
       operationId: updateTodoStatus
       parameters:
         - name: menteeGoalId

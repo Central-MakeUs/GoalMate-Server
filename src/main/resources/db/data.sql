@@ -30,7 +30,8 @@ VALUES (@goal1_id, 2, 'https://picsum.photos/seed/102/156/214');
 
 -- 4. Goal_Daily_Todo 테이블에 데이터 삽입
 INSERT INTO goal_daily_todo (estimated_minutes, day_number, goal_id, description, mentor_tip)
-VALUES (60, 1, @goal1_id, 'Introduction to Java and setup environment', 'Install JDK and configure your IDE.'),
+VALUES (60, 0, @goal1_id, 'Introduction to Java and setup environment', 'Install JDK and configure your IDE.'),
+       (60, 0, @goal1_id, 'More Java and setup environment', 'Install JDK and configure your IDE.'),
        (90, 1, @goal1_id, 'Learn Java syntax and basic programming concepts', 'Practice coding exercises and review Java documentation.'),
        (75, 2, @goal1_id, 'Explore Java data types and control structures', 'Write code snippets to understand loops and conditional statements.'),
        (120, 2, @goal1_id, 'Create a simple Java application', 'Build a console-based program to apply your knowledge.'),
@@ -76,9 +77,18 @@ VALUES (@goal2_id, 2, 'https://picsum.photos/seed/14/156/214');
 
 -- 4. Goal_Daily_Todo 테이블에 데이터 삽입
 INSERT INTO goal_daily_todo (estimated_minutes, day_number, goal_id, description, mentor_tip)
-VALUES (45, 1, @goal2_id, 'Introduction to camera settings: aperture, shutter speed, and ISO', 'Study your camera manual for detailed info.');
-INSERT INTO goal_daily_todo (estimated_minutes, day_number, goal_id, description, mentor_tip)
-VALUES (60, 2, @goal2_id, 'Practice basic composition and framing techniques', 'Apply the rule of thirds in your shots.');
+VALUES (30, 0, @goal2_id, 'Introduction to photography basics and camera types', 'Research different camera models and their features.'),
+       (45, 0, @goal2_id, 'Understanding exposure: aperture, shutter speed, and ISO', 'Experiment with different settings in manual mode.'),
+       (60, 1, @goal2_id, 'Introduction to camera settings: aperture, shutter speed, and ISO', 'Study your camera manual for detailed info.'),
+       (60, 1, @goal2_id, 'Practice basic composition and framing techniques', 'Apply the rule of thirds in your shots.'),
+       (90, 2, @goal2_id, 'Learn about natural lighting and its effects on photography', 'Experiment with different lighting conditions.'),
+       (75, 2, @goal2_id, 'Explore photo composition and visual storytelling', 'Capture images that tell a story or evoke emotions.'),
+       (120, 3, @goal2_id, 'Understand the principles of exposure and metering', 'Practice exposure compensation and metering modes.'),
+       (90, 3, @goal2_id, 'Develop skills in photo editing and post-processing', 'Experiment with editing software and techniques.'),
+       (120, 4, @goal2_id, 'Learn to compose visually appealing photographs', 'Experiment with different angles and perspectives.'),
+       (90, 4, @goal2_id, 'Explore advanced techniques in portrait and landscape photography', 'Experiment with different lighting setups and compositions.'),
+       (120, 5, @goal2_id, 'Create a photography portfolio and share your work', 'Select your best images and create an online portfolio.'),
+       (90, 5, @goal2_id, 'Review your progress and set new photography goals', 'Reflect on your learning journey and set new challenges.');
 
 -- 5. Goal_Mid_Objective 테이블에 데이터 삽입
 INSERT INTO goal_mid_objective (goal_id, sequence, description)

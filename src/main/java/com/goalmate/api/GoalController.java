@@ -18,7 +18,7 @@ public class GoalController implements GoalApi {
 	private final GoalService goalService;
 
 	@Override
-	public ResponseEntity createGoal(GoalCreateRequest goalCreateRequest) throws Exception {
+	public ResponseEntity createGoal(GoalCreateRequest goalCreateRequest) {
 		Long goalId = goalService.createGoal(goalCreateRequest);
 		return ResponseEntity.ok(ApiResponse.success(goalId));
 	}
@@ -38,7 +38,7 @@ public class GoalController implements GoalApi {
 	@Override
 	public ResponseEntity participateInGoal(Integer goalId) {
 		Long currentUserId = SecurityUtil.getCurrentUserId();
-		goalService.participateInGoal(currentUserId, goalId.longValue());
-		return ResponseEntity.ok(ApiResponse.success());
+		Long menteeGoalId = goalService.participateInGoal(currentUserId, goalId.longValue());
+		return ResponseEntity.ok(ApiResponse.success(menteeGoalId));
 	}
 }
