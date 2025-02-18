@@ -145,9 +145,6 @@ paths:
             schema:
               type: object
               properties:
-                access_token:
-                  type: string
-                  example: <header>.<payload>.<signature>
                 refresh_token:
                   type: string
                   example: <header>.<payload>.<signature>
@@ -699,26 +696,29 @@ paths:
                       data:
                         $ref: '#/components/schemas/RemainingTodosResponse'
   /mentees/my/goals/{menteeGoalId}/todos/{todoId}:
-    post:
+    patch:
       security:
         - bearerAuth: [ ]
       tags:
         - MenteeGoal
-      summary: 멘티의 목표 투두 업데이트
+      summary: 멘티의 목표 투두 상태 업데이트
       description: >
         ## 개요
         
         멘티의 목표에 대해 투두 상태를 업데이트 합니다.
         
-        ## 응답 설명
+        ## 요청 설명
         
-        현재 상태가 `TODO`라면 `COMPLETED`로, `COMPLETED`라면 `TODO`로 변경됩니다.
-        
-        또한, 변경된 투두 정보를 반환합니다.
+        요청에 들어있는 `todo_status`로 투두의 상태를 변경합니다. 사용할 수 있는 상태는 다음과 같습니다.
         
         ### todo_status: 투두의 상태
           - `TODO`: 진행 중인 투두
           - `COMPLETED`: 완료된 투두
+        
+        ## 응답 설명
+        
+        변경된 투두 정보를 반환합니다.
+
       operationId: updateTodoStatus
       parameters:
         - name: menteeGoalId
@@ -735,6 +735,19 @@ paths:
             type: integer
             format: int64
           description: 투두 ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                todo_status:
+                  type: string
+                  enum:
+                    - TODO
+                    - COMPLETED
+                  description: 투두 상태
       responses:
         '200':
           description: 업데이트 성공. 업데이트된 투두 정보를 반환합니다.
@@ -749,6 +762,49 @@ paths:
                         $ref: '#/components/schemas/MenteeGoalTodoResponse'
 
   # Comments
+  /comment-rooms/my:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Comment
+      summary: "[공통] 코멘트 룸 리스트 조회"
+      description: >
+        ## 개요
+        
+        코멘트 룸 목록을 조회합니다.
+      operationId: getCommentRooms
+      parameters:
+        - name: page
+          in: query
+          description: 페이지 번호 (1부터 시작)
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: size
+          in: query
+          description: 페이지당 아이템 수
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+      responses:
+        '200':
+          description: 조회 성공
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/CommentRoomPagingResponse'
+
   /comment-rooms/{roomId}/comments:
     get:
       security:
@@ -840,48 +896,6 @@ paths:
                       data:
                         $ref: '#/components/schemas/CommentResponse'
 
-  /comment-rooms/my:
-    get:
-      security:
-        - bearerAuth: [ ]
-      tags:
-        - Comment
-      summary: 코멘트 리스트 조회
-      description: >
-        ## 개요
-        
-        멘티에게 온 코멘트 리스트를 조회합니다. 페이지네이션이 적용되며, 최신 코멘트 순으로 정렬됩니다.
-      operationId: getCommentRooms
-      parameters:
-        - name: page
-          in: query
-          description: 페이지 번호 (1부터 시작)
-          required: false
-          schema:
-            type: integer
-            minimum: 1
-            default: 1
-        - name: size
-          in: query
-          description: 페이지당 아이템 수
-          required: false
-          schema:
-            type: integer
-            minimum: 1
-            maximum: 100
-            default: 10
-      responses:
-        '200':
-          description: 조회 성공
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/ApiResponse'
-                  - type: object
-                    properties:
-                      data:
-                        $ref: '#/components/schemas/CommentRoomPagingResponse'
   /comments/{commentId}:
     patch:
       security:
@@ -1403,6 +1417,9 @@ components:
     CommentRoomResponse:
       type: object
       properties:
+        comment_room_id:
+          type: integer
+          format: int64
         mentee_goal_id:
           type: integer
           format: int64

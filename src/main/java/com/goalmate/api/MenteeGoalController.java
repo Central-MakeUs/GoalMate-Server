@@ -10,6 +10,7 @@ import com.goalmate.api.model.MenteeGoalDailyDetailResponse;
 import com.goalmate.api.model.MenteeGoalSummaryPagingResponse;
 import com.goalmate.api.model.MenteeGoalTodoResponse;
 import com.goalmate.api.model.RemainingTodosResponse;
+import com.goalmate.api.model.UpdateTodoStatusRequest;
 import com.goalmate.security.util.SecurityUtil;
 import com.goalmate.service.MenteeGoalService;
 import com.goalmate.support.response.ApiResponse;
@@ -51,9 +52,16 @@ public class MenteeGoalController implements MenteeGoalApi {
 	}
 
 	@Override
-	public ResponseEntity updateTodoStatus(Long menteeGoalId, Long todoId) {
-		MenteeGoalTodoResponse response = menteeGoalService.updateTodoStatus(menteeGoalId, todoId);
+	public ResponseEntity updateTodoStatus(
+		Long menteeGoalId,
+		Long todoId,
+		UpdateTodoStatusRequest request
+	) {
+		MenteeGoalTodoResponse response = menteeGoalService.updateTodoStatus(
+			menteeGoalId,
+			todoId,
+			request.getTodoStatus().getValue()
+		);
 		return ResponseEntity.ok(ApiResponse.success(response));
 	}
-
 }

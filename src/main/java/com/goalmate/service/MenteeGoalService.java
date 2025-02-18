@@ -2,6 +2,7 @@ package com.goalmate.service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,6 +17,7 @@ import com.goalmate.api.model.PageResponse;
 import com.goalmate.domain.menteeGoal.MenteeGoalDailyTodoEntity;
 import com.goalmate.domain.menteeGoal.MenteeGoalEntity;
 import com.goalmate.domain.menteeGoal.TodoProgress;
+import com.goalmate.domain.menteeGoal.TodoStatus;
 import com.goalmate.mapper.MenteeGoalResponseMapper;
 import com.goalmate.mapper.PageResponseMapper;
 import com.goalmate.repository.MenteeGoalDailyTodoRepository;
@@ -85,6 +87,9 @@ public class MenteeGoalService {
 
 	public MenteeGoalDailyDetailResponse getMenteeGoalDailyDetails(Long menteeGoalId, LocalDate date) {
 		MenteeGoalEntity menteeGoal = getMenteeGoal(menteeGoalId);
+		if (Optional.ofNullable(date).isEmpty()) {
+			date = LocalDate.now();
+		}
 		MenteeGoalSummaryResponse summary = MenteeGoalResponseMapper
 			.mapToSummaryResponse(
 				menteeGoal,
@@ -96,13 +101,13 @@ public class MenteeGoalService {
 		return MenteeGoalResponseMapper.mapToDailyDetailResponse(summary, date, todos);
 	}
 
-	public MenteeGoalTodoResponse updateTodoStatus(Long menteeGoalId, Long todoId) {
+	public MenteeGoalTodoResponse updateTodoStatus(Long menteeGoalId, Long todoId, String status) {
 		MenteeGoalDailyTodoEntity todo = dailyTodoRepository.findById(todoId)
 			.orElseThrow(() -> new CoreApiException(ErrorType.NOT_FOUND, "Todo not found"));
 		if (!todo.getTodoDate().isEqual(LocalDate.now())) {
 			throw new CoreApiException(ErrorType.BAD_REQUEST, "Cannot update past todo");
 		}
-		todo.toggleStatus();
+		todo.updateStatus(TodoStatus.valueOf(status));
 		return MenteeGoalResponseMapper.mapToTodoResponse(todo);
 	}
 
