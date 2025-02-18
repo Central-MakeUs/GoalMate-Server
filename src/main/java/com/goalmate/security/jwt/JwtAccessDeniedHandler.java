@@ -21,6 +21,6 @@ public class JwtAccessDeniedHandler implements AccessDeniedHandler {
 		AccessDeniedException accessDeniedException) throws IOException {
 		HttpResponseUtil.writeErrorResponse(
 			response,
-			new CoreApiException(ErrorType.NOT_FOUND, "[Error] 접근 권한이 없습니다."));
+			new CoreApiException(ErrorType.FORBIDDEN, "[Error] 접근 권한이 없습니다."));
 	}
 }

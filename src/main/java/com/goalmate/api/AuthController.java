@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.goalmate.api.model.LoginResponse;
 import com.goalmate.api.model.OAuthRequest;
+import com.goalmate.api.model.ReissueRequest;
 import com.goalmate.service.AuthService;
 import com.goalmate.service.LoginResult;
 import com.goalmate.support.response.ApiResponse;
@@ -39,8 +40,13 @@ public class AuthController implements AuthApi {
 	}
 
 	@Override
-	public ResponseEntity<Void> reissue() throws Exception {
-		return AuthApi.super.reissue();
+	public ResponseEntity<Void> reissue(ReissueRequest reissueRequest) throws Exception {
+		return AuthApi.super.reissue(reissueRequest);
+	}
+
+	@Override
+	public ResponseEntity validateToken() {
+		return ResponseEntity.ok(ApiResponse.success());
 	}
 
 	@Override
