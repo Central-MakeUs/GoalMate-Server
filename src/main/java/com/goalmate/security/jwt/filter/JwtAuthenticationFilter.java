@@ -1,4 +1,4 @@
-package com.goalmate.security.jwt;
+package com.goalmate.security.jwt.filter;
 
 import static org.springframework.util.StringUtils.*;
 
@@ -8,6 +8,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.goalmate.security.jwt.JwtProvider;
 import com.goalmate.support.HttpResponseUtil;
 import com.goalmate.support.error.CoreApiException;
 import com.goalmate.support.error.ErrorType;
@@ -34,7 +35,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			String accessToken = jwtProvider.resolveToken(request.getHeader(AUTHENTICATION_HEADER));
 			if (hasText(accessToken)) {
 				log.info(">>>>>> AccessToken : {}", accessToken);
-				jwtProvider.validateAccessToken(accessToken);
 				Authentication authentication = jwtProvider.getAuthentication(accessToken);
 				SecurityContextHolder.getContext().setAuthentication(authentication);
 			}

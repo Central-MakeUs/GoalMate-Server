@@ -96,8 +96,10 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           script: |
-            docker pull ${{ secrets.DOCKER_ID }}/${{ env.DOCKER_REPOSITORY }}:${CURRENT_TIME}
-            docker service update --image ${{ secrets.DOCKER_ID }}/${{ env.DOCKER_REPOSITORY }}:${TAG} goalmate-stack_goalmate
+            docker pull ${{ secrets.DOCKER_ID }}/${{ env.DOCKER_REPOSITORY }}:latest
+            
+            # update는 stack deploy로 대체 가능
+            # docker service update --image ${{ secrets.DOCKER_ID }}/${{ env.DOCKER_REPOSITORY }}:latest goalmate-stack_goalmate
             
             cd deploy
             chmod 777 ./deploy.sh

@@ -17,6 +17,10 @@ import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+import com.goalmate.security.user.UserDetailsImpl;
+import com.goalmate.support.error.CoreApiException;
+import com.goalmate.support.error.ErrorType;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
@@ -40,8 +44,6 @@ public class JwtProvider {
 
 	@Value("${jwt.refresh-expiry-seconds}")
 	private int refreshExpirySeconds;
-
-	// private final RefreshTokenRepository refreshTokenRepository;
 
 	public TokenPair generateTokenPair(UserDetails userDetails) {
 		String accessToken = generateAccessToken(userDetails);
@@ -100,19 +102,29 @@ public class JwtProvider {
 		return null;
 	}
 
-	private Claims verifyAndExtractClaims(String accessToken) {
-		return Jwts.parser()
-			.verifyWith(extractSecretKey())
-			.build()
-			.parseSignedClaims(accessToken)
-			.getPayload();
+	public void verifyToken(String token) {
+		try {
+			Jwts.parser()
+				.verifyWith(extractSecretKey())
+				.build()
+				.parse(token);
+		} catch (Exception e) {
+			log.warn(">>>>>> Token verification failed: ", e);
+			throw new CoreApiException(ErrorType.UNAUTHORIZED, e.getMessage());
+		}
 	}
 
-	public void validateAccessToken(String accessToken) {
-		Jwts.parser()
-			.verifyWith(extractSecretKey())
-			.build()
-			.parse(accessToken);
+	private Claims verifyAndExtractClaims(String accessToken) {
+		try {
+			return Jwts.parser()
+				.verifyWith(extractSecretKey())
+				.build()
+				.parseSignedClaims(accessToken)
+				.getPayload();
+		} catch (Exception e) {
+			log.warn(">>>>>> Token verification failed: ", e);
+			throw new CoreApiException(ErrorType.UNAUTHORIZED, e.getMessage());
+		}
 	}
 
 	private SecretKey extractSecretKey() {

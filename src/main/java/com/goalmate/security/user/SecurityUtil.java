@@ -1,10 +1,9 @@
-package com.goalmate.security.util;
+package com.goalmate.security.user;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.goalmate.domain.mentee.Role;
-import com.goalmate.security.jwt.UserDetailsImpl;
 import com.goalmate.support.error.CoreApiException;
 import com.goalmate.support.error.ErrorType;
 

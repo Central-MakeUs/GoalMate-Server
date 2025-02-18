@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.goalmate.api.model.GoalCreateRequest;
 import com.goalmate.api.model.GoalDetailResponse;
 import com.goalmate.api.model.GoalSummaryPagingResponse;
-import com.goalmate.security.util.SecurityUtil;
+import com.goalmate.security.user.SecurityUtil;
 import com.goalmate.service.GoalService;
 import com.goalmate.support.response.ApiResponse;
 

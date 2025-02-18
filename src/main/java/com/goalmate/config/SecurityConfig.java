@@ -20,10 +20,10 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.ExceptionTranslationFilter;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
-import com.goalmate.security.jwt.JwtAccessDeniedHandler;
-import com.goalmate.security.jwt.JwtAuthenticationEntryPoint;
-import com.goalmate.security.jwt.JwtAuthenticationFilter;
 import com.goalmate.security.jwt.JwtProvider;
+import com.goalmate.security.jwt.filter.JwtAccessDeniedHandler;
+import com.goalmate.security.jwt.filter.JwtAuthenticationEntryPoint;
+import com.goalmate.security.jwt.filter.JwtAuthenticationFilter;
 
 import lombok.RequiredArgsConstructor;
 
@@ -61,6 +61,7 @@ public class SecurityConfig {
 			antMatcher("/swagger-ui/**"),
 			antMatcher("/v3/api-docs/**"),
 			antMatcher("/auth/login"),
+			antMatcher("/auth/reissue"),
 			antMatcher(HttpMethod.GET, "/goals"),
 			antMatcher(HttpMethod.GET, "/goals/{goalId}")
 		);

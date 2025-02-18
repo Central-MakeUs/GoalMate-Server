@@ -1,4 +1,4 @@
-package com.goalmate.security.util;
+package com.goalmate.security.user;
 
 import com.goalmate.domain.mentee.Role;
 

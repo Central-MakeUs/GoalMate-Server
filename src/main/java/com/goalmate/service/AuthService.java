@@ -9,13 +9,17 @@ import org.springframework.transaction.annotation.Transactional;
 import com.goalmate.domain.mentee.MenteeEntity;
 import com.goalmate.domain.mentee.SocialProvider;
 import com.goalmate.repository.MenteeRepository;
-import com.goalmate.security.LoginResult;
 import com.goalmate.security.jwt.JwtProvider;
+import com.goalmate.security.jwt.LoginResult;
 import com.goalmate.security.jwt.TokenPair;
-import com.goalmate.security.jwt.UserDetailsImpl;
 import com.goalmate.security.oauth.oidc.OAuthMember;
 import com.goalmate.security.oauth.provider.AppleUserProvider;
 import com.goalmate.security.oauth.provider.KakaoUserProvider;
+import com.goalmate.security.user.UserDetailsImpl;
+import com.goalmate.support.error.CoreApiException;
+import com.goalmate.support.error.ErrorType;
+import com.goalmate.token.RefreshToken;
+import com.goalmate.token.RefreshTokenRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +33,7 @@ public class AuthService {
 	private final KakaoUserProvider kakaoUserProvider;
 	private final JwtProvider jwtProvider;
 	private final MenteeRepository menteeRepository;
+	private final RefreshTokenRepository refreshTokenRepository;
 
 	public LoginResult authenticateWithOauth(String identityToken, String nonce, String provider) {
 		// 소셜 제공자 매핑
@@ -67,11 +72,24 @@ public class AuthService {
 			.build();
 	}
 
+	public TokenPair reissue(String refreshToken) {
+		jwtProvider.verifyToken(refreshToken);
+		RefreshToken token = refreshTokenRepository.findById(refreshToken)
+			.orElseThrow(() -> new CoreApiException(ErrorType.UNAUTHORIZED, "Invalid refresh token"));
+		MenteeEntity mentee = menteeRepository.findById(token.getMenteeId())
+			.orElseThrow(() -> new CoreApiException(ErrorType.NOT_FOUND, "Mentee not found"));
+		refreshTokenRepository.deleteById(refreshToken);
+		return generateMenteeToken(mentee);
+	}
+
 	private TokenPair generateMenteeToken(MenteeEntity menteeEntity) {
-		return jwtProvider.generateTokenPair(
+		TokenPair tokenPair = jwtProvider.generateTokenPair(
 			UserDetailsImpl.builder()
 				.id(menteeEntity.getId())
 				.authorities(List.of(new SimpleGrantedAuthority(menteeEntity.getRole().name())))
 				.build());
+		refreshTokenRepository.save(new RefreshToken(tokenPair.refreshToken(), menteeEntity.getId()));
+		return tokenPair;
 	}
+
 }

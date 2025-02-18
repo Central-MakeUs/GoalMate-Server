@@ -7,8 +7,8 @@ import com.goalmate.api.model.CommentPagingResponse;
 import com.goalmate.api.model.CommentRequest;
 import com.goalmate.api.model.CommentResponse;
 import com.goalmate.api.model.CommentRoomPagingResponse;
-import com.goalmate.security.util.CurrentUserContext;
-import com.goalmate.security.util.SecurityUtil;
+import com.goalmate.security.user.CurrentUserContext;
+import com.goalmate.security.user.SecurityUtil;
 import com.goalmate.service.CommentService;
 import com.goalmate.support.response.ApiResponse;
 

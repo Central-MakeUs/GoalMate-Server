@@ -41,10 +41,10 @@ spring:
       mode: always
       data-locations: classpath:db/data.sql
       #      schema-locations: classpath:db/schema.sql
-  #  data:
-  #    redis:
-  #      host: ${REDIS_HOST}
-  #      port: ${REDIS_PORT}
+  data:
+    redis:
+      host: ${redis.host}
+      port: ${redis.port}
 
 ---
 spring.config.activate.on-profile: dev
@@ -73,7 +73,7 @@ spring:
       mode: never
       data-locations: classpath:db/data.sql
       #      schema-locations: classpath:db/schema.sql
-  #  data:
-  #    redis:
-  #      host: ${REDIS_HOST}
-  #      port: ${REDIS_PORT}
+  data:
+    redis:
+      host: ${redis.host}
+      port: ${redis.port}

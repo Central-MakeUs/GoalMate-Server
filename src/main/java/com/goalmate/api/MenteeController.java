@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.goalmate.api.model.MenteeInfoResponse;
 import com.goalmate.api.model.NameAvailabilityResponse;
-import com.goalmate.security.util.SecurityUtil;
+import com.goalmate.security.user.SecurityUtil;
 import com.goalmate.service.MenteeService;
 import com.goalmate.support.response.ApiResponse;
 

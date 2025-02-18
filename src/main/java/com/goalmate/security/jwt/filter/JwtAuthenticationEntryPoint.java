@@ -1,4 +1,4 @@
-package com.goalmate.security.jwt;
+package com.goalmate.security.jwt.filter;
 
 import java.io.IOException;
 

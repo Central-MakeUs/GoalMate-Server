@@ -1,4 +1,4 @@
-package com.goalmate.security;
+package com.goalmate.security.jwt;
 
 public record LoginResult(
 	String accessToken,
