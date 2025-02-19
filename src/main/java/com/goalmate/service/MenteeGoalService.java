@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
@@ -95,9 +94,6 @@ public class MenteeGoalService {
 
 	public MenteeGoalDailyDetailResponse getMenteeGoalDailyDetails(Long menteeGoalId, LocalDate date) {
 		MenteeGoalEntity menteeGoal = getMenteeGoal(menteeGoalId);
-		if (Optional.ofNullable(date).isEmpty()) {
-			date = LocalDate.now();
-		}
 		MenteeGoalSummaryResponse summary = MenteeGoalResponseMapper
 			.mapToSummaryResponse(
 				menteeGoal,
@@ -153,11 +149,13 @@ public class MenteeGoalService {
 			boolean isValid = dailyTodoCount > 0;
 
 			// 주어진 날짜의 progress 객체를 생성
-			MenteeGoalDailyProgressResponse dailyProgress = MenteeGoalResponseMapper.mapToDailyProgressResponse(
-				currentDate,
-				dailyTodoCount,
-				completedDailyTodoCount,
-				isValid);
+			MenteeGoalDailyProgressResponse dailyProgress =
+				MenteeGoalResponseMapper.mapToDailyProgressResponse(
+					currentDate,
+					dailyTodoCount,
+					completedDailyTodoCount,
+					isValid
+				);
 
 			dailyProgressList.add(dailyProgress);
 		}

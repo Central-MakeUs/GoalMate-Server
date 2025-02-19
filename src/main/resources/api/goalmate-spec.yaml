@@ -46,7 +46,7 @@ info:
   license:
     name: Apache 2.0
     url: https://www.apache.org/licenses/LICENSE-2.0.html
-  version: 1.0.0
+  version: Beta 1.0.0
 
 servers:
   - url: http://3.39.253.230
@@ -606,9 +606,11 @@ paths:
       description: >
         ## 개요
         
-        멘티의 목표의 일일 세부정보를 조회합니다. 쿼리 파라미터로 날짜(default: 오늘)가 필요하며, 해당 날짜의 투두 정보를 포함합니다.
+        멘티의 목표의 일일 세부정보를 조회하며, 이는 투두 리스트와 진척도를 포함합니다.  
         
-        `mentee_goal`의 ID와 `goal`의 ID는 서로 다른 값입니다.
+        `date`의 기본값은 조회일로, 조회일의 투두 리스트를 반환합니다.
+        
+        `mentee_goal`의 ID와 `goal`의 ID는 서로 다른 값이니 주의해주세요. 
         
         ## 응답 설명
         
@@ -659,11 +661,13 @@ paths:
       description: >
         ## 개요
         
-        멘티의 목표 진척도를 주 단위로 조회하며, 페이지 크기는 7로 고정됩니다.
+        멘티의 목표 진척도를 주 단위로 조회하며, 페이지 크기는 7로 고정됩니다.  
         
-        주의 시작은 일요일이며, 일요일 ~ 월요일 순으로 진척도가 제공됩니다.
+        `date`의 기본값은 조회일로, 조회일의 투두 리스트를 반환합니다.  
         
-        존재하지 않는 주의 진척도(count)는 0으로 표시되고, is_valid가 false로 반환됩니다.
+        주의 시작은 일요일이며, 일요일 ~ 월요일 순으로 진척도가 제공됩니다.  
+        
+        존재하지 않는 주의 진척도(count)는 0으로 표시되고, is_valid가 false로 반환됩니다.  
         
         ## 응답 설명
         
@@ -1539,9 +1543,13 @@ components:
           format: date
         mentor_name:
           type: string
+        mentor_profile_image:
+          type: string
         new_comments_count:
           type: integer
           format: int64
+      required:
+        - mentor_profile_image
 
     # Paging
     PageResponse:

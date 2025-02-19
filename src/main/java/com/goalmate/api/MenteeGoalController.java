@@ -1,6 +1,7 @@
 package com.goalmate.api;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -34,6 +35,9 @@ public class MenteeGoalController implements MenteeGoalApi {
 		Long menteeGoalId,
 		LocalDate date
 	) {
+		if (Optional.ofNullable(date).isEmpty()) {
+			date = LocalDate.now();
+		}
 		final MenteeGoalWeeklyProgressResponse response = menteeGoalService.getWeeklyProgress(menteeGoalId, date);
 		return ResponseEntity.ok(ApiResponse.success(response));
 	}
@@ -48,8 +52,13 @@ public class MenteeGoalController implements MenteeGoalApi {
 
 	@Override
 	public ResponseEntity getMenteeGoalDailyDetails(Long menteeGoalId, LocalDate date) {
-		MenteeGoalDailyDetailResponse response = menteeGoalService.getMenteeGoalDailyDetails(menteeGoalId,
-			date);
+		if (Optional.ofNullable(date).isEmpty()) {
+			date = LocalDate.now();
+		}
+		MenteeGoalDailyDetailResponse response = menteeGoalService.getMenteeGoalDailyDetails(
+			menteeGoalId,
+			date
+		);
 		return ResponseEntity.ok(ApiResponse.success(response));
 	}
 
