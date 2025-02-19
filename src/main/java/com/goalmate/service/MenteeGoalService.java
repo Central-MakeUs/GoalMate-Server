@@ -1,8 +1,14 @@
 package com.goalmate.service;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -10,9 +16,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.goalmate.api.model.MenteeGoalDailyDetailResponse;
+import com.goalmate.api.model.MenteeGoalDailyProgressResponse;
 import com.goalmate.api.model.MenteeGoalSummaryPagingResponse;
 import com.goalmate.api.model.MenteeGoalSummaryResponse;
 import com.goalmate.api.model.MenteeGoalTodoResponse;
+import com.goalmate.api.model.MenteeGoalWeeklyProgressResponse;
 import com.goalmate.api.model.PageResponse;
 import com.goalmate.domain.menteeGoal.MenteeGoalDailyTodoEntity;
 import com.goalmate.domain.menteeGoal.MenteeGoalEntity;
@@ -114,5 +122,45 @@ public class MenteeGoalService {
 	public MenteeGoalEntity getMenteeGoal(Long menteeGoalId) {
 		return menteeGoalRepository.findById(menteeGoalId)
 			.orElseThrow(() -> new CoreApiException(ErrorType.NOT_FOUND, "MenteeGoal not found"));
+	}
+
+	public MenteeGoalWeeklyProgressResponse getWeeklyProgress(Long menteeGoalId, LocalDate date) {
+		// 해당 주의 일요일 구하기 (해당 날짜가 일요일이면 그대로, 아니면 이전 일요일)
+		LocalDate sunday = date.with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY));
+		// 해당 주의 토요일 구하기 (해당 날짜가 토요일이면 그대로, 아니면 다음 토요일)
+		LocalDate saturday = date.with(TemporalAdjusters.nextOrSame(DayOfWeek.SATURDAY));
+		boolean hasLastWeek = dailyTodoRepository.existsByMenteeGoalIdAndDate(menteeGoalId, sunday.minusDays(1));
+		boolean hasNextWeek = dailyTodoRepository.existsByMenteeGoalIdAndDate(menteeGoalId, saturday.plusDays(1));
+		List<MenteeGoalDailyTodoEntity> todos = dailyTodoRepository.findByMenteeGoalIdAndDateBetween(menteeGoalId,
+			sunday, saturday);
+
+		// todos를 날짜별로 그룹화합니다.
+		Map<LocalDate, List<MenteeGoalDailyTodoEntity>> todosByDate = todos.stream()
+			.collect(Collectors.groupingBy(MenteeGoalDailyTodoEntity::getTodoDate));
+
+		List<MenteeGoalDailyProgressResponse> dailyProgressList = new ArrayList<>();
+
+		// 일요일부터 토요일까지 순회하며 각 날짜의 progress를 계산합니다.
+		for (LocalDate currentDate = sunday; !currentDate.isAfter(saturday); currentDate = currentDate.plusDays(1)) {
+			List<MenteeGoalDailyTodoEntity> dailyTodos = todosByDate.getOrDefault(currentDate, Collections.emptyList());
+
+			int dailyTodoCount = dailyTodos.size();
+			int completedDailyTodoCount = (int)dailyTodos.stream()
+				.filter(MenteeGoalDailyTodoEntity::isCompleted)
+				.count();
+
+			// isValid의 기준은 비즈니스 로직에 따라 설정합니다. 여기서는 todo가 하나라도 있으면 유효하다고 가정.
+			boolean isValid = dailyTodoCount > 0;
+
+			// 주어진 날짜의 progress 객체를 생성
+			MenteeGoalDailyProgressResponse dailyProgress = MenteeGoalResponseMapper.mapToDailyProgressResponse(
+				currentDate,
+				dailyTodoCount,
+				completedDailyTodoCount,
+				isValid);
+
+			dailyProgressList.add(dailyProgress);
+		}
+		return MenteeGoalResponseMapper.mapToWeeklyProgressResponse(hasLastWeek, hasNextWeek, dailyProgressList);
 	}
 }

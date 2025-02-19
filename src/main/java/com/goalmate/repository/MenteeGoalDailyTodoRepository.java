@@ -20,4 +20,18 @@ public interface MenteeGoalDailyTodoRepository extends JpaRepository<MenteeGoalD
 
 	@Query("SELECT m FROM MenteeGoalDailyTodoEntity m WHERE m.menteeGoalEntity.id = :menteeGoalId AND m.todoDate = :date")
 	List<MenteeGoalDailyTodoEntity> findByMenteeGoalIdAndDate(Long menteeGoalId, LocalDate date);
+
+	@Query("SELECT COUNT(m) > 0 FROM MenteeGoalDailyTodoEntity m " +
+		"WHERE m.menteeGoalEntity.id = :menteeGoalId " +
+		"AND m.todoDate = :date")
+	Boolean existsByMenteeGoalIdAndDate(Long menteeGoalId, LocalDate date);
+
+	@Query("SELECT m FROM MenteeGoalDailyTodoEntity m " +
+		"WHERE m.menteeGoalEntity.id = :menteeGoalId " +
+		"AND m.todoDate BETWEEN :sunday AND :saturday " +
+		"ORDER BY m.todoDate ASC")
+	List<MenteeGoalDailyTodoEntity> findByMenteeGoalIdAndDateBetween(
+		Long menteeGoalId,
+		LocalDate sunday,
+		LocalDate saturday);
 }

@@ -5,10 +5,10 @@ import java.time.LocalDate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.goalmate.api.model.GetMenteeGoalWeeklyProgress200Response;
 import com.goalmate.api.model.MenteeGoalDailyDetailResponse;
 import com.goalmate.api.model.MenteeGoalSummaryPagingResponse;
 import com.goalmate.api.model.MenteeGoalTodoResponse;
+import com.goalmate.api.model.MenteeGoalWeeklyProgressResponse;
 import com.goalmate.api.model.RemainingTodosResponse;
 import com.goalmate.api.model.UpdateTodoStatusRequest;
 import com.goalmate.security.user.SecurityUtil;
@@ -30,10 +30,12 @@ public class MenteeGoalController implements MenteeGoalApi {
 	}
 
 	@Override
-	public ResponseEntity<GetMenteeGoalWeeklyProgress200Response> getMenteeGoalWeeklyProgress(Integer menteeGoalId,
-		LocalDate date) throws Exception {
-		// 보류
-		return MenteeGoalApi.super.getMenteeGoalWeeklyProgress(menteeGoalId, date);
+	public ResponseEntity getMenteeGoalWeeklyProgress(
+		Long menteeGoalId,
+		LocalDate date
+	) {
+		final MenteeGoalWeeklyProgressResponse response = menteeGoalService.getWeeklyProgress(menteeGoalId, date);
+		return ResponseEntity.ok(ApiResponse.success(response));
 	}
 
 	@Override

@@ -5,10 +5,12 @@ import java.util.List;
 
 import com.goalmate.api.model.GoalSummaryResponse;
 import com.goalmate.api.model.MenteeGoalDailyDetailResponse;
+import com.goalmate.api.model.MenteeGoalDailyProgressResponse;
 import com.goalmate.api.model.MenteeGoalStatusEnum;
 import com.goalmate.api.model.MenteeGoalSummaryPagingResponse;
 import com.goalmate.api.model.MenteeGoalSummaryResponse;
 import com.goalmate.api.model.MenteeGoalTodoResponse;
+import com.goalmate.api.model.MenteeGoalWeeklyProgressResponse;
 import com.goalmate.api.model.PageResponse;
 import com.goalmate.domain.goal.GoalEntity;
 import com.goalmate.domain.menteeGoal.MenteeGoalDailyTodoEntity;
@@ -76,6 +78,32 @@ public class MenteeGoalResponseMapper {
 		response.setTodoDate(todo.getTodoDate());
 		response.setMentorTip(todo.getMentorTip());
 		response.setTodoStatus(todo.getStatus().getValue());
+		return response;
+	}
+
+	public static MenteeGoalDailyProgressResponse mapToDailyProgressResponse(
+		LocalDate date,
+		int dailyTodoCount,
+		int completedDailyTodoCount,
+		boolean isValid
+	) {
+		MenteeGoalDailyProgressResponse response = new MenteeGoalDailyProgressResponse();
+		response.setDate(date);
+		response.dayOfWeek(date.getDayOfWeek().toString());
+		response.setDailyTodoCount(dailyTodoCount);
+		response.setCompletedDailyTodoCount(completedDailyTodoCount);
+		response.setIsValid(isValid);
+		return response;
+	}
+
+	public static MenteeGoalWeeklyProgressResponse mapToWeeklyProgressResponse(
+		boolean hasLastWeek,
+		boolean hasNextWeek,
+		List<MenteeGoalDailyProgressResponse> progress) {
+		MenteeGoalWeeklyProgressResponse response = new MenteeGoalWeeklyProgressResponse();
+		response.setHasLastWeek(hasLastWeek);
+		response.setHasNextWeek(hasNextWeek);
+		response.setProgress(progress);
 		return response;
 	}
 }

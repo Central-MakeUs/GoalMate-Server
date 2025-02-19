@@ -619,6 +619,7 @@ paths:
         ## Nullable Fields
           - `main_image`: 메인 이미지가 없는 경우 null
           - `mentor_letter`: 멘토의 편지가 없는 경우 null
+          - `todos.mentor_tip`: 멘토의 팁이 없는 경우 null
 
       operationId: getMenteeGoalDailyDetails
       parameters:
@@ -654,13 +655,31 @@ paths:
         - bearerAuth: [ ]
       tags:
         - MenteeGoal
-      summary: 멘티의 목표 진척도 조회
+      summary: 주간 목표 진척도 조회
       description: >
         ## 개요
         
-        멘티의 목표 진척도를 주 단위로 조회합니다.
+        멘티의 목표 진척도를 주 단위로 조회하며, 페이지 크기는 7로 고정됩니다.
         
-        일~월 순으로 진척도가 제공되며, 페이지 크기는 7로 고정됩니다.
+        주의 시작은 일요일이며, 일요일 ~ 월요일 순으로 진척도가 제공됩니다.
+        
+        존재하지 않는 주의 진척도(count)는 0으로 표시되고, is_valid가 false로 반환됩니다.
+        
+        ## 응답 설명
+        
+        ### day_of_week: 요일
+            - `SUNDAY`: 일요일
+            - `MONDAY`: 월요일
+            - `TUESDAY`: 화요일
+            - `WEDNESDAY`: 수요일
+            - `THURSDAY`: 목요일
+            - `FRIDAY`: 금요일
+            - `SATURDAY`: 토요일
+        
+        ### is_valid: Todo가 있는 날인지 여부
+          - `true`: Todo가 있는 날
+          - `false`: Todo가 없는 날 > 모든 count 0으로 표시
+
       operationId: getMenteeGoalWeeklyProgress
       parameters:
         - name: menteeGoalId
@@ -668,6 +687,7 @@ paths:
           required: true
           schema:
             type: integer
+            format: int64
           description: 멘티목표 ID
         - name: date
           in: query
@@ -687,16 +707,7 @@ paths:
                   - type: object
                     properties:
                       data:
-                        type: object
-                        properties:
-                          progress:
-                            type: array
-                            items:
-                              $ref: '#/components/schemas/MenteeGoalDailyProgressResponse'
-                          has_last_week:
-                            type: boolean
-                          has_next_week:
-                            type: boolean
+                        $ref: '#/components/schemas/MenteeGoalWeeklyProgressResponse'
   /mentees/my/todos:
     # 오늘 해야할 일이 남았는지 확인용
     get:
@@ -943,7 +954,7 @@ paths:
           schema:
             type: integer
             format: int64
-          description: 코멘트 ID
+          description: 코멘트 룸 ID
       requestBody:
         required: true
         content:
@@ -1388,21 +1399,32 @@ components:
     MenteeGoalDailyProgressResponse:
       type: object
       properties:
+        date:
+          type: string
+          format: date
+        day_of_week:
+          type: string
+          example: MONDAY
         daily_todo_count:
           type: integer
           example: 5
         completed_daily_todo_count:
           type: integer
           example: 3
-        date:
-          type: string
-          format: date
-        day_of_week:
-          type: string
-          example: MON
         is_valid:
           type: boolean
           example: true
+    MenteeGoalWeeklyProgressResponse:
+      type: object
+      properties:
+        progress:
+          type: array
+          items:
+            $ref: '#/components/schemas/MenteeGoalDailyProgressResponse'
+        has_last_week:
+          type: boolean
+        has_next_week:
+          type: boolean
 
     MenteeGoalStatusEnum:
       type: string
