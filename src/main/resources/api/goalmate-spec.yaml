@@ -880,7 +880,12 @@ paths:
         멘토-멘티 간 주고받은 코멘트를 조회합니다.
         
         코멘트는 최신 날짜부터 내림차순으로 정렬되며, 페이지네이션이 적용됩니다.
-
+        
+        ## 응답 설명
+        
+        ### writer_role: 코멘트 작성자의 역할
+          - `MENTOR`: 멘토
+          - `MENTEE`: 멘티
       operationId: getComments
       parameters:
         - name: roomId
