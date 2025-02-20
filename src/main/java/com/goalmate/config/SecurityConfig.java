@@ -60,7 +60,7 @@ public class SecurityConfig {
 			antMatcher("/actuator/**"),
 			antMatcher("/swagger-ui/**"),
 			antMatcher("/v3/api-docs/**"),
-			antMatcher("/auth/login"),
+			antMatcher("/auth/login/**"),
 			antMatcher("/auth/reissue"),
 			antMatcher(HttpMethod.GET, "/goals"),
 			antMatcher(HttpMethod.GET, "/goals/{goalId}")

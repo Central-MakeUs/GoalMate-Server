@@ -1,10 +1,14 @@
--- 멘토 1: Java Bootcamp 담당 멘토 (mentor_id = 1)
-INSERT INTO mentor (created_at, updated_at, email, name, role)
-VALUES ('2025-02-14 09:00:00', '2025-02-14 09:00:00', 'mentor1@example.com', 'John Doe', 'ROLE_MENTOR');
+-- 어드민
+INSERT INTO admin (created_at, updated_at, login_id, password, role)
+VALUES ('2025-02-14 09:00:00', '2025-02-14 09:00:00', 'admin',
+        '$2a$10$1i.h33et9oKl/R9jjz9GV.JdROMZHOH.cWge4QtXdXSaCxhkmQpYW', 'ROLE_ADMIN');
 
--- 멘토 2: Photography Basics 담당 멘토 (mentor_id = 2)
-INSERT INTO mentor (created_at, updated_at, email, name, role)
-VALUES ('2025-02-13 14:00:00', '2025-02-13 14:00:00', 'mentor2@example.com', 'Jane Smith', 'ROLE_MENTOR');
+-- 멘토 1: Java Bootcamp 담당 멘토 (mentor_id = 1)
+INSERT INTO mentor (created_at, updated_at, email, name, password, role)
+VALUES ('2025-02-14 09:00:00', '2025-02-14 09:00:00', 'mentor1@example.com', 'John Doe',
+        '$2a$10$rXFCPrq71rGm2YhXAAPOF.3Pw/S9cHMFkh8HpMrbCutOKut5lBfry', 'ROLE_MENTOR'),
+       ('2025-02-13 14:00:00', '2025-02-13 14:00:00', 'mentor2@example.com', 'Jane Smith',
+        '$2a$10$doQL4j/bMbSx3e6d07Akte3KLauOUtAh8G1tXvrRBCWWw2OmQR3nO', 'ROLE_MENTOR');
 
 -- 1. Goal 테이블에 데이터 삽입 (Java Bootcamp)
 INSERT INTO goal
@@ -18,9 +22,8 @@ SET @goal1_id = LAST_INSERT_ID();
 
 -- 2. Goal_Content_Image 테이블에 데이터 삽입 (랜덤 seed: 101, 102)
 INSERT INTO goal_content_image (goal_id, sequence, image_url)
-VALUES (@goal1_id, 1, 'https://picsum.photos/seed/101/156/214');
-INSERT INTO goal_content_image (goal_id, sequence, image_url)
-VALUES (@goal1_id, 2, 'https://picsum.photos/seed/102/156/214');
+VALUES (@goal1_id, 1, 'https://picsum.photos/seed/101/156/214'),
+       (@goal1_id, 2, 'https://picsum.photos/seed/102/156/214');
 
 -- 3. Goal_Thumbnail_Image 테이블에 데이터 삽입 (랜덤 seed: 103)
 -- INSERT INTO goal_thumbnail_image (goal_id, sequence, image_url)
@@ -98,15 +101,13 @@ SET @goal2_id = LAST_INSERT_ID();
 
 -- 2. Goal_Content_Image 테이블에 데이터 삽입 (랜덤 seed: 201, 202)
 INSERT INTO goal_content_image (goal_id, sequence, image_url)
-VALUES (@goal2_id, 1, 'https://picsum.photos/seed/99/156/214');
-INSERT INTO goal_content_image (goal_id, sequence, image_url)
-VALUES (@goal2_id, 2, 'https://picsum.photos/seed/902/156/214');
+VALUES (@goal2_id, 1, 'https://picsum.photos/seed/99/156/214'),
+       (@goal2_id, 2, 'https://picsum.photos/seed/902/156/214');
 
 -- 3. Goal_Thumbnail_Image 테이블에 데이터 삽입 (랜덤 seed: 103)
 INSERT INTO goal_thumbnail_image (goal_id, sequence, image_url)
-VALUES (@goal2_id, 1, 'https://picsum.photos/seed/11/156/214');
-INSERT INTO goal_thumbnail_image (goal_id, sequence, image_url)
-VALUES (@goal2_id, 2, 'https://picsum.photos/seed/14/156/214');
+VALUES (@goal2_id, 1, 'https://picsum.photos/seed/11/156/214'),
+       (@goal2_id, 2, 'https://picsum.photos/seed/14/156/214');
 
 -- 4. Goal_Daily_Todo 테이블에 데이터 삽입
 INSERT INTO goal_daily_todo (estimated_minutes, day_number, goal_id, description, mentor_tip)
@@ -150,3 +151,62 @@ VALUES (1, @goal2_id, 'Familiarize yourself with camera functions and settings.'
        (5, @goal2_id, 'Explore advanced techniques in portrait and landscape photography.'),
        (6, @goal2_id, 'Create a photography portfolio and share your work.'),
        (7, @goal2_id, 'Review your progress and set new photography goals.');
+
+-- 1. Goal 테이블에 데이터 삽입 (Web Development Bootcamp)
+INSERT INTO goal (current_participants, discount_price, participants_limit, period, daily_duration, price, created_at,
+                  updated_at, mentor_id, description, title, topic, goal_status)
+VALUES (10, 15000, 25, 45, 40, 100000, '2025-02-13 16:00:00', '2025-02-13 16:00:00', 1,
+        'Master the fundamentals of web development and build dynamic websites.', 'Web Development Bootcamp',
+        'Programming', 'CLOSED');
+
+-- 삽입된 Goal의 ID를 변수에 저장
+SET @goal3_id = LAST_INSERT_ID();
+
+-- 2. Goal_Content_Image 테이블에 데이터 삽입 (랜덤 seed: 301, 302)
+INSERT INTO goal_content_image (goal_id, sequence, image_url)
+VALUES (@goal3_id, 1, 'https://picsum.photos/seed/301/156/214'),
+       (@goal3_id, 2, 'https://picsum.photos/seed/302/156/214');
+
+-- 3. Goal_Thumbnail_Image 테이블에 데이터 삽입 (랜덤 seed: 303)
+INSERT INTO goal_thumbnail_image (goal_id, sequence, image_url)
+VALUES (@goal3_id, 1, 'https://picsum.photos/seed/303/156/214'),
+       (@goal3_id, 2, 'https://picsum.photos/seed/304/156/214');
+
+-- 4. Goal_Daily_Todo 테이블에 데이터 삽입
+INSERT INTO goal_daily_todo (estimated_minutes, day_number, goal_id, description, mentor_tip)
+VALUES (60, 0, @goal3_id, 'Introduction to web development and setup environment',
+        'Install code editor and browser developer tools.'),
+       (60, 0, @goal3_id, 'More web development and setup environment',
+        'Install code editor and browser developer tools.'),
+       (90, 1, @goal3_id, 'Learn HTML and create a basic webpage',
+        'Practice writing HTML tags and elements.'),
+       (75, 2, @goal3_id, 'Explore CSS and style your webpage',
+        'Experiment with CSS properties and selectors.'),
+       (120, 2, @goal3_id, 'Build a responsive webpage with CSS',
+        'Design a mobile-friendly layout using media queries.'),
+       (90, 3, @goal3_id, 'Understand JavaScript fundamentals and DOM manipulation',
+        'Practice writing JavaScript code and interacting with the DOM.'),
+       (120, 3, @goal3_id, 'Develop interactive features with JavaScript',
+        'Create dynamic content and user interactions with JavaScript.'),
+       (90, 4, @goal3_id, 'Learn about web development frameworks and libraries',
+        'Explore popular frameworks like React and Angular.'),
+       (120, 4, @goal3_id, 'Build a single-page application with React',
+        'Create a modern web app using React components and state management.'),
+       (90, 5, @goal3_id, 'Review your web projects and seek feedback',
+        'Share your code with peers and mentors for review.'),
+       (120, 5, @goal3_id, 'Reflect on your learning journey and set new goals',
+        'Identify areas for improvement and set new challenges.');
+
+-- 5. Goal_Mid_Objective 테이블에 데이터 삽입
+INSERT INTO goal_mid_objective (goal_id, sequence, description)
+VALUES (@goal3_id, 1, 'Master HTML and CSS for web design.'),
+       (@goal3_id, 2, 'Understand JavaScript fundamentals and DOM manipulation.');
+
+-- 6. Goal_Weekly_Objective 테이블에 데이터 삽입
+INSERT INTO goal_weekly_objective (week_number, goal_id, description)
+VALUES (1, @goal3_id, 'Learn HTML and create a basic webpage.'),
+       (2, @goal3_id, 'Explore CSS and style your webpage.'),
+       (3, @goal3_id, 'Understand JavaScript fundamentals and DOM manipulation.'),
+       (4, @goal3_id, 'Learn about web development frameworks and libraries.'),
+       (5, @goal3_id, 'Review your web projects and seek feedback.'),
+       (6, @goal3_id, 'Reflect on your learning journey and set new goals.');

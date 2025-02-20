@@ -5,7 +5,7 @@ spring:
     import:
       - optional:classpath:env.yaml
   profiles:
-    active: local
+    active: test
 
 server:
   tomcat:
@@ -15,12 +15,12 @@ server:
       min-spare: 100
   port: 8080
 ---
-spring.config.activate.on-profile: local
+spring.config.activate.on-profile: test
 
 spring:
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
@@ -33,42 +33,15 @@ spring:
     open-in-view: false
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/goalmate
+    url: jdbc:mysql://localhost:3306/goalmate_test?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
     username: root
     password: local1234!
   sql:
     init:
-      mode: never
+      mode: always
       data-locations: classpath:db/data.sql
       #      schema-locations: classpath:db/schema.sql
   data:
     redis:
       host: localhost
       port: 6379
-
----
-spring.config.activate.on-profile: dev
-
-spring:
-  jpa:
-    hibernate:
-      ddl-auto: update
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.MySQLDialect
-        format_sql: true
-        show_sql: true
-      hibernate.default_batch_fetch_size: 1000
-    show-sql: true
-    generate-ddl: true
-    defer-datasource-initialization: true
-    open-in-view: false
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://${aws.rds.url}
-    username: ${aws.rds.username}
-    password: ${aws.rds.password}
-  data:
-    redis:
-      host: ${redis.host}
-      port: ${redis.port}

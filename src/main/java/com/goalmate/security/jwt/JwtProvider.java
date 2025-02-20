@@ -5,6 +5,7 @@ import static org.springframework.util.StringUtils.*;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.crypto.SecretKey;
@@ -14,9 +15,12 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+import com.goalmate.infra.redis.RefreshToken;
+import com.goalmate.infra.redis.RefreshTokenRepository;
 import com.goalmate.security.user.UserDetailsImpl;
 import com.goalmate.support.error.CoreApiException;
 import com.goalmate.support.error.ErrorType;
@@ -36,6 +40,8 @@ public class JwtProvider {
 	private static final String AUTHENTICATION_CLAIM_NAME = "roles";
 	private static final String AUTHENTICATION_SCHEME = "Bearer ";
 
+	private final RefreshTokenRepository refreshTokenRepository;
+
 	@Value("${jwt.secret-key}")
 	private String secretKey;
 
@@ -45,9 +51,15 @@ public class JwtProvider {
 	@Value("${jwt.refresh-expiry-seconds}")
 	private int refreshExpirySeconds;
 
-	public TokenPair generateTokenPair(UserDetails userDetails) {
+	public TokenPair generateTokenPair(Long id, String role) {
+		UserDetailsImpl userDetails = UserDetailsImpl.builder()
+			.id(id)
+			.authorities(List.of(new SimpleGrantedAuthority(role)))
+			.build();
+		
 		String accessToken = generateAccessToken(userDetails);
 		String refreshToken = generateRefreshToken();
+		refreshTokenRepository.save(new RefreshToken(refreshToken, Long.parseLong(userDetails.getUsername())));
 		return new TokenPair(accessToken, refreshToken);
 	}
 

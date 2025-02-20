@@ -58,6 +58,8 @@ servers:
 tags:
   - name: Auth
     description: 인증 API
+  - name: Admin
+    description: 관리자 API
   - name: Mentee
     description: 멘티 API
   - name: Mentor
@@ -99,6 +101,106 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/OAuthRequest'
+      responses:
+        '200':
+          description: 로그인 성공
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/LoginResponse'
+        '201':
+          description: 회원가입 성공
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/LoginResponse'
+  /auth/login/metor:
+    post:
+      tags:
+        - Auth
+      summary: 멘토 로그인
+      description: >
+        ## 개요
+        멘토 로그인
+          - id
+          - password
+      operationId: loginMentor
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  example: "mentor1@example.com"
+                password:
+                  type: string
+                  example: "password"
+              required:
+                - id
+                - password
+      responses:
+        '200':
+          description: 로그인 성공
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/LoginResponse'
+        '201':
+          description: 회원가입 성공
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/LoginResponse'
+  /auth/login/admin:
+    post:
+      tags:
+        - Auth
+      summary: 관리자 로그인
+      description: >
+        ## 개요
+        관리자 로그인
+          - id
+          - password
+      operationId: loginAdmin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  example: "admin"
+                password:
+                  type: string
+                  example: "admin"
+              required:
+                - id
+                - password
       responses:
         '200':
           description: 로그인 성공

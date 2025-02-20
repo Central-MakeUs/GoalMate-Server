@@ -4,6 +4,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.goalmate.api.model.LoginAdminRequest;
+import com.goalmate.api.model.LoginMentorRequest;
 import com.goalmate.api.model.LoginResponse;
 import com.goalmate.api.model.OAuthRequest;
 import com.goalmate.api.model.ReissueRequest;
@@ -36,6 +38,18 @@ public class AuthController implements AuthApi {
 	}
 
 	@Override
+	public ResponseEntity loginAdmin(LoginAdminRequest loginAdminRequest) {
+		TokenPair tokenPair = authService.loginAdmin(loginAdminRequest);
+		return ResponseEntity.ok(ApiResponse.success(tokenPair.toLoginResponse()));
+	}
+
+	@Override
+	public ResponseEntity loginMentor(LoginMentorRequest loginMentorRequest) {
+		TokenPair tokenPair = authService.loginMentor(loginMentorRequest);
+		return ResponseEntity.ok(ApiResponse.success(tokenPair.toLoginResponse()));
+	}
+
+	@Override
 	public ResponseEntity logout() throws Exception {
 		return AuthApi.super.logout();
 	}
@@ -43,10 +57,7 @@ public class AuthController implements AuthApi {
 	@Override
 	public ResponseEntity reissue(ReissueRequest reissueRequest) {
 		TokenPair tokenPair = authService.reissue(reissueRequest.getRefreshToken());
-		LoginResponse response = new LoginResponse();
-		response.setAccessToken(tokenPair.accessToken());
-		response.setRefreshToken(tokenPair.refreshToken());
-		return ResponseEntity.ok(ApiResponse.success(response));
+		return ResponseEntity.ok(ApiResponse.success(tokenPair.toLoginResponse()));
 	}
 
 	@Override
@@ -58,5 +69,4 @@ public class AuthController implements AuthApi {
 	public ResponseEntity<Void> withdraw() throws Exception {
 		return AuthApi.super.withdraw();
 	}
-
 }
