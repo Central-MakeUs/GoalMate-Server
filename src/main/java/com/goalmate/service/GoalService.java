@@ -152,7 +152,8 @@ public class GoalService {
 
 	private void createCommentRoom(MentorEntity mentor, MenteeEntity mentee, MenteeGoalEntity menteeGoal) {
 		CommentRoomEntity commentRoom = new CommentRoomEntity(mentor, mentee, menteeGoal);
-		commentRoomRepository.save(commentRoom);
+		commentRoom = commentRoomRepository.save(commentRoom);
+		menteeGoal.setCommentRoomId(commentRoom.getId());
 	}
 
 	private void copyAndSaveDailyTodos(GoalEntity goal, MenteeGoalEntity menteeGoal) {

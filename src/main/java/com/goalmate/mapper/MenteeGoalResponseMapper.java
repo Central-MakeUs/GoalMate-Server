@@ -43,6 +43,7 @@ public class MenteeGoalResponseMapper {
 		response.setTotalCompletedCount(progress.getTotalCompletedCount());
 		response.setMentorLetter(menteeGoal.getMentorLetter());
 
+		response.setCommentRoomId(menteeGoal.getCommentRoomId());
 		response.setMenteeGoalStatus(MenteeGoalStatusEnum.valueOf(menteeGoal.getStatus().getValue()));
 
 		response.setCreatedAt(menteeGoal.getCreatedAt().atOffset(java.time.ZoneOffset.UTC));

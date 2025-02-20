@@ -6,6 +6,7 @@ info:
     ### 공통응답
     
     모든 응답은 아래와 같은 필드를 포함합니다.
+    모든 응답은 아래와 같은 필드를 포함합니다.
     
       - `status`
     
@@ -509,7 +510,6 @@ paths:
         ## 응답 설명
         
         생성된 멘티의 목표(mentee_goal) ID를 반환합니다. `목표 ID`와 `멘티 목표 ID`는 서로 다른 값입니다.
-
       operationId: participateInGoal
       parameters:
         - name: goalId
@@ -1095,6 +1095,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/WeeklyObjectiveRequest'
+        todo_list:
+          type: array
+          items:
+            $ref: '#/components/schemas/TodoRequest'
         thumbnail_images:
           type: array
           items:
@@ -1113,6 +1117,7 @@ components:
         - description
         - mid_objectives
         - weekly_objectives
+        - todo_list
         - thumbnail_images
         - content_images
     MidObjectiveRequest:
@@ -1140,6 +1145,28 @@ components:
           example: "간단한 단어부터 시작하기"
       required:
         - week_number
+        - description
+    TodoRequest:
+      type: object
+      properties:
+        todo_date:
+          type: string
+          format: date
+          example: "2025-02-20"
+        estimated_minutes:
+          type: integer
+          example: 30
+        description:
+          type: string
+          description: 투두 설명
+          example: "오늘은 30분 영어 단어 외우기"
+        mentor_tip:
+          type: string
+          description: 멘토의 팁
+          example: "단어를 외울 때, 뜻을 함께 외워보세요."
+      required:
+        - todo_date
+        - estimated_minutes
         - description
     ImageRequest:
       type: object
@@ -1392,6 +1419,9 @@ components:
             total_completed_count:
               type: integer
               example: 50
+            comment_room_id:
+              type: integer
+              format: int64
             mentee_goal_status:
               $ref: '#/components/schemas/MenteeGoalStatusEnum'
             created_at:

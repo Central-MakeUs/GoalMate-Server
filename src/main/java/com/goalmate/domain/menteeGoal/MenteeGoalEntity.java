@@ -45,6 +45,9 @@ public class MenteeGoalEntity extends BaseEntity {
 	@Column(nullable = false)
 	private MenteeGoalStatus status;
 
+	@Column
+	private Long commentRoomId;
+
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "mentee_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
 	private MenteeEntity menteeEntity;
@@ -64,5 +67,9 @@ public class MenteeGoalEntity extends BaseEntity {
 
 	public void updateStatus(MenteeGoalStatus status) {
 		this.status = status;
+	}
+
+	public void setCommentRoomId(Long commentRoomId) {
+		this.commentRoomId = commentRoomId;
 	}
 }
