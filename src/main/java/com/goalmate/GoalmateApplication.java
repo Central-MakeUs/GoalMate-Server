@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @EnableJpaAuditing // for BaseEntity
 @EnableTransactionManagement // transaction
-@EnableRedisRepositories(basePackages = "com.goalmate.token") // redis
+@EnableRedisRepositories(basePackages = "com.goalmate.redis") // redis
 @SpringBootApplication
 public class GoalmateApplication {
 

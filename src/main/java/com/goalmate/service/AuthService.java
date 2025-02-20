@@ -8,6 +8,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.goalmate.domain.mentee.MenteeEntity;
 import com.goalmate.domain.mentee.SocialProvider;
+import com.goalmate.infra.redis.RefreshToken;
+import com.goalmate.infra.redis.RefreshTokenRepository;
 import com.goalmate.repository.MenteeRepository;
 import com.goalmate.security.jwt.JwtProvider;
 import com.goalmate.security.jwt.LoginResult;
@@ -18,8 +20,6 @@ import com.goalmate.security.oauth.provider.KakaoUserProvider;
 import com.goalmate.security.user.UserDetailsImpl;
 import com.goalmate.support.error.CoreApiException;
 import com.goalmate.support.error.ErrorType;
-import com.goalmate.token.RefreshToken;
-import com.goalmate.token.RefreshTokenRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

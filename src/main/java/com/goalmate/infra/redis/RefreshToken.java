@@ -1,4 +1,4 @@
-package com.goalmate.token;
+package com.goalmate.infra.redis;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
