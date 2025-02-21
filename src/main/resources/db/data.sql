@@ -14,7 +14,7 @@ VALUES ('2025-02-14 09:00:00', '2025-02-14 09:00:00', 'mentor1@example.com', 'Jo
 INSERT INTO goal
 (current_participants, discount_price, participants_limit, period, daily_duration, price, created_at, updated_at,
  mentor_id, description, title, topic, goal_status)
-VALUES (0, 10000, 20, 30, 30, 50000, '2025-02-14 10:00:00', '2025-02-14 10:00:00', 1,
+VALUES (7, 10000, 10, 30, 30, 50000, '2025-02-14 10:00:00', '2025-02-14 10:00:00', 1,
         'A comprehensive Java bootcamp for beginners.', 'Java Bootcamp', 'Programming', 'OPEN');
 
 -- 삽입된 Goal의 ID를 변수에 저장
@@ -94,7 +94,7 @@ INSERT INTO goal
 (current_participants, discount_price, participants_limit, period, daily_duration, price, created_at, updated_at,
  mentor_id, description, title, topic, goal_status)
 VALUES (5, 5000, 15, 60, 20, 75000, '2025-02-13 15:30:00', '2025-02-13 15:30:00', 2,
-        'Learn the fundamentals of photography and enhance your skills.', 'Photography Basics', 'Art', 'UPCOMING');
+        'Learn the fundamentals of photography and enhance your skills.', 'Photography Basics', 'Art', 'OPEN');
 
 -- 삽입된 Goal의 ID를 변수에 저장
 SET @goal2_id = LAST_INSERT_ID();

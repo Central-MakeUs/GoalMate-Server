@@ -20,7 +20,7 @@ spring.config.activate.on-profile: local
 spring:
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
@@ -38,7 +38,7 @@ spring:
     password: local1234!
   sql:
     init:
-      mode: never
+      mode: always
       data-locations: classpath:db/data.sql
       #      schema-locations: classpath:db/schema.sql
   data:

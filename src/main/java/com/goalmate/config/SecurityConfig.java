@@ -64,9 +64,21 @@ public class SecurityConfig {
 			antMatcher("/auth/login/**"),
 			antMatcher("/auth/reissue"),
 			antMatcher(HttpMethod.GET, "/goals"),
-			antMatcher(HttpMethod.GET, "/goals/{goalId}")
+			antMatcher("/uploads/**")
 		);
 		return requestMatchers.toArray(RequestMatcher[]::new);
+	}
+
+	// permitAll 이지만, 필터는 거쳐야 하는 경우
+	@Bean
+	public SecurityFilterChain securityFilterChainPermitAllButAuthenticate(HttpSecurity http) throws Exception {
+		configureDefaultSecurity(http);
+		http.securityMatchers(matchers -> matchers
+				.requestMatchers(antMatcher("/goals/{goalId}")))
+			.authorizeHttpRequests(authorize -> authorize
+				.anyRequest().permitAll())
+			.addFilterAfter(new JwtAuthenticationFilter(jwtProvider), ExceptionTranslationFilter.class);
+		return http.build();
 	}
 
 	@Bean

@@ -1,5 +1,7 @@
 package com.goalmate.security.user;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -8,6 +10,8 @@ import com.goalmate.support.error.CoreApiException;
 import com.goalmate.support.error.ErrorType;
 
 public class SecurityUtil {
+
+	private static final Logger log = LoggerFactory.getLogger(SecurityUtil.class);
 
 	private SecurityUtil() {
 	}
@@ -32,6 +36,11 @@ public class SecurityUtil {
 		return Role.valueOf(authority.toUpperCase());
 	}
 
+	public static boolean isUserLoggedIn() {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		return authentication != null && authentication.isAuthenticated();
+	}
+
 	private static UserDetailsImpl getUserDetailImpl(Authentication authentication) {
 		// 인증 객체가 null이거나 인증되지 않은 상태일 수 있으므로 예외 처리
 		if (authentication == null || !authentication.isAuthenticated()) {
@@ -45,4 +54,5 @@ public class SecurityUtil {
 		}
 		return (UserDetailsImpl)principal;
 	}
+
 }

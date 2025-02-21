@@ -37,6 +37,7 @@ import com.goalmate.repository.MenteeGoalRepository;
 import com.goalmate.repository.MidObjectiveRepository;
 import com.goalmate.repository.ThumbnailImageRepository;
 import com.goalmate.repository.WeeklyObjectiveRepository;
+import com.goalmate.security.user.SecurityUtil;
 import com.goalmate.support.error.CoreApiException;
 import com.goalmate.support.error.ErrorType;
 import com.goalmate.util.PageRequestUtil;
@@ -98,7 +99,13 @@ public class GoalService {
 	public GoalDetailResponse getGoalDetails(Long goalId) {
 		GoalEntity goal = goalRepository.findByIdWithDetails(goalId).orElseThrow(()
 			-> new CoreApiException(ErrorType.NOT_FOUND));
-		return GoalResponseMapper.mapToDetailResponse(goal);
+		GoalDetailResponse response = GoalResponseMapper.mapToDetailResponse(goal);
+		if (SecurityUtil.isUserLoggedIn()) {
+			log.info(">>>>>> User is logged in");
+			Long currentUserId = SecurityUtil.getCurrentUserId();
+			response = GoalResponseMapper.setParticipationStatus(response, isParticipated(currentUserId, goalId));
+		}
+		return response;
 	}
 
 	public Long participateInGoal(Long currentUserId, Long goalId) {
@@ -125,19 +132,22 @@ public class GoalService {
 	}
 
 	private void validateParticipation(GoalEntity goal, MenteeEntity menteeEntity) {
+		if (!goal.isOpen()) {
+			throw new CoreApiException(ErrorType.FORBIDDEN, "Goal is not started or closed");
+		}
+		if (isParticipated(menteeEntity.getId(), goal.getId())) {
+			throw new CoreApiException(ErrorType.FORBIDDEN, "Already participated in this goal");
+		}
 		if (goal.isFull()) {
 			throw new CoreApiException(ErrorType.FORBIDDEN, "There is no free participation count");
 		}
 		if (!menteeEntity.hasFreeCount()) {
 			throw new CoreApiException(ErrorType.FORBIDDEN, "No free participation available.");
 		}
-		if (!goal.isOpen()) {
-			throw new CoreApiException(ErrorType.FORBIDDEN, "Goal is not started or closed");
-		}
-		menteeGoalRepository.findByMenteeIdAndGoalId(menteeEntity.getId(), goal.getId())
-			.ifPresent(menteeGoalEntity -> {
-				throw new CoreApiException(ErrorType.FORBIDDEN, "Already participated.");
-			});
+	}
+
+	private boolean isParticipated(Long menteeId, Long goalId) {
+		return menteeGoalRepository.existsByMenteeIdAndGoalId(menteeId, goalId);
 	}
 
 	private MenteeGoalEntity createMenteeGoal(GoalEntity goal, MenteeEntity mentee) {

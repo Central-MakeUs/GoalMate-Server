@@ -15,7 +15,7 @@ import com.goalmate.api.model.WeeklyObjectiveResponse;
 import com.goalmate.domain.goal.GoalEntity;
 
 public class GoalResponseMapper {
-	private static final int CLOSING_SOON_THRESHOLD = 10;
+	private static final int CLOSING_SOON_THRESHOLD = 3;
 
 	public static GoalSummaryResponse mapToSummaryResponse(GoalEntity goal) {
 		GoalSummaryResponse summary = new GoalSummaryResponse();
@@ -29,7 +29,7 @@ public class GoalResponseMapper {
 		// summary.setDiscountPrice(goal.getDiscountPrice());
 		summary.setParticipantsLimit(goal.getParticipantsLimit());
 		summary.setCurrentParticipants(goal.getCurrentParticipants());
-		summary.setIsClosingSoon(goal.getCurrentParticipants() <= CLOSING_SOON_THRESHOLD);
+		summary.setIsClosingSoon(isClosingSoon(goal.getParticipantsLimit(), goal.getCurrentParticipants()));
 		summary.setGoalStatus(GoalStatusEnum.fromValue(goal.getGoalStatus().getValue()));
 		summary.setMentorName(goal.getMentor().getName());
 		summary.setCreatedAt(goal.getCreatedAt().atOffset(ZoneOffset.UTC));
@@ -53,7 +53,7 @@ public class GoalResponseMapper {
 		detail.setCurrentParticipants(goal.getCurrentParticipants());
 		detail.setGoalStatus(GoalStatusEnum.fromValue(goal.getGoalStatus().getValue()));
 		detail.setMentorName(goal.getMentor().getName());
-		detail.setIsClosingSoon(goal.getCurrentParticipants() <= CLOSING_SOON_THRESHOLD);
+		detail.setIsClosingSoon(isClosingSoon(goal.getParticipantsLimit(), goal.getCurrentParticipants()));
 		detail.setCreatedAt(goal.getCreatedAt().atOffset(ZoneOffset.UTC));
 		detail.setUpdatedAt(goal.getUpdatedAt().atOffset(ZoneOffset.UTC));
 		// ThumbnailImages
@@ -82,6 +82,7 @@ public class GoalResponseMapper {
 				return midObjectiveResponse;
 			})
 			.collect(Collectors.toList()));
+		detail.setIsParticipated(false); //default
 		return detail;
 	}
 
@@ -95,10 +96,18 @@ public class GoalResponseMapper {
 		return response;
 	}
 
+	public static GoalDetailResponse setParticipationStatus(GoalDetailResponse response, boolean participated) {
+		return response.isParticipated(participated);
+	}
+
 	private static ImageResponse mapToImageResponse(Integer sequence, String imageUrl) {
 		ImageResponse imageResponse = new ImageResponse();
 		imageResponse.setSequence(sequence);
 		imageResponse.setImageUrl(imageUrl);
 		return imageResponse;
+	}
+
+	private static boolean isClosingSoon(int participantsLimit, int currentParticipants) {
+		return participantsLimit - currentParticipants <= CLOSING_SOON_THRESHOLD;
 	}
 }

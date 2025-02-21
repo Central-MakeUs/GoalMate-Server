@@ -3,7 +3,6 @@ package com.goalmate.api;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.goalmate.api.model.GoalCreateRequest;
 import com.goalmate.api.model.GoalDetailResponse;
 import com.goalmate.api.model.GoalSummaryPagingResponse;
 import com.goalmate.security.user.SecurityUtil;
@@ -16,12 +15,6 @@ import lombok.RequiredArgsConstructor;
 @RestController
 public class GoalController implements GoalApi {
 	private final GoalService goalService;
-
-	@Override
-	public ResponseEntity createGoal(GoalCreateRequest goalCreateRequest) {
-		Long goalId = goalService.createGoal(goalCreateRequest);
-		return ResponseEntity.ok(ApiResponse.success(goalId));
-	}
 
 	@Override
 	public ResponseEntity getGoals(Integer page, Integer size) {

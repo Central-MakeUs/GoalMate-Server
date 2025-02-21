@@ -480,7 +480,6 @@ paths:
         ## 응답 설명
         
         ### goal_status: 목표의 현재 상태
-          - `UPCOMING`: 모집 시작 전 목표
           - `OPEN`: 모집 중인 목표
           - `CLOSED`: 모집 종료된 목표
         
@@ -518,50 +517,12 @@ paths:
                     properties:
                       data:
                         $ref: '#/components/schemas/GoalSummaryPagingResponse'
-    post:
-      tags:
-        - Goal
-      summary: "[멘토] 목표 생성"
-      description: >
-        ## 개요
-        
-        새로운 목표를 생성합니다. 목표가 생성되면 목표 ID가 반환됩니다.
-        
-        ## 요청 설명
-        
-        아래의 필드들은 배열로 여러 개의 값을 받을 수 있습니다.
-        
-          - `mid_objectives`: 중간 목표 설명 (1부터 시작)
-          - `weekly_objectives`: 주차별 목표 설명 (1주차부터 시작)
-          - `thumbnail_images`: 썸네일 이미지 URL. 첫 번째 이미지가 메인 이미지로 사용됩니다.
-          - `content_images`: 목표 상세 이미지 URL
-
-      operationId: createGoal
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/GoalCreateRequest'
-      responses:
-        '201':
-          description: 생성 성공
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/ApiResponse'
-                  - type: object
-                    properties:
-                      data:
-                        type: integer
-                        format: int64
-                        example: 1
-                        description: 생성된 목표의 ID
   /goals/{goalId}:
     get:
       tags:
         - Goal
+      security:
+        - bearerAuth: [ ]
       summary: 목표 세부정보 조회
       description: >
         ## 개요
@@ -571,9 +532,12 @@ paths:
         ## 응답 설명
         
         ### goal_status: 목표의 현재 상태
-          - `UPCOMING`: 모집 시작 전 목표
           - `OPEN`: 모집 중인 목표
           - `CLOSED`: 모집 종료된 목표
+        
+        ### is_participated: 멘티가 참여 중인지 여부
+          - `true`: 참여중
+          - `false`: 미참여
 
         ## Nullable Fields
           - `main_image`: 메인 이미지가 없는 경우 null
@@ -905,7 +869,49 @@ paths:
                       data:
                         $ref: '#/components/schemas/MenteeGoalTodoResponse'
 
-  /mentors/my/goals/{menteeGoalId}/mentor-letter:
+  # Mentor
+  /mentors/me/goals:
+    post:
+      tags:
+        - Mentor
+      summary: "목표 생성"
+      description: >
+        ## 개요
+        
+        새로운 목표를 생성합니다. 목표가 생성되면 목표 ID가 반환됩니다.
+        
+        ## 요청 설명
+        
+        아래의 필드들은 배열로 여러 개의 값을 받을 수 있습니다.
+        
+          - `mid_objectives`: 중간 목표 설명 (1부터 시작)
+          - `weekly_objectives`: 주차별 목표 설명 (1주차부터 시작)
+          - `thumbnail_images`: 썸네일 이미지 URL. 첫 번째 이미지가 메인 이미지로 사용됩니다.
+          - `content_images`: 목표 상세 이미지 URL
+
+      operationId: createGoal
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GoalCreateRequest'
+      responses:
+        '201':
+          description: 생성 성공
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: integer
+                        format: int64
+                        example: 1
+                        description: 생성된 목표의 ID
+  /mentors/me/goals/{menteeGoalId}/mentor-letter:
     put:
       security:
         - bearerAuth: [ ]
@@ -983,7 +989,6 @@ paths:
                     properties:
                       data:
                         $ref: '#/components/schemas/CommentRoomPagingResponse'
-
   /comment-rooms/{roomId}/comments:
     get:
       security:
@@ -1079,7 +1084,6 @@ paths:
                     properties:
                       data:
                         $ref: '#/components/schemas/CommentResponse'
-
   /comments/{commentId}:
     patch:
       security:
@@ -1441,6 +1445,9 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/ImageResponse'
+            is_participated:
+              type: boolean
+              example: false
     WeeklyObjectiveResponse:
       type: object
       properties:
