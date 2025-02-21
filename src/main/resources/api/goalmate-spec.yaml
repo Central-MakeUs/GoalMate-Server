@@ -298,6 +298,16 @@ paths:
       responses:
         '200':
           description: 유효한 토큰
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        example: { }
         '401':
           description: 유효하지 않은 토큰
 
@@ -922,7 +932,7 @@ paths:
         - bearerAuth: [ ]
       tags:
         - Mentor
-      summary: 멘토 레터 작성
+      summary: 멘토 편지 작성
       description: 멘토가 특정 menteeGoal에 대해 mentor_letter를 작성합니다.
       operationId: updateMentorLetter
       parameters:
@@ -1000,7 +1010,7 @@ paths:
         - bearerAuth: [ ]
       tags:
         - Comment
-      summary: 멘티의 목표 코멘트 조회
+      summary: "[공통] 목표 코멘트 조회"
       description: >
         ## 개요
         
@@ -1056,13 +1066,17 @@ paths:
         - bearerAuth: [ ]
       tags:
         - Comment
-      summary: "[멘티] 코멘트 작성"
+      summary: "[공통] 코멘트 작성"
       description: >
         ## 개요
         
-        멘티가 목표에 대해 코멘트를 작성합니다. 코멘트 최대 길이는 300자이며, 하루 1회만 작성 가능합니다.
+        코멘트를 작성합니다.
+        
+        ## 유의사항
+        
+          - ***멘티***의 코멘트 최대 길이는 300자이며, 하루 1회만 작성 가능합니다.
 
-      operationId: addCommentFromMentee
+      operationId: addComment
       parameters:
         - name: roomId
           in: path
@@ -1090,17 +1104,17 @@ paths:
                       data:
                         $ref: '#/components/schemas/CommentResponse'
   /comments/{commentId}:
-    patch:
+    put:
       security:
         - bearerAuth: [ ]
       tags:
         - Comment
-      summary: 멘티가 작성한 코멘트 수정
+      summary: "[공통] 코멘트 수정"
       description: >
         ## 개요
         
-        멘티가 작성한 코멘트를 수정합니다. 코멘트 최대 길이는 300자 입니다.
-      operationId: updateCommentFromMentee
+        이미 작성한 코멘트를 수정합니다.
+      operationId: updateComment
       parameters:
         - name: commentId
           in: path
@@ -1132,9 +1146,9 @@ paths:
         - bearerAuth: [ ]
       tags:
         - Comment
-      summary: 멘티의 목표 코멘트 삭제
-      description: 멘티의 목표에 대한 코멘트를 삭제합니다.
-      operationId: deleteCommentFromMentee
+      summary: "[공통] 코멘트 삭제"
+      description: 코멘트를 영구 삭제합니다.
+      operationId: deleteComment
       parameters:
         - name: commentId
           in: path
@@ -1146,6 +1160,16 @@ paths:
       responses:
         '200':
           description: 삭제 성공
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        example: "{}"
 
 components:
   schemas:
@@ -1262,6 +1286,7 @@ components:
       properties:
         dayNumber:
           type: integer
+          minimum: 1
           example: 1
         estimated_minutes:
           type: integer
@@ -1684,6 +1709,8 @@ components:
         end_date:
           type: string
           format: date
+        mentee_name:
+          type: string
         mentor_name:
           type: string
         mentor_profile_image:

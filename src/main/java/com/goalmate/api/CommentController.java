@@ -21,31 +21,37 @@ public class CommentController implements CommentApi {
 
 	@Override
 	public ResponseEntity getCommentRooms(Integer page, Integer size) {
-		CurrentUserContext userContext = SecurityUtil.getCurrentUser();
-		CommentRoomPagingResponse response = commentService.getCommentRooms(userContext, page, size);
+		CurrentUserContext user = SecurityUtil.getCurrentUser();
+		CommentRoomPagingResponse response = commentService.getCommentRooms(user, page, size);
 		return ResponseEntity.ok(ApiResponse.success(response));
 	}
 
 	@Override
-	public ResponseEntity addCommentFromMentee(Long roomId, CommentRequest commentRequest) {
-		CommentResponse response = commentService.addMenteeComment(roomId, commentRequest.getComment());
+	public ResponseEntity addComment(Long roomId, CommentRequest commentRequest) {
+		CurrentUserContext user = SecurityUtil.getCurrentUser();
+		CommentResponse response = commentService.addComment(user, roomId, commentRequest.getComment());
 		return ResponseEntity.ok(ApiResponse.success(response));
 	}
 
 	@Override
 	public ResponseEntity getComments(Long roomId, Integer page, Integer size) {
-		CommentPagingResponse response = commentService.getComments(roomId, page, size);
+		CurrentUserContext user = SecurityUtil.getCurrentUser();
+		CommentPagingResponse response = commentService.getComments(user, roomId, page, size);
 		return ResponseEntity.ok(ApiResponse.success(response));
 	}
 
 	@Override
-	public ResponseEntity updateCommentFromMentee(Long commentId, CommentRequest commentRequest) throws Exception {
-		return CommentApi.super.updateCommentFromMentee(commentId, commentRequest);
+	public ResponseEntity updateComment(Long commentId, CommentRequest commentRequest) {
+		CurrentUserContext user = SecurityUtil.getCurrentUser();
+		CommentResponse response = commentService.updateComment(user, commentId, commentRequest.getComment());
+		return ResponseEntity.ok(ApiResponse.success(response));
 	}
 
 	@Override
-	public ResponseEntity deleteCommentFromMentee(Long commentId) {
-		commentService.deleteComment(commentId);
+	public ResponseEntity deleteComment(Long commentId) {
+		CurrentUserContext user = SecurityUtil.getCurrentUser();
+		commentService.deleteComment(user, commentId);
 		return ResponseEntity.ok(ApiResponse.success());
 	}
+
 }

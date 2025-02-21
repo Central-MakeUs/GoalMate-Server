@@ -1,5 +1,7 @@
 package com.goalmate.support.response;
 
+import java.util.Collections;
+
 import org.springframework.http.HttpStatus;
 
 import com.goalmate.support.error.ErrorType;
@@ -21,7 +23,7 @@ public class ApiResponse<S> {
 	}
 
 	public static ApiResponse<?> success() {
-		return ApiResponse.success(new Object());
+		return ApiResponse.success(Collections.emptyMap());
 	}
 
 	public static <S> ApiResponse<S> success(S data) {

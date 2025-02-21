@@ -62,12 +62,19 @@ public class CommentEntity extends BaseEntity {
 		this.isRead = false;
 	}
 
+	public void updateComment(String comment) {
+		this.comment = comment;
+		this.isRead = false;
+	}
+
 	public void markAsRead(Role readerRole) {
-		if (!readerRole.equals(this.writerRole))
+		if (!readerRole.equals(this.writerRole)) {
 			this.isRead = true;
+		}
 	}
 
 	public boolean isWriter(Long writerId, Role role) {
 		return this.writerId.equals(writerId) && this.writerRole.equals(role);
 	}
+
 }

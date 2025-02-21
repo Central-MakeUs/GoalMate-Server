@@ -69,7 +69,11 @@ public class MenteeGoalEntity extends BaseEntity {
 		this.status = status;
 	}
 
-	public void setCommentRoomId(Long commentRoomId) {
+	public void updateCommentRoomId(Long commentRoomId) {
 		this.commentRoomId = commentRoomId;
+	}
+
+	public void updateMentorLetter(String mentorLetter) {
+		this.mentorLetter = mentorLetter;
 	}
 }

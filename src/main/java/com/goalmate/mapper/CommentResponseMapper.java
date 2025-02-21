@@ -44,6 +44,7 @@ public class CommentResponseMapper {
 		response.setCommentRoomId(commentRoom.getId());
 		response.setMenteeGoalId(menteeGoal.getId());
 		response.setMenteeGoalTitle(goal.getTitle());
+		response.setMenteeName(commentRoom.getMentee().getName());
 		response.setMentorName(commentRoom.getMentor().getName());
 		response.setStartDate(menteeGoal.getStartDate());
 		response.setEndDate(menteeGoal.getEndDate());

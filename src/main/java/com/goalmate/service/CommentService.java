@@ -18,13 +18,11 @@ import com.goalmate.api.model.PageResponse;
 import com.goalmate.domain.comment.CommentEntity;
 import com.goalmate.domain.comment.CommentRoomEntity;
 import com.goalmate.domain.mentee.Role;
-import com.goalmate.domain.menteeGoal.MenteeGoalEntity;
 import com.goalmate.mapper.CommentResponseMapper;
 import com.goalmate.mapper.PageResponseMapper;
 import com.goalmate.repository.CommentRepository;
 import com.goalmate.repository.CommentRoomRepository;
 import com.goalmate.security.user.CurrentUserContext;
-import com.goalmate.security.user.SecurityUtil;
 import com.goalmate.support.error.CoreApiException;
 import com.goalmate.support.error.ErrorType;
 import com.goalmate.util.PageRequestUtil;
@@ -41,65 +39,16 @@ public class CommentService {
 	private final CommentRoomRepository commentRoomRepository;
 	private final CommentRepository commentRepository;
 
-	public CommentResponse addMenteeComment(Long roomId, String comment) {
-		CommentRoomEntity commentRoom = getCommentRoom(roomId);
-		MenteeGoalEntity menteeGoal = commentRoom.getMenteeGoal();
-
-		LocalDate today = LocalDate.now();
-		LocalDateTime startOfDay = today.atStartOfDay(); // 오늘 00:00:00
-		LocalDateTime endOfDay = today.atTime(LocalTime.MAX); // 오늘 23:59:59
-
-		// 오늘 코멘트가 이미 작성되었는지 확인
-		commentRepository.findTodayCommentFromMentee(roomId, startOfDay, endOfDay)
-			.ifPresent(baseComment -> {
-				log.warn("Comment Already Exists: {}", baseComment);
-				throw new CoreApiException(ErrorType.CONFLICT, "Today's Comment Already Exists");
-			});
-
-		CommentEntity commentEntity = CommentEntity.builder()
-			.comment(comment)
-			.writerId(menteeGoal.getMenteeEntity().getId())
-			.writerName(menteeGoal.getMenteeEntity().getName())
-			.writerRole(Role.ROLE_MENTEE)
-			.commentRoom(commentRoom)
-			.build();
-		commentRepository.save(commentEntity);
-		commentRoom.triggerUpdate();
-
-		return CommentResponseMapper.mapToCommentResponse(commentEntity);
-	}
-
-	public CommentPagingResponse getComments(Long roomId, Integer page, Integer size) {
-		Role currentUserRole = SecurityUtil.getCurrenUserRole();
-		CommentRoomEntity commentRoom = getCommentRoom(roomId);
-
-		Pageable pageable = PageRequestUtil.createPageRequest(page, size);
-		Page<CommentEntity> comments = commentRepository.findLatestCommentsByRoomId(commentRoom.getId(), pageable);
-
-		List<CommentResponse> commentResponses = comments.stream()
-			.map(comment -> {
-				comment.markAsRead(currentUserRole);
-				return CommentResponseMapper.mapToCommentResponse(comment);
-			})
-			.toList();
-		PageResponse pageResponse = PageResponseMapper.mapToPageResponse(comments);
-
-		return CommentResponseMapper.mapToCommentPagingResponse(commentResponses, pageResponse);
-	}
-
-	public CommentRoomPagingResponse getCommentRooms(CurrentUserContext userContext, Integer page, Integer size) {
+	public CommentRoomPagingResponse getCommentRooms(CurrentUserContext user, Integer page, Integer size) {
 		Page<CommentRoomEntity> commentRooms = null;
 		Pageable pageable = PageRequestUtil.createPageRequest(page, size);
 
-		if (userContext.userRole().equals(Role.ROLE_MENTEE))
-			commentRooms = commentRoomRepository.findByMenteeIdOrderByUpdatedAtDesc(userContext.userId(), pageable);
-		else if (userContext.userRole().equals(Role.ROLE_MENTOR))
-			commentRooms = commentRoomRepository.findByMentorIdOrderByUpdatedAtDesc(userContext.userId(), pageable);
+		commentRooms = getCommentRoomsByRole(user, commentRooms, pageable);
 
 		List<CommentRoomResponse> commentRoomResponses = commentRooms.stream()
 			.map(commentRoom -> {
 				Long countedUnreadComments = commentRepository
-					.countUnreadComments(commentRoom.getId(), userContext.userRole());
+					.countUnreadComments(commentRoom.getId(), user.userRole());
 				return CommentResponseMapper.mapToCommentRoomResponse(commentRoom, countedUnreadComments);
 			})
 			.toList();
@@ -107,14 +56,70 @@ public class CommentService {
 		return CommentResponseMapper.mapToCommentRoomPagingResponse(commentRoomResponses, pageResponse);
 	}
 
-	public void deleteComment(Long commentId) {
-		CommentEntity comment = getComment(commentId);
-		Long currentUserId = SecurityUtil.getCurrentUserId();
-		Role currentUserRole = SecurityUtil.getCurrenUserRole();
-		if (!comment.isWriter(currentUserId, currentUserRole)) {
-			throw new CoreApiException(ErrorType.FORBIDDEN, "Comment writer is not correct");
+	public CommentResponse addComment(CurrentUserContext user, Long roomId, String comment) {
+		String writerName = null;
+		CommentRoomEntity commentRoom = getCommentRoom(roomId);
+
+		if (user.isMentee()) {
+			validateUser(user, commentRoom.getMentee().getId());
+
+			LocalDate today = LocalDate.now();
+			LocalDateTime startOfDay = today.atStartOfDay(); // 오늘 00:00:00
+			LocalDateTime endOfDay = today.atTime(LocalTime.MAX); // 오늘 23:59:59
+
+			// 오늘 코멘트가 이미 작성되었는지 확인
+			commentRepository.findTodayCommentFromMentee(roomId, startOfDay, endOfDay)
+				.ifPresent(baseComment -> {
+					log.warn("Comment Already Exists: {}", baseComment);
+					throw new CoreApiException(ErrorType.CONFLICT, "Today's Comment Already Exists");
+				});
+			writerName = commentRoom.getMentee().getName();
+		} else if (user.isMentor()) {
+			validateUser(user, commentRoom.getMentor().getId());
+			writerName = commentRoom.getMentor().getName();
+		} else {
+			throw new CoreApiException(ErrorType.FORBIDDEN, "User Role is not correct");
 		}
+
+		CommentEntity commentEntity = CommentEntity.builder()
+			.comment(comment)
+			.writerId(user.userId())
+			.writerName(writerName)
+			.writerRole(user.userRole())
+			.commentRoom(commentRoom)
+			.build();
+		commentRepository.save(commentEntity);
+		commentRoom.triggerUpdate();
+		return CommentResponseMapper.mapToCommentResponse(commentEntity);
+	}
+
+	public CommentPagingResponse getComments(CurrentUserContext user, Long roomId, Integer page, Integer size) {
+		CommentRoomEntity commentRoom = getCommentRoom(roomId);
+
+		Pageable pageable = PageRequestUtil.createPageRequest(page, size);
+		Page<CommentEntity> comments = commentRepository.findLatestCommentsByRoomId(commentRoom.getId(), pageable);
+
+		List<CommentResponse> commentResponses = comments.stream()
+			.map(comment -> {
+				comment.markAsRead(user.userRole());
+				return CommentResponseMapper.mapToCommentResponse(comment);
+			})
+			.toList();
+		PageResponse pageResponse = PageResponseMapper.mapToPageResponse(comments);
+		return CommentResponseMapper.mapToCommentPagingResponse(commentResponses, pageResponse);
+	}
+
+	public void deleteComment(CurrentUserContext user, Long commentId) {
+		CommentEntity comment = getComment(commentId);
+		validateCommentWriter(user, comment);
 		commentRepository.delete(comment);
+	}
+
+	public CommentResponse updateComment(CurrentUserContext user, Long commentId, String comment) {
+		CommentEntity baseComment = getComment(commentId);
+		validateCommentWriter(user, baseComment);
+		baseComment.updateComment(comment);
+		return CommentResponseMapper.mapToCommentResponse(baseComment);
 	}
 
 	private CommentEntity getComment(Long commentId) {
@@ -122,8 +127,29 @@ public class CommentService {
 			.orElseThrow(() -> new CoreApiException(ErrorType.NOT_FOUND, "Comment not found"));
 	}
 
+	private void validateUser(CurrentUserContext user, Long userId) {
+		if (!user.userId().equals(userId)) {
+			throw new CoreApiException(ErrorType.FORBIDDEN, "User is not correct");
+		}
+	}
+
+	private void validateCommentWriter(CurrentUserContext user, CommentEntity comment) {
+		if (!comment.isWriter(user.userId(), user.userRole())) {
+			throw new CoreApiException(ErrorType.FORBIDDEN, "Comment writer is not correct");
+		}
+	}
+
 	private CommentRoomEntity getCommentRoom(Long roomId) {
 		return commentRoomRepository.findById(roomId)
 			.orElseThrow(() -> new CoreApiException(ErrorType.NOT_FOUND, "Comment Room not found"));
+	}
+
+	private Page<CommentRoomEntity> getCommentRoomsByRole(CurrentUserContext userContext,
+		Page<CommentRoomEntity> commentRooms, Pageable pageable) {
+		if (userContext.userRole().equals(Role.ROLE_MENTEE))
+			commentRooms = commentRoomRepository.findByMenteeIdOrderByUpdatedAtDesc(userContext.userId(), pageable);
+		else if (userContext.userRole().equals(Role.ROLE_MENTOR))
+			commentRooms = commentRoomRepository.findByMentorIdOrderByUpdatedAtDesc(userContext.userId(), pageable);
+		return commentRooms;
 	}
 }
