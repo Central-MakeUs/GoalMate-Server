@@ -19,7 +19,7 @@ info:
         : 응답에 대한 설명을 포함합니다. 에러 응답의 경우 에러 메시지를 포함합니다.
       - `data`
     
-        : 응답 데이터. 데이터가 없는 경우 null을 반환합니다.
+        : 응답 데이터. 데이터가 없는 경우 빈 객체(data:{})를 반환합니다.
     
     ### 페이징
     
@@ -47,7 +47,7 @@ info:
   license:
     name: Apache 2.0
     url: https://www.apache.org/licenses/LICENSE-2.0.html
-  version: Beta 1.0.0
+  version: Beta 1.0.1
 
 servers:
   - url: http://3.39.253.230
