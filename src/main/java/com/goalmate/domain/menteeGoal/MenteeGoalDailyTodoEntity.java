@@ -55,7 +55,7 @@ public class MenteeGoalDailyTodoEntity extends BaseEntity {
 	private MenteeGoalEntity menteeGoalEntity;
 
 	public MenteeGoalDailyTodoEntity(DailyTodoEntity dailyTodo, MenteeGoalEntity menteeGoal) {
-		this.todoDate = LocalDate.now().plusDays(dailyTodo.getDayNumber());
+		this.todoDate = LocalDate.now().plusDays(dailyTodo.getDayNumber() - 1); // 1일차 -> 오늘, 2일차 -> 내일
 		this.estimatedMinutes = dailyTodo.getEstimatedMinutes();
 		this.description = dailyTodo.getDescription();
 		this.mentorTip = dailyTodo.getMentorTip();
