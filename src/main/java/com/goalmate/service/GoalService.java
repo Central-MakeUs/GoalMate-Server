@@ -15,9 +15,11 @@ import com.goalmate.api.model.GoalSummaryResponse;
 import com.goalmate.api.model.ImageRequest;
 import com.goalmate.api.model.MidObjectiveRequest;
 import com.goalmate.api.model.PageResponse;
+import com.goalmate.api.model.TodoRequest;
 import com.goalmate.api.model.WeeklyObjectiveRequest;
 import com.goalmate.domain.comment.CommentRoomEntity;
 import com.goalmate.domain.goal.ContentImageEntity;
+import com.goalmate.domain.goal.DailyTodoEntity;
 import com.goalmate.domain.goal.GoalEntity;
 import com.goalmate.domain.goal.GoalStatus;
 import com.goalmate.domain.goal.MidObjectiveEntity;
@@ -31,6 +33,7 @@ import com.goalmate.mapper.GoalResponseMapper;
 import com.goalmate.mapper.PageResponseMapper;
 import com.goalmate.repository.CommentRoomRepository;
 import com.goalmate.repository.ContentImageRepository;
+import com.goalmate.repository.DailyTodoRepository;
 import com.goalmate.repository.GoalRepository;
 import com.goalmate.repository.MenteeGoalDailyTodoRepository;
 import com.goalmate.repository.MenteeGoalRepository;
@@ -56,7 +59,8 @@ public class GoalService {
 	private final GoalRepository goalRepository;
 	private final MenteeGoalRepository menteeGoalRepository;
 	private final CommentRoomRepository commentRoomRepository;
-	private final MenteeGoalDailyTodoRepository dailyTodoRepository;
+	private final DailyTodoRepository dailyTodoRepository;
+	private final MenteeGoalDailyTodoRepository menteeGoalDailyTodoRepository;
 	private final MidObjectiveRepository midObjectiveRepository;
 	private final WeeklyObjectiveRepository weeklyObjectiveRepository;
 	private final ThumbnailImageRepository thumbnailImageRepository;
@@ -80,6 +84,7 @@ public class GoalService {
 		saveAllWeeklyObjectives(request.getWeeklyObjectives(), goal);
 		saveAllThumbnailImages(request.getThumbnailImages(), goal);
 		saveAllContentImages(request.getContentImages(), goal);
+		saveAllTodos(request.getTodoList(), goal);
 		return goal.getId();
 	}
 
@@ -172,7 +177,7 @@ public class GoalService {
 			.toList();
 
 		// TODO: Bulk insert로 개선
-		dailyTodoRepository.saveAll(dailyTodoSnapshots);
+		menteeGoalDailyTodoRepository.saveAll(dailyTodoSnapshots);
 	}
 
 	private void saveAllMidObjectives(List<MidObjectiveRequest> request, GoalEntity goal) {
@@ -212,5 +217,19 @@ public class GoalService {
 				image.getImageUrl(),
 				goal))
 			.toList();
+		contentImageRepository.saveAll(contentImages);
+	}
+
+	private void saveAllTodos(List<TodoRequest> todoList, GoalEntity goal) {
+		List<DailyTodoEntity> dailyTodos = todoList.stream()
+			.map(todo -> DailyTodoEntity.builder()
+				.dayNumber(todo.getDayNumber())
+				.estimatedMinutes(todo.getEstimatedMinutes())
+				.description(todo.getDescription())
+				.mentorTip(todo.getMentorTip())
+				.goal(goal)
+				.build())
+			.toList();
+		dailyTodoRepository.saveAll(dailyTodos);
 	}
 }

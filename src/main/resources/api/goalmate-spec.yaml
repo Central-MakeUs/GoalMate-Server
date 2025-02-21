@@ -1260,10 +1260,9 @@ components:
     TodoRequest:
       type: object
       properties:
-        todo_date:
-          type: string
-          format: date
-          example: "2025-02-20"
+        dayNumber:
+          type: integer
+          example: 1
         estimated_minutes:
           type: integer
           example: 30
