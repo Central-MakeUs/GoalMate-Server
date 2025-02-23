@@ -15,6 +15,7 @@ import com.goalmate.api.model.GoalSummaryResponse;
 import com.goalmate.api.model.ImageRequest;
 import com.goalmate.api.model.MidObjectiveRequest;
 import com.goalmate.api.model.PageResponse;
+import com.goalmate.api.model.ParticipateInGoalResponse;
 import com.goalmate.api.model.TodoRequest;
 import com.goalmate.api.model.WeeklyObjectiveRequest;
 import com.goalmate.domain.comment.CommentRoomEntity;
@@ -113,7 +114,7 @@ public class GoalService {
 		return response;
 	}
 
-	public Long participateInGoal(Long currentUserId, Long goalId) {
+	public ParticipateInGoalResponse participateInGoal(Long currentUserId, Long goalId) {
 		MenteeEntity mentee = menteeService.getMenteeById(currentUserId);
 		GoalEntity goal = getGoalById(goalId);
 
@@ -122,12 +123,15 @@ public class GoalService {
 		goal.increaseCurrentParticipants(); // 현재 참여자 수 증가
 
 		MenteeGoalEntity menteeGoal = createMenteeGoal(goal, mentee);
-		createCommentRoom(goal.getMentor(), mentee, menteeGoal);
+		CommentRoomEntity commentRoom = createCommentRoom(goal.getMentor(), mentee, menteeGoal);
 
 		// DailyTodo 복사
 		copyAndSaveDailyTodos(goal, menteeGoal);
 
-		return menteeGoal.getId();
+		ParticipateInGoalResponse response = new ParticipateInGoalResponse();
+		response.setMenteeGoalId(menteeGoal.getId());
+		response.setCommentRoomId(commentRoom.getId());
+		return response;
 	}
 
 	@Transactional(readOnly = true)
@@ -165,10 +169,11 @@ public class GoalService {
 		return menteeGoalRepository.save(menteeGoal);
 	}
 
-	private void createCommentRoom(MentorEntity mentor, MenteeEntity mentee, MenteeGoalEntity menteeGoal) {
+	private CommentRoomEntity createCommentRoom(MentorEntity mentor, MenteeEntity mentee, MenteeGoalEntity menteeGoal) {
 		CommentRoomEntity commentRoom = new CommentRoomEntity(mentor, mentee, menteeGoal);
 		commentRoom = commentRoomRepository.save(commentRoom);
 		menteeGoal.updateCommentRoomId(commentRoom.getId());
+		return commentRoom;
 	}
 
 	private void copyAndSaveDailyTodos(GoalEntity goal, MenteeGoalEntity menteeGoal) {

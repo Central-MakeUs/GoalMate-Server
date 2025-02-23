@@ -610,10 +610,7 @@ paths:
                   - type: object
                     properties:
                       data:
-                        type: integer
-                        format: int64
-                        example: 1
-                        description: 생성된 멘티의 목표 ID
+                        $ref: '#/components/schemas/ParticipateInGoalResponse'
         '403':
           description: 참여 인원 초과 또는 무료 참여 횟수 초과
         '404':
@@ -926,6 +923,7 @@ paths:
                         format: int64
                         example: 1
                         description: 생성된 목표의 ID
+
   /mentors/me/goals/{menteeGoalId}/mentor-letter:
     put:
       security:
@@ -1508,6 +1506,20 @@ components:
         imageUrl:
           type: string
           example: "https://image.url"
+
+    ParticipateInGoalResponse:
+      type: object
+      properties:
+        mentee_goal_id:
+          type: integer
+          format: int64
+          example: 1
+          description: 생성된 멘티 목표 ID
+        comment_room_id:
+          type: integer
+          format: int64
+          example: 1
+          description: 생성된 코멘트 룸 ID
 
     # MenteeGoal 관련
     MenteeGoalSummaryResponse:

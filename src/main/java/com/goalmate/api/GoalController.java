@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.goalmate.api.model.GoalDetailResponse;
 import com.goalmate.api.model.GoalSummaryPagingResponse;
+import com.goalmate.api.model.ParticipateInGoalResponse;
 import com.goalmate.security.user.SecurityUtil;
 import com.goalmate.service.GoalService;
 import com.goalmate.support.response.ApiResponse;
@@ -31,7 +32,7 @@ public class GoalController implements GoalApi {
 	@Override
 	public ResponseEntity participateInGoal(Integer goalId) {
 		Long currentUserId = SecurityUtil.getCurrentUserId();
-		Long menteeGoalId = goalService.participateInGoal(currentUserId, goalId.longValue());
-		return ResponseEntity.ok(ApiResponse.success(menteeGoalId));
+		ParticipateInGoalResponse response = goalService.participateInGoal(currentUserId, goalId.longValue());
+		return ResponseEntity.ok(ApiResponse.success(response));
 	}
 }
