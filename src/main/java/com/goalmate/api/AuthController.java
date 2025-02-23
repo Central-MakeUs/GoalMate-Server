@@ -11,6 +11,8 @@ import com.goalmate.api.model.OAuthRequest;
 import com.goalmate.api.model.ReissueRequest;
 import com.goalmate.security.jwt.LoginResult;
 import com.goalmate.security.jwt.TokenPair;
+import com.goalmate.security.user.CurrentUserContext;
+import com.goalmate.security.user.SecurityUtil;
 import com.goalmate.service.AuthService;
 import com.goalmate.support.response.ApiResponse;
 
@@ -50,8 +52,8 @@ public class AuthController implements AuthApi {
 	}
 
 	@Override
-	public ResponseEntity logout() throws Exception {
-		return AuthApi.super.logout();
+	public ResponseEntity logout() {
+		return ResponseEntity.ok(ApiResponse.success());
 	}
 
 	@Override
@@ -66,7 +68,9 @@ public class AuthController implements AuthApi {
 	}
 
 	@Override
-	public ResponseEntity<Void> withdraw() throws Exception {
-		return AuthApi.super.withdraw();
+	public ResponseEntity withdraw() {
+		CurrentUserContext user = SecurityUtil.getCurrentUser();
+		authService.deleteUser(user);
+		return ResponseEntity.ok(ApiResponse.success());
 	}
 }

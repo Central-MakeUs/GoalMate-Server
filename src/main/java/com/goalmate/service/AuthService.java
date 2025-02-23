@@ -21,6 +21,7 @@ import com.goalmate.security.jwt.TokenPair;
 import com.goalmate.security.oauth.oidc.OAuthMember;
 import com.goalmate.security.oauth.provider.AppleUserProvider;
 import com.goalmate.security.oauth.provider.KakaoUserProvider;
+import com.goalmate.security.user.CurrentUserContext;
 import com.goalmate.support.error.CoreApiException;
 import com.goalmate.support.error.ErrorType;
 
@@ -41,6 +42,7 @@ public class AuthService {
 	private final MentorRepository mentorRepository;
 	private final MenteeRepository menteeRepository;
 	private final RefreshTokenRepository refreshTokenRepository;
+	private final MenteeService menteeService;
 
 	public LoginResult authenticateWithOauth(String identityToken, String nonce, String provider) {
 		// 소셜 제공자 매핑
@@ -107,5 +109,18 @@ public class AuthService {
 		if (!passwordEncoder.matches(rawPassword, encodedPassword)) {
 			throw new CoreApiException(ErrorType.UNAUTHORIZED, "Invalid password");
 		}
+	}
+
+	public void deleteUser(CurrentUserContext user) {
+		if (!user.isMentee()) {
+			throw new CoreApiException(ErrorType.FORBIDDEN, "Contact the administrator if you are not a mentee");
+		}
+		MenteeEntity mentee = menteeService.getMenteeById(user.userId());
+		String socialId = mentee.getSocialId();
+		if (mentee.getProvider() == SocialProvider.KAKAO) {
+			kakaoUserProvider.unlinkUser(socialId);
+		}
+		// TODO: Soft delete 로 변경
+		menteeRepository.delete(mentee);
 	}
 }

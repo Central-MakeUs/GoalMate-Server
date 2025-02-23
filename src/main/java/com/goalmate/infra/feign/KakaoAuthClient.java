@@ -9,7 +9,8 @@ import com.goalmate.security.oauth.oidc.OIDCPublicKeys;
 
 @FeignClient(value = "kakaoClient", url = "https://kauth.kakao.com", configuration = KakaoFeignConfig.class)
 @Component
-public interface KakaoClient {
+public interface KakaoAuthClient {
 	@GetMapping(value = "/.well-known/jwks.json")
 	OIDCPublicKeys getPublicKeys();
+
 }
