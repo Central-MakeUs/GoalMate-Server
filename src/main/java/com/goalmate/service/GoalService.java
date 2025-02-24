@@ -150,9 +150,9 @@ public class GoalService {
 		if (goal.isFull()) {
 			throw new CoreApiException(ErrorType.FORBIDDEN, "There is no free participation count");
 		}
-		if (!menteeEntity.hasFreeCount()) {
-			throw new CoreApiException(ErrorType.FORBIDDEN, "No free participation available.");
-		}
+		// if (!menteeEntity.hasFreeCount()) {
+		// 	throw new CoreApiException(ErrorType.FORBIDDEN, "No free participation available.");
+		// }
 	}
 
 	private boolean isParticipated(Long menteeId, Long goalId) {
