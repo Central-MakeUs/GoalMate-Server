@@ -134,9 +134,12 @@ public class MenteeGoalService {
 		return MenteeGoalResponseMapper.mapToWeeklyProgressResponse(hasLastWeek, hasNextWeek, dailyProgressList);
 	}
 
-	public void updateMentorLetter(Long menteeGoalId, String mentorLetter) {
+	public MenteeGoalSummaryResponse updateMentorLetter(Long menteeGoalId, String mentorLetter) {
 		MenteeGoalEntity menteeGoal = getMenteeGoal(menteeGoalId);
 		menteeGoal.updateMentorLetter(mentorLetter);
+		return MenteeGoalResponseMapper.mapToSummaryResponse(
+			menteeGoal,
+			getTodoProgress(menteeGoal));
 	}
 
 	private TodoProgress getTodoProgress(MenteeGoalEntity menteeGoal) {
