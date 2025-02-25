@@ -124,7 +124,7 @@ paths:
                     properties:
                       data:
                         $ref: '#/components/schemas/LoginResponse'
-  /auth/login/metor:
+  /auth/login/mentor:
     post:
       tags:
         - Auth
