@@ -22,7 +22,7 @@ public class MenteeGoalResponseMapper {
 	public static MenteeGoalSummaryResponse mapToSummaryResponse(
 		MenteeGoalEntity menteeGoal,
 		TodoProgress progress) {
-		GoalEntity goal = menteeGoal.getGoalEntity();
+		GoalEntity goal = menteeGoal.getGoal();
 		GoalSummaryResponse goalSummary = GoalResponseMapper.mapToSummaryResponse(goal);
 
 		MenteeGoalSummaryResponse response = new MenteeGoalSummaryResponse();

@@ -1,8 +1,9 @@
-package com.goalmate.api;
+package com.goalmate.api.v1;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.goalmate.api.CommentApi;
 import com.goalmate.api.model.CommentPagingResponse;
 import com.goalmate.api.model.CommentRequest;
 import com.goalmate.api.model.CommentResponse;

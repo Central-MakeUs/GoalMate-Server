@@ -142,7 +142,7 @@ public class MenteeGoalService {
 			getTodoProgress(menteeGoal));
 	}
 
-	private TodoProgress getTodoProgress(MenteeGoalEntity menteeGoal) {
+	public TodoProgress getTodoProgress(MenteeGoalEntity menteeGoal) {
 		// 전체 투두를 조회하며, 완료된 투두개수, 전체 투두개수, 오늘 할 투두 개수, 오늘 완료한 투두 개수를 구한다.
 		List<MenteeGoalDailyTodoEntity> dailyTodos = dailyTodoRepository.findByMenteeGoalId(menteeGoal.getId());
 		final LocalDate today = LocalDate.now();

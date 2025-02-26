@@ -1,8 +1,9 @@
-package com.goalmate.api;
+package com.goalmate.api.v1;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.goalmate.api.MentorApi;
 import com.goalmate.api.model.GoalCreateRequest;
 import com.goalmate.api.model.MenteeGoalSummaryResponse;
 import com.goalmate.api.model.MentorLetterRequest;

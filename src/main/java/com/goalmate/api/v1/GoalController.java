@@ -1,8 +1,9 @@
-package com.goalmate.api;
+package com.goalmate.api.v1;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.goalmate.api.GoalApi;
 import com.goalmate.api.model.GoalDetailResponse;
 import com.goalmate.api.model.GoalSummaryPagingResponse;
 import com.goalmate.api.model.ParticipateInGoalResponse;

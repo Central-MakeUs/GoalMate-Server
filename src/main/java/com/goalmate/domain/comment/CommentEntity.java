@@ -68,7 +68,7 @@ public class CommentEntity extends BaseEntity {
 	}
 
 	public void markAsRead(Role readerRole) {
-		if (!readerRole.equals(this.writerRole)) {
+		if (!readerRole.equals(this.writerRole) && !readerRole.equals(Role.ROLE_ADMIN)) {
 			this.isRead = true;
 		}
 	}

@@ -38,7 +38,7 @@ public class CommentResponseMapper {
 		long countedUnreadComments
 	) {
 		MenteeGoalEntity menteeGoal = commentRoom.getMenteeGoal();
-		GoalEntity goal = menteeGoal.getGoalEntity();
+		GoalEntity goal = menteeGoal.getGoal();
 
 		CommentRoomResponse response = new CommentRoomResponse();
 		response.setCommentRoomId(commentRoom.getId());

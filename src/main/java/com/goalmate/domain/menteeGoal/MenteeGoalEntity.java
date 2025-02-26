@@ -51,19 +51,19 @@ public class MenteeGoalEntity extends BaseEntity {
 
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "mentee_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-	private MenteeEntity menteeEntity;
+	private MenteeEntity mentee;
 
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "goal_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-	private GoalEntity goalEntity;
+	private GoalEntity goal;
 
 	@Builder
-	public MenteeGoalEntity(LocalDate startDate, LocalDate endDate, MenteeEntity menteeEntity, GoalEntity goalEntity) {
+	public MenteeGoalEntity(LocalDate startDate, LocalDate endDate, MenteeEntity mentee, GoalEntity goal) {
 		this.startDate = startDate;
 		this.endDate = endDate;
 		this.status = MenteeGoalStatus.IN_PROGRESS;
-		this.menteeEntity = menteeEntity;
-		this.goalEntity = goalEntity;
+		this.mentee = mentee;
+		this.goal = goal;
 	}
 
 	public void updateStatus(MenteeGoalStatus status) {

@@ -1,8 +1,9 @@
-package com.goalmate.api;
+package com.goalmate.api.v1;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.goalmate.api.MenteeApi;
 import com.goalmate.api.model.MenteeInfoResponse;
 import com.goalmate.api.model.NameAvailabilityResponse;
 import com.goalmate.security.user.SecurityUtil;

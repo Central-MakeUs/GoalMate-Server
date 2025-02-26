@@ -163,8 +163,8 @@ public class GoalService {
 		MenteeGoalEntity menteeGoal = MenteeGoalEntity.builder()
 			.startDate(LocalDate.now())
 			.endDate(LocalDate.now().plusDays(goal.getPeriod()))
-			.menteeEntity(mentee)
-			.goalEntity(goal)
+			.mentee(mentee)
+			.goal(goal)
 			.build();
 		return menteeGoalRepository.save(menteeGoal);
 	}

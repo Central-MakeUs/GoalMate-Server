@@ -10,7 +10,7 @@ spring:
     multipart:
       enabled: true  # 멀티파트 업로드 지원 여부 (default: true)
       file-size-threshold: 0B  # 메모리에 저장하는 최소 크기 (default: 0B)
-      location: /users/charming/temp  # 업로드된 파일이 임시로 저장되는 위치
+      location: /tmp/goalmate  # 업로드된 파일이 임시로 저장되는 위치
       max-file-size: 100MB  # 개별 파일의 최대 크기
       max-request-size: 100MB  # 전체 요청의 최대 크기
 

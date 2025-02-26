@@ -3,7 +3,7 @@ INSERT INTO admin (created_at, updated_at, login_id, password, role)
 VALUES ('2025-02-14 09:00:00', '2025-02-14 09:00:00', 'admin',
         '$2a$10$1i.h33et9oKl/R9jjz9GV.JdROMZHOH.cWge4QtXdXSaCxhkmQpYW', 'ROLE_ADMIN');
 
--- 멘토 1: Java Bootcamp 담당 멘토 (mentor_id = 1)
+-- 멘토
 INSERT INTO mentor (created_at, updated_at, email, name, password, role)
 VALUES ('2025-02-14 09:00:00', '2025-02-14 09:00:00', 'mentor1@example.com', 'John Doe',
         '$2a$10$rXFCPrq71rGm2YhXAAPOF.3Pw/S9cHMFkh8HpMrbCutOKut5lBfry', 'ROLE_MENTOR'),

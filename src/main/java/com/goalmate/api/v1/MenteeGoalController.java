@@ -1,4 +1,4 @@
-package com.goalmate.api;
+package com.goalmate.api.v1;
 
 import java.time.LocalDate;
 import java.util.Optional;
@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.goalmate.api.MenteeGoalApi;
 import com.goalmate.api.model.MenteeGoalDailyDetailResponse;
 import com.goalmate.api.model.MenteeGoalSummaryPagingResponse;
 import com.goalmate.api.model.MenteeGoalTodoResponse;

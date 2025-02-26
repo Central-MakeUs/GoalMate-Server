@@ -1,9 +1,10 @@
-package com.goalmate.api;
+package com.goalmate.api.v1;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.goalmate.api.AuthApi;
 import com.goalmate.api.model.LoginAdminRequest;
 import com.goalmate.api.model.LoginMentorRequest;
 import com.goalmate.api.model.LoginResponse;

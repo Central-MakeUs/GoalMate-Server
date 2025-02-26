@@ -10,12 +10,17 @@ import org.springframework.data.jpa.repository.Query;
 import com.goalmate.domain.menteeGoal.MenteeGoalEntity;
 
 public interface MenteeGoalRepository extends JpaRepository<MenteeGoalEntity, Long> {
-	@Query("SELECT m FROM MenteeGoalEntity m WHERE m.menteeEntity.id = :menteeId ORDER BY m.createdAt DESC")
+	@Query("SELECT m FROM MenteeGoalEntity m WHERE m.mentee.id = :menteeId ORDER BY m.createdAt DESC")
 	List<MenteeGoalEntity> findByMenteeId(Long menteeId);
 
-	@Query("SELECT m FROM MenteeGoalEntity m WHERE m.menteeEntity.id = :menteeId ORDER BY m.createdAt DESC")
+	@Query("SELECT m FROM MenteeGoalEntity m WHERE m.mentee.id = :menteeId ORDER BY m.createdAt DESC")
 	Page<MenteeGoalEntity> findByMenteeId(Long menteeId, Pageable pageable);
 
-	@Query("SELECT COUNT(m) > 0 FROM MenteeGoalEntity m WHERE m.menteeEntity.id = :menteeId AND m.goalEntity.id = :goalId")
+	@Query("SELECT COUNT(m) > 0 FROM MenteeGoalEntity m WHERE m.mentee.id = :menteeId AND m.goal.id = :goalId")
 	boolean existsByMenteeIdAndGoalId(Long menteeId, Long goalId);
+
+	@Query("SELECT m FROM MenteeGoalEntity m WHERE m.goal.id = :goalId ORDER BY m.createdAt DESC")
+	Page<MenteeGoalEntity> findByGoalId(Long goalId, Pageable pageable);
+
+	long countByGoalId(Long goalId);
 }

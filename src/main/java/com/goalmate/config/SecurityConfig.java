@@ -65,7 +65,8 @@ public class SecurityConfig {
 			antMatcher("/auth/reissue"),
 			antMatcher(HttpMethod.GET, "/goals"),
 			antMatcher("/uploads/**"),
-			antMatcher("/mentors/**")
+			antMatcher("/mentors/**"),
+			antMatcher("/api/v2/admin/**")
 		);
 		return requestMatchers.toArray(RequestMatcher[]::new);
 	}

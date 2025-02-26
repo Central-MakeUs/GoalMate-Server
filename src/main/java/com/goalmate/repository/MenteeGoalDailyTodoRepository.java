@@ -10,7 +10,7 @@ import com.goalmate.domain.menteeGoal.MenteeGoalDailyTodoEntity;
 
 public interface MenteeGoalDailyTodoRepository extends JpaRepository<MenteeGoalDailyTodoEntity, Long> {
 	@Query("SELECT COUNT(m) > 0 FROM MenteeGoalDailyTodoEntity m " +
-		"WHERE m.menteeGoalEntity.menteeEntity.id = :menteeId " +
+		"WHERE m.menteeGoalEntity.mentee.id = :menteeId " +
 		"AND m.todoDate = :date " +
 		"AND m.status != 'COMPLETED'")
 	boolean existsByMenteeIdAndDateAndIsNotCompleted(Long menteeId, LocalDate date);
