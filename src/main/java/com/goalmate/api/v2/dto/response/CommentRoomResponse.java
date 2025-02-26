@@ -13,11 +13,11 @@ public record CommentRoomResponse(
 	String menteeName,
 	String mentorName,
 	String profileImageUrl,
-	Long newCommentsCount
+	int newCommentsCount
 ) {
 	public static CommentRoomResponse of(
 		CommentRoomEntity commentRoom,
-		Long newCommentsCount
+		int newCommentsCount
 	) {
 		return new CommentRoomResponse(
 			commentRoom.getId(),

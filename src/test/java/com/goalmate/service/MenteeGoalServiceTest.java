@@ -64,8 +64,8 @@ class MenteeGoalServiceTest {
 		MenteeGoalEntity realMenteeGoal = MenteeGoalEntity.builder()
 			.startDate(LocalDate.now())
 			.endDate(LocalDate.now().plusDays(30))
-			.goalEntity(goal)
-			.menteeEntity(mentee)
+			.goal(goal)
+			.mentee(mentee)
 			.build();
 
 		menteeGoal = spy(realMenteeGoal);

@@ -14,6 +14,7 @@ import com.goalmate.api.model.CommentPagingResponse;
 import com.goalmate.api.model.CommentResponse;
 import com.goalmate.api.model.CommentRoomPagingResponse;
 import com.goalmate.api.model.CommentRoomResponse;
+import com.goalmate.api.model.NewCommentsCountResponse;
 import com.goalmate.api.model.PageResponse;
 import com.goalmate.domain.comment.CommentEntity;
 import com.goalmate.domain.comment.CommentRoomEntity;
@@ -47,8 +48,8 @@ public class CommentService {
 
 		List<CommentRoomResponse> commentRoomResponses = commentRooms.stream()
 			.map(commentRoom -> {
-				Long countedUnreadComments = commentRepository
-					.countUnreadComments(commentRoom.getId(), user.userRole());
+				int countedUnreadComments = commentRepository
+					.countUnreadCommentsByRoomAndReceiver(commentRoom.getId(), user.userId(), user.userRole());
 				return CommentResponseMapper.mapToCommentRoomResponse(commentRoom, countedUnreadComments);
 			})
 			.toList();
@@ -57,11 +58,15 @@ public class CommentService {
 	}
 
 	public CommentResponse addComment(CurrentUserContext user, Long roomId, String comment) {
-		String writerName = null;
+		Long receiverId = null;
+		Role receiverRole = null;
+		String senderName = null;
 		CommentRoomEntity commentRoom = getCommentRoom(roomId);
 
 		if (user.isMentee()) {
-			validateUser(user, commentRoom.getMentee().getId());
+			validateAccessibleUser(user, commentRoom.getMentee().getId());
+			receiverId = commentRoom.getMentor().getId();
+			receiverRole = commentRoom.getMentor().getRole();
 
 			LocalDate today = LocalDate.now();
 			LocalDateTime startOfDay = today.atStartOfDay(); // 오늘 00:00:00
@@ -73,19 +78,25 @@ public class CommentService {
 					log.warn("Comment Already Exists: {}", baseComment);
 					throw new CoreApiException(ErrorType.CONFLICT, "Today's Comment Already Exists");
 				});
-			writerName = commentRoom.getMentee().getName();
+			senderName = commentRoom.getMentee().getName();
 		} else if (user.isMentor()) {
-			validateUser(user, commentRoom.getMentor().getId());
-			writerName = commentRoom.getMentor().getName();
-		} else {
-			throw new CoreApiException(ErrorType.FORBIDDEN, "User Role is not correct");
+			validateAccessibleUser(user, commentRoom.getMentor().getId());
+			senderName = commentRoom.getMentor().getName();
+			receiverId = commentRoom.getMentee().getId();
+			receiverRole = commentRoom.getMentee().getRole();
+		} else if (user.isAdmin()) {
+			senderName = "관리자";
+			receiverId = commentRoom.getMentee().getId();
+			receiverRole = commentRoom.getMentee().getRole();
 		}
 
 		CommentEntity commentEntity = CommentEntity.builder()
 			.comment(comment)
-			.writerId(user.userId())
-			.writerName(writerName)
-			.writerRole(user.userRole())
+			.senderId(user.userId())
+			.senderName(senderName)
+			.senderRole(user.userRole())
+			.receiverId(receiverId)
+			.receiverRole(receiverRole)
 			.commentRoom(commentRoom)
 			.build();
 		commentRepository.save(commentEntity);
@@ -111,32 +122,27 @@ public class CommentService {
 
 	public void deleteComment(CurrentUserContext user, Long commentId) {
 		CommentEntity comment = getComment(commentId);
-		validateCommentWriter(user, comment);
+		validateCommentSender(user, comment);
 		commentRepository.delete(comment);
 	}
 
 	public CommentResponse updateComment(CurrentUserContext user, Long commentId, String comment) {
 		CommentEntity baseComment = getComment(commentId);
-		validateCommentWriter(user, baseComment);
+		validateCommentSender(user, baseComment);
 		baseComment.updateComment(comment);
 		return CommentResponseMapper.mapToCommentResponse(baseComment);
+	}
+
+	public NewCommentsCountResponse countNewComments(CurrentUserContext user) {
+		int unreadCommentsCount = commentRepository
+			.countUnreadCommentsByReceiver(user.userId(), user.userRole());
+		NewCommentsCountResponse response = new NewCommentsCountResponse();
+		return response.newCommentsCount(unreadCommentsCount);
 	}
 
 	private CommentEntity getComment(Long commentId) {
 		return commentRepository.findById(commentId)
 			.orElseThrow(() -> new CoreApiException(ErrorType.NOT_FOUND, "Comment not found"));
-	}
-
-	private void validateUser(CurrentUserContext user, Long userId) {
-		if (!user.userId().equals(userId)) {
-			throw new CoreApiException(ErrorType.FORBIDDEN, "User is not correct");
-		}
-	}
-
-	private void validateCommentWriter(CurrentUserContext user, CommentEntity comment) {
-		if (!comment.isWriter(user.userId(), user.userRole())) {
-			throw new CoreApiException(ErrorType.FORBIDDEN, "Comment writer is not correct");
-		}
 	}
 
 	private CommentRoomEntity getCommentRoom(Long roomId) {
@@ -152,4 +158,17 @@ public class CommentService {
 			commentRooms = commentRoomRepository.findByMentorIdOrderByUpdatedAtDesc(userContext.userId(), pageable);
 		return commentRooms;
 	}
+
+	private void validateAccessibleUser(CurrentUserContext user, Long userId) {
+		if (!user.userId().equals(userId)) {
+			throw new CoreApiException(ErrorType.FORBIDDEN, "User is not correct");
+		}
+	}
+
+	private void validateCommentSender(CurrentUserContext user, CommentEntity comment) {
+		if (!comment.isSender(user.userId(), user.userRole())) {
+			throw new CoreApiException(ErrorType.FORBIDDEN, "Comment sender is not correct");
+		}
+	}
+
 }

@@ -1168,7 +1168,31 @@ paths:
                       data:
                         type: object
                         example: "{}"
+  /comments/new:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Comment
+      summary: "[공통] 새로운 코멘트 조회"
+      description: >
+        ## 개요
+        
+        새로운(안읽은) 코멘트가 몇 개인지 조회합니다.
 
+      operationId: countNewComments
+      responses:
+        '200':
+          description: 조회 성공
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/NewCommentsCountResponse'
 components:
   schemas:
     # Request Dto
@@ -1241,7 +1265,6 @@ components:
           items:
             $ref: '#/components/schemas/ImageRequest'
       required:
-        - mentor_id
         - title
         - participants_limit
         - topic
@@ -1531,6 +1554,10 @@ components:
               type: integer
               format: int64
               example: 1
+            goal_id:
+              type: integer
+              format: int64
+              example: 1
             title:
               type: string
               description: 목표 제목
@@ -1694,7 +1721,11 @@ components:
             $ref: '#/components/schemas/CommentResponse'
         page:
           $ref: '#/components/schemas/PageResponse'
-
+    NewCommentsCountResponse:
+      type: object
+      properties:
+        new_comments_count:
+          type: integer
     CommentRoomPagingResponse:
       type: object
       properties:
@@ -1729,7 +1760,6 @@ components:
           type: string
         new_comments_count:
           type: integer
-          format: int64
       required:
         - mentor_profile_image
 

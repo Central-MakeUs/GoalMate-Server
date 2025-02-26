@@ -19,8 +19,8 @@ public class CommentResponseMapper {
 		response.setId(comment.getId());
 		response.setComment(comment.getComment());
 		response.setCommentedAt(comment.getCreatedAt().atOffset(ZoneOffset.UTC));
-		response.setWriter(comment.getWriterName());
-		response.setWriterRole(comment.getWriterRole().getValue());
+		response.setWriter(comment.getSenderName());
+		response.setWriterRole(comment.getSenderRole().getValue());
 		return response;
 	}
 
@@ -35,7 +35,7 @@ public class CommentResponseMapper {
 
 	public static CommentRoomResponse mapToCommentRoomResponse(
 		CommentRoomEntity commentRoom,
-		long countedUnreadComments
+		int countedUnreadComments
 	) {
 		MenteeGoalEntity menteeGoal = commentRoom.getMenteeGoal();
 		GoalEntity goal = menteeGoal.getGoal();

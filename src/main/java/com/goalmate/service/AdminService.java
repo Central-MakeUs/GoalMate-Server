@@ -10,7 +10,6 @@ import com.goalmate.api.v2.dto.request.PageCondition;
 import com.goalmate.api.v2.dto.response.CommentRoomResponse;
 import com.goalmate.api.v2.dto.response.PageResponse;
 import com.goalmate.api.v2.dto.response.ParticipationResponse;
-import com.goalmate.domain.mentee.Role;
 import com.goalmate.repository.CommentRepository;
 import com.goalmate.repository.CommentRoomRepository;
 import com.goalmate.repository.MenteeGoalRepository;
@@ -54,9 +53,10 @@ public class AdminService {
 				pageable)
 			.stream()
 			.map(commentRoom -> {
-				Long countedUnreadComments = commentRepository.countUnreadComments(
+				int countedUnreadComments = commentRepository.countUnreadCommentsByRoomAndReceiver(
 					commentRoom.getId(),
-					Role.ROLE_MENTOR
+					commentRoom.getMentor().getId(), // 지금은 멘토 전용
+					commentRoom.getMentor().getRole()
 				);
 				return CommentRoomResponse.of(commentRoom, countedUnreadComments);
 			})

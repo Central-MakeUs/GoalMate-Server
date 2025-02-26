@@ -13,4 +13,8 @@ public record CurrentUserContext(
 	public boolean isMentor() {
 		return userRole == Role.ROLE_MENTOR;
 	}
+
+	public boolean isAdmin() {
+		return userRole == Role.ROLE_ADMIN;
+	}
 }

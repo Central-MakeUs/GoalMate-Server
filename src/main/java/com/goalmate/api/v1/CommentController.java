@@ -8,6 +8,7 @@ import com.goalmate.api.model.CommentPagingResponse;
 import com.goalmate.api.model.CommentRequest;
 import com.goalmate.api.model.CommentResponse;
 import com.goalmate.api.model.CommentRoomPagingResponse;
+import com.goalmate.api.model.NewCommentsCountResponse;
 import com.goalmate.security.user.CurrentUserContext;
 import com.goalmate.security.user.SecurityUtil;
 import com.goalmate.service.CommentService;
@@ -38,6 +39,13 @@ public class CommentController implements CommentApi {
 	public ResponseEntity getComments(Long roomId, Integer page, Integer size) {
 		CurrentUserContext user = SecurityUtil.getCurrentUser();
 		CommentPagingResponse response = commentService.getComments(user, roomId, page, size);
+		return ResponseEntity.ok(ApiResponse.success(response));
+	}
+
+	@Override
+	public ResponseEntity countNewComments() {
+		CurrentUserContext user = SecurityUtil.getCurrentUser();
+		NewCommentsCountResponse response = commentService.countNewComments(user);
 		return ResponseEntity.ok(ApiResponse.success(response));
 	}
 

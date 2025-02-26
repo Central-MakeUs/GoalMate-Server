@@ -88,7 +88,7 @@ public class SecurityConfig {
 		configureDefaultSecurity(http);
 		http.securityMatchers(AbstractRequestMatcherRegistry::anyRequest)
 			.authorizeHttpRequests(authorize -> authorize
-				.anyRequest().hasAnyRole("MENTEE", "MENTOR"))
+				.anyRequest().hasAnyRole("MENTEE", "MENTOR", "ADMIN"))
 			.exceptionHandling(exception -> {
 				exception.authenticationEntryPoint(jwtAuthenticationEntryPoint);
 				exception.accessDeniedHandler(jwtAccessDeniedHandler);

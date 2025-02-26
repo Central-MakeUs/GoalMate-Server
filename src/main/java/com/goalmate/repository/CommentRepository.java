@@ -18,7 +18,7 @@ public interface CommentRepository extends JpaRepository<CommentEntity, Long> {
 
 	@Query("SELECT c FROM CommentEntity c "
 		+ "WHERE c.commentRoom.id = :roomId "
-		+ "AND c.writerRole = com.goalmate.domain.mentee.Role.ROLE_MENTEE "
+		+ "AND c.senderRole = com.goalmate.domain.mentee.Role.ROLE_MENTEE "
 		+ "AND c.createdAt BETWEEN :startOfDay AND :endOfDay")
 	Optional<CommentEntity> findTodayCommentFromMentee(
 		Long roomId,
@@ -28,7 +28,14 @@ public interface CommentRepository extends JpaRepository<CommentEntity, Long> {
 
 	@Query("SELECT COUNT(c) FROM CommentEntity c "
 		+ "WHERE c.commentRoom.id = :roomId "
-		+ "AND c.writerRole != :readerRole "
+		+ "AND c.receiverId = :receiverId "
+		+ "AND c.receiverRole = :receiverRole "
 		+ "AND c.isRead = false")
-	Long countUnreadComments(Long roomId, Role readerRole);
+	int countUnreadCommentsByRoomAndReceiver(Long roomId, Long receiverId, Role receiverRole);
+
+	@Query("SELECT COUNT(c) > 0 FROM CommentEntity c "
+		+ "WHERE c.receiverId = :receiverId "
+		+ "AND c.receiverRole = :receiverRole "
+		+ "AND c.isRead = false")
+	int countUnreadCommentsByReceiver(Long receiverId, Role receiverRole);
 }

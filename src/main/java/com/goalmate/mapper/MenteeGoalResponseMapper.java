@@ -27,6 +27,7 @@ public class MenteeGoalResponseMapper {
 
 		MenteeGoalSummaryResponse response = new MenteeGoalSummaryResponse();
 		response.setId(menteeGoal.getId());
+		response.setGoalId(goal.getId());
 		response.setTitle(goalSummary.getTitle());
 		response.setTopic(goalSummary.getTopic());
 		response.setMentorName(goalSummary.getMentorName());
