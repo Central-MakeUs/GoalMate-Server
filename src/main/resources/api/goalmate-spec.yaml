@@ -47,7 +47,7 @@ info:
   license:
     name: Apache 2.0
     url: https://www.apache.org/licenses/LICENSE-2.0.html
-  version: Beta 1.0.3
+  version: Beta 1.0.4
 
 servers:
   - url: http://3.39.253.230
@@ -1021,6 +1021,7 @@ paths:
         ### writer_role: 코멘트 작성자의 역할
           - `MENTOR`: 멘토
           - `MENTEE`: 멘티
+          - `ADMIN`: 관리자
       operationId: getComments
       parameters:
         - name: roomId

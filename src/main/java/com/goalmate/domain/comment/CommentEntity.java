@@ -6,6 +6,8 @@ import com.goalmate.domain.mentee.Role;
 import jakarta.persistence.Column;
 import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.ForeignKey;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
@@ -29,13 +31,15 @@ public class CommentEntity extends BaseEntity {
 
 	@Column(nullable = false)
 	private String senderName;
-
+	
+	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
 	private Role senderRole;
 
 	@Column(nullable = false)
 	private Long receiverId;
 
+	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
 	private Role receiverRole;
 
