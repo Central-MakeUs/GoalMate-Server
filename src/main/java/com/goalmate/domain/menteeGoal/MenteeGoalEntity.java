@@ -50,6 +50,9 @@ public class MenteeGoalEntity extends BaseEntity {
 	@JoinColumn(name = "goal_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
 	private GoalEntity goal;
 
+	// @OneToMany(mappedBy = "menteeGoal", cascade = CascadeType.ALL, orphanRemoval = true)
+	// private List<MenteeGoalDailyTodoEntity> dailyTodos;
+
 	@Builder
 	public MenteeGoalEntity(LocalDate startDate, LocalDate endDate, MenteeEntity mentee, GoalEntity goal) {
 		this.startDate = startDate;

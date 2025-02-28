@@ -11,6 +11,8 @@ import com.goalmate.security.oauth.oidc.OIDCJwtParser;
 import com.goalmate.security.oauth.oidc.OIDCPublicKeyResolver;
 import com.goalmate.security.oauth.oidc.OIDCPublicKeys;
 import com.goalmate.security.oauth.validator.AppleClaimsValidator;
+import com.goalmate.support.error.CoreApiException;
+import com.goalmate.support.error.ErrorType;
 
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +38,7 @@ public class AppleUserProvider {
 
 	private void validateClaims(Claims claims, String nonce) {
 		if (!appleClaimsValidator.isValid(claims, nonce)) {
-			throw new IllegalArgumentException("Apple OAuth Claims 값이 올바르지 않습니다.");
+			throw new CoreApiException(ErrorType.UNAUTHORIZED, "Apple OAuth Claims 값이 올바르지 않습니다.");
 		}
 	}
 }

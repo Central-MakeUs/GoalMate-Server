@@ -45,7 +45,7 @@ public class MenteeGoalDailyTodoEntity extends BaseEntity {
 
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "mentee_goal_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-	private MenteeGoalEntity menteeGoalEntity;
+	private MenteeGoalEntity menteeGoal;
 
 	public MenteeGoalDailyTodoEntity(DailyTodoEntity dailyTodo, MenteeGoalEntity menteeGoal) {
 		this.todoDate = LocalDate.now().plusDays(dailyTodo.getDayNumber() - 1); // 1일차 -> 오늘, 2일차 -> 내일
@@ -53,7 +53,7 @@ public class MenteeGoalDailyTodoEntity extends BaseEntity {
 		this.description = dailyTodo.getDescription();
 		this.mentorTip = dailyTodo.getMentorTip();
 		this.status = TodoStatus.TODO; // 초기상태
-		this.menteeGoalEntity = menteeGoal;
+		this.menteeGoal = menteeGoal;
 	}
 
 	public boolean isCompleted() {

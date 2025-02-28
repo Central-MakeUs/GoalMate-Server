@@ -121,6 +121,7 @@ public class AuthService {
 			kakaoUserProvider.unlinkUser(socialId);
 		}
 		// TODO: Soft delete 로 변경
+
 		menteeRepository.delete(mentee);
 	}
 
