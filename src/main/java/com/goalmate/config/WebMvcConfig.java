@@ -13,7 +13,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 	@Override
 	public void addCorsMappings(CorsRegistry registry) {
 		registry.addMapping("/**")
-			.allowedOrigins("http://localhost:5173", "http://3.39.253.230")
+			.allowedOrigins("http://localhost:5173", "goalmate-web-beta.vercel.app", "http://3.39.253.230")
 			.allowedHeaders("*")
 			.exposedHeaders("Authorization")
 			.allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
