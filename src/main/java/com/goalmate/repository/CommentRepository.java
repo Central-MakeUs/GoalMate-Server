@@ -33,7 +33,7 @@ public interface CommentRepository extends JpaRepository<CommentEntity, Long> {
 		+ "AND c.isRead = false")
 	int countUnreadCommentsByRoomAndReceiver(Long roomId, Long receiverId, Role receiverRole);
 
-	@Query("SELECT COUNT(c) > 0 FROM CommentEntity c "
+	@Query("SELECT COUNT(c) FROM CommentEntity c "
 		+ "WHERE c.receiverId = :receiverId "
 		+ "AND c.receiverRole = :receiverRole "
 		+ "AND c.isRead = false")

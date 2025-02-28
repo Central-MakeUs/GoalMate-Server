@@ -6,7 +6,6 @@ import org.springframework.context.annotation.Configuration;
 import com.goalmate.GoalmateApplication;
 
 @Configuration
-@EnableFeignClients(basePackageClasses = GoalmateApplication.class)
+@EnableFeignClients(basePackages = "com.goalmate.infra.feign", basePackageClasses = GoalmateApplication.class)
 public class FeignClientConfig {
-} 
- 
+}
