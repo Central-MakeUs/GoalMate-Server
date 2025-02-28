@@ -25,11 +25,11 @@ public class CommentRoomEntity extends BaseEntity {
 	private boolean forceUpdate = false;
 
 	@ManyToOne
-	@JoinColumn(name = "mentor_id", nullable = false)
+	@JoinColumn(name = "mentor_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
 	private MentorEntity mentor;
 
 	@ManyToOne
-	@JoinColumn(name = "mentee_id", nullable = false)
+	@JoinColumn(name = "mentee_id", nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
 	private MenteeEntity mentee;
 
 	@OneToOne

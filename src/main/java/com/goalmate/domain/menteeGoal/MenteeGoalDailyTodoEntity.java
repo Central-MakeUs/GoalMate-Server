@@ -13,9 +13,6 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ForeignKey;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -27,10 +24,6 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "mentee_goal_daily_todo")
 public class MenteeGoalDailyTodoEntity extends BaseEntity {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
-
 	@Column(nullable = false)
 	private LocalDate todoDate;
 

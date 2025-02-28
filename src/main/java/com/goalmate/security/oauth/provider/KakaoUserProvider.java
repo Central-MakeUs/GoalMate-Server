@@ -15,7 +15,9 @@ import com.goalmate.security.oauth.oidc.OIDCPublicKeys;
 
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RequiredArgsConstructor
 @Component
 public class KakaoUserProvider {
@@ -41,6 +43,6 @@ public class KakaoUserProvider {
 	}
 
 	public void unlinkUser(String targetId) {
-		kakaoUserClient.unlinkUser(adminKey, targetIdType, targetId);
+		kakaoUserClient.unlinkUser(adminKey, targetIdType, Long.valueOf(targetId));
 	}
 }

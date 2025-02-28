@@ -18,6 +18,6 @@ public interface KakaoUserClient {
 	ResponseEntity<String> unlinkUser(
 		@RequestHeader("Authorization") String adminKey,
 		@RequestParam("target_id_type") String targetIdType,
-		@RequestParam("target_id") String targetId
+		@RequestParam("target_id") Long targetId
 	);
 }
