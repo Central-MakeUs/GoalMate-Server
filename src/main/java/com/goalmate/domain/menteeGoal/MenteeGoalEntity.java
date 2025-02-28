@@ -1,11 +1,13 @@
 package com.goalmate.domain.menteeGoal;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import com.goalmate.domain.BaseEntity;
 import com.goalmate.domain.goal.GoalEntity;
 import com.goalmate.domain.mentee.MenteeEntity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
@@ -15,6 +17,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.ForeignKey;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -50,8 +53,8 @@ public class MenteeGoalEntity extends BaseEntity {
 	@JoinColumn(name = "goal_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
 	private GoalEntity goal;
 
-	// @OneToMany(mappedBy = "menteeGoal", cascade = CascadeType.ALL, orphanRemoval = true)
-	// private List<MenteeGoalDailyTodoEntity> dailyTodos;
+	@OneToMany(mappedBy = "menteeGoal", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<MenteeGoalDailyTodoEntity> dailyTodos;
 
 	@Builder
 	public MenteeGoalEntity(LocalDate startDate, LocalDate endDate, MenteeEntity mentee, GoalEntity goal) {

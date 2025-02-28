@@ -129,6 +129,7 @@ public class CommentService {
 	public CommentResponse updateComment(CurrentUserContext user, Long commentId, String comment) {
 		CommentEntity baseComment = getComment(commentId);
 		validateCommentSender(user, baseComment);
+		validateCommentDate(baseComment);
 		baseComment.updateComment(comment);
 		return CommentResponseMapper.mapToCommentResponse(baseComment);
 	}
@@ -161,13 +162,21 @@ public class CommentService {
 
 	private void validateAccessibleUser(CurrentUserContext user, Long userId) {
 		if (!user.userId().equals(userId)) {
-			throw new CoreApiException(ErrorType.FORBIDDEN, "User is not correct");
+			throw new CoreApiException(ErrorType.FORBIDDEN, "User is not accessible");
 		}
 	}
 
 	private void validateCommentSender(CurrentUserContext user, CommentEntity comment) {
 		if (!comment.isSender(user.userId(), user.userRole())) {
 			throw new CoreApiException(ErrorType.FORBIDDEN, "Comment sender is not correct");
+		}
+	}
+
+	private void validateCommentDate(CommentEntity baseComment) {
+		LocalDate baseCommentDate = baseComment.getUpdatedAt().toLocalDate();
+		LocalDate today = LocalDate.now();
+		if (!baseCommentDate.isEqual(today)) {
+			throw new CoreApiException(ErrorType.FORBIDDEN, "Comment can only be modified on the same day");
 		}
 	}
 

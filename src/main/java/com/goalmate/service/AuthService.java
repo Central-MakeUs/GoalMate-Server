@@ -111,18 +111,18 @@ public class AuthService {
 		}
 	}
 
-	public void deleteUser(CurrentUserContext user) {
+	public void deleteMentee(CurrentUserContext user) {
 		if (!user.isMentee()) {
 			throw new CoreApiException(ErrorType.FORBIDDEN, "Contact the administrator if you are not a mentee");
 		}
 		MenteeEntity mentee = menteeService.getMenteeById(user.userId());
-		String socialId = mentee.getSocialId();
-		if (mentee.getProvider() == SocialProvider.KAKAO) {
-			kakaoUserProvider.unlinkUser(socialId);
+		if (mentee.isDeleted()) {
+			throw new CoreApiException(ErrorType.FORBIDDEN, "Already withdrawn");
 		}
-		// TODO: Soft delete 로 변경
-
-		menteeRepository.delete(mentee);
+		if (mentee.getProvider() == SocialProvider.KAKAO) {
+			kakaoUserProvider.unlinkUser(mentee.getSocialId());
+		}
+		mentee.delete();
 	}
 
 	public TokenPair getTestUser() {

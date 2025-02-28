@@ -31,7 +31,7 @@ public class CommentEntity extends BaseEntity {
 
 	@Column(nullable = false)
 	private String senderName;
-	
+
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
 	private Role senderRole;

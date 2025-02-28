@@ -1,5 +1,5 @@
-INSERT INTO goalmate.mentee (free_participation_count, created_at, id, updated_at, email, name, social_id, provider,
-                             role, status)
+INSERT INTO mentee (free_participation_count, created_at, id, updated_at, email, name, social_id, provider,
+                    role, status)
 VALUES (0, '2025-02-28 10:08:31.000000', 0, '2025-02-28 10:08:44.000000', 'test@gmail.com', '테스터', '0000000000',
         'KAKAO', 'ROLE_MENTEE', 'ACTIVE');
 

@@ -18,7 +18,7 @@ public class CommentResponseMapper {
 		CommentResponse response = new CommentResponse();
 		response.setId(comment.getId());
 		response.setComment(comment.getComment());
-		response.setCommentedAt(comment.getCreatedAt().atOffset(ZoneOffset.UTC));
+		response.setCommentedAt(comment.getUpdatedAt().atOffset(ZoneOffset.UTC));
 		response.setWriter(comment.getSenderName());
 		response.setWriterRole(comment.getSenderRole().getValue());
 		return response;

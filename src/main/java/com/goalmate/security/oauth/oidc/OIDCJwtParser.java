@@ -8,6 +8,8 @@ import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.goalmate.support.error.CoreApiException;
+import com.goalmate.support.error.ErrorType;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -41,9 +43,9 @@ public class OIDCJwtParser {
 				.parseSignedClaims(identityToken)
 				.getPayload();
 		} catch (ExpiredJwtException e) {
-			throw new IllegalArgumentException("Expired or invalid JWT token");
+			throw new CoreApiException(ErrorType.BAD_REQUEST, "Expired or invalid JWT token");
 		} catch (UnsupportedJwtException | MalformedJwtException | SignatureException | IllegalArgumentException e) {
-			throw new IllegalArgumentException("Invalid JWT token");
+			throw new CoreApiException(ErrorType.BAD_REQUEST, "Invalid JWT token");
 		}
 	}
 }

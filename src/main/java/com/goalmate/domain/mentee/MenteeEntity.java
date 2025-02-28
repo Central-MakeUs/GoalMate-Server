@@ -23,7 +23,7 @@ public class MenteeEntity extends BaseEntity {
 	@Column(nullable = false)
 	private String email;
 
-	@Column(nullable = false)
+	@Column(nullable = false, unique = true)
 	private String socialId;
 
 	@Column(nullable = false)
@@ -62,6 +62,10 @@ public class MenteeEntity extends BaseEntity {
 		return status == MenteeStatus.PENDING;
 	}
 
+	public boolean isDeleted() {
+		return status == MenteeStatus.DELETED;
+	}
+
 	public boolean hasFreeCount() {
 		return freeParticipationCount > 0;
 	}
@@ -72,5 +76,11 @@ public class MenteeEntity extends BaseEntity {
 
 	private void updateToActive() {
 		this.status = MenteeStatus.ACTIVE;
+	}
+
+	public void delete() {
+		this.name = "Unknown";
+		this.status = MenteeStatus.DELETED;
+		this.socialId = "Deleted." + socialId;
 	}
 }
