@@ -123,4 +123,10 @@ public class AuthService {
 		// TODO: Soft delete 로 변경
 		menteeRepository.delete(mentee);
 	}
+
+	public TokenPair getTestUser() {
+		MenteeEntity mentee = menteeRepository.findBySocialId("0000000000")
+			.orElseThrow(() -> new CoreApiException(ErrorType.NOT_FOUND, "Test user not found"));
+		return jwtProvider.generateTokenPair(mentee.getId(), mentee.getRole().name());
+	}
 }

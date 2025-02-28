@@ -2,6 +2,7 @@ package com.goalmate.api.v1;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.goalmate.api.AuthApi;
@@ -73,5 +74,11 @@ public class AuthController implements AuthApi {
 		CurrentUserContext user = SecurityUtil.getCurrentUser();
 		authService.deleteUser(user);
 		return ResponseEntity.ok(ApiResponse.success());
+	}
+
+	// for test
+	@PostMapping("/auth/login/test")
+	public ResponseEntity test() {
+		return ResponseEntity.ok(ApiResponse.success(authService.getTestUser()));
 	}
 }
