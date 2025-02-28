@@ -46,6 +46,7 @@ public class CommentResponseMapper {
 		response.setMenteeGoalTitle(goal.getTitle());
 		response.setMenteeName(commentRoom.getMentee().getName());
 		response.setMentorName(commentRoom.getMentor().getName());
+		response.setMentorProfileImage(commentRoom.getMentor().getProfileImageUrl());
 		response.setStartDate(menteeGoal.getStartDate());
 		response.setEndDate(menteeGoal.getEndDate());
 		response.setNewCommentsCount(countedUnreadComments);
