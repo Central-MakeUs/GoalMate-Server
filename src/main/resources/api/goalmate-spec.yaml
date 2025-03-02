@@ -398,8 +398,6 @@ paths:
           description: 중복된 이름
   /mentees/name/validate:
     get:
-      security:
-        - bearerAuth: [ ]
       tags:
         - Mentee
       summary: 멘티 이름 유효성 확인

@@ -64,6 +64,7 @@ public class SecurityConfig {
 			antMatcher("/auth/login/**"),
 			antMatcher("/auth/reissue"),
 			antMatcher(HttpMethod.GET, "/goals"),
+			antMatcher(HttpMethod.GET, "/mentees/name/validate"),
 			antMatcher("/uploads/**"),
 			antMatcher("/mentors/**"),
 			antMatcher("/api/v2/admin/**")
