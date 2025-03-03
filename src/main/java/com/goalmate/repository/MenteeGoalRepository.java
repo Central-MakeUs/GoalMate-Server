@@ -13,7 +13,7 @@ public interface MenteeGoalRepository extends JpaRepository<MenteeGoalEntity, Lo
 	@Query("SELECT m FROM MenteeGoalEntity m WHERE m.mentee.id = :menteeId ORDER BY m.createdAt DESC")
 	List<MenteeGoalEntity> findByMenteeId(Long menteeId);
 
-	@Query("SELECT m FROM MenteeGoalEntity m WHERE m.mentee.id = :menteeId ORDER BY m.createdAt DESC")
+	@Query("SELECT m FROM MenteeGoalEntity m WHERE m.mentee.id = :menteeId ORDER BY m.status DESC, m.endDate ASC")
 	Page<MenteeGoalEntity> findByMenteeId(Long menteeId, Pageable pageable);
 
 	@Query("SELECT COUNT(m) > 0 FROM MenteeGoalEntity m WHERE m.mentee.id = :menteeId AND m.goal.id = :goalId")
