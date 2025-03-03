@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "mentee")
 public class MenteeEntity extends BaseEntity {
-	@Column
+	@Column(nullable = false)
 	private String name;
 
 	@Column(nullable = false)
@@ -42,7 +42,8 @@ public class MenteeEntity extends BaseEntity {
 	private Role role;
 
 	@Builder
-	public MenteeEntity(String email, String socialId, SocialProvider provider) {
+	public MenteeEntity(String name, String email, String socialId, SocialProvider provider) {
+		this.name = name;
 		this.email = email;
 		this.socialId = socialId;
 		this.freeParticipationCount = 1;    // 기본 제공 1회

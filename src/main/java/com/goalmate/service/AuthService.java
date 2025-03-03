@@ -1,5 +1,7 @@
 package com.goalmate.service;
 
+import java.util.Random;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +35,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @Transactional
 public class AuthService {
+	private static final String[] MENTEE_PREFIXES = {"멘티", "골메"};
 	private final AppleUserProvider appleUserProvider;
 	private final KakaoUserProvider kakaoUserProvider;
 	private final JwtProvider jwtProvider;
@@ -71,16 +74,6 @@ public class AuthService {
 		};
 	}
 
-	private MenteeEntity createNewMentee(OAuthMember oauthMember, SocialProvider socialProvider) {
-		// 새로운 Mentee 생성
-		log.info(">>>>>> 새로운 멤버 생성: {}", oauthMember.subject());
-		return MenteeEntity.builder()
-			.email(oauthMember.email())
-			.socialId(oauthMember.subject())
-			.provider(socialProvider)
-			.build();
-	}
-
 	public TokenPair reissue(String refreshToken) {
 		jwtProvider.verifyToken(refreshToken);
 		RefreshToken token = refreshTokenRepository.findById(refreshToken)
@@ -105,12 +98,6 @@ public class AuthService {
 		return jwtProvider.generateTokenPair(mentor.getId(), mentor.getRole().name());
 	}
 
-	private void validatePassword(String rawPassword, String encodedPassword) {
-		if (!passwordEncoder.matches(rawPassword, encodedPassword)) {
-			throw new CoreApiException(ErrorType.UNAUTHORIZED, "Invalid password");
-		}
-	}
-
 	public void deleteMentee(CurrentUserContext user) {
 		if (!user.isMentee()) {
 			throw new CoreApiException(ErrorType.FORBIDDEN, "Contact the administrator if you are not a mentee");
@@ -125,9 +112,34 @@ public class AuthService {
 		mentee.delete();
 	}
 
+	// for test
 	public TokenPair getTestUser() {
 		MenteeEntity mentee = menteeRepository.findBySocialId("0000000000")
 			.orElseThrow(() -> new CoreApiException(ErrorType.NOT_FOUND, "Test user not found"));
 		return jwtProvider.generateTokenPair(mentee.getId(), mentee.getRole().name());
+	}
+
+	private MenteeEntity createNewMentee(OAuthMember oauthMember, SocialProvider socialProvider) {
+		// 새로운 Mentee 생성
+		log.info(">>>>>> 새로운 멤버 생성: {}", oauthMember.subject());
+		return MenteeEntity.builder()
+			.name(createMenteeName())
+			.email(oauthMember.email())
+			.socialId(oauthMember.subject())
+			.provider(socialProvider)
+			.build();
+	}
+
+	private String createMenteeName() {
+		Random random = new Random();
+		String prefix = MENTEE_PREFIXES[random.nextInt(MENTEE_PREFIXES.length)];
+		int number = random.nextInt(900) + 100; // 100~999 범위의 숫자 생성
+		return prefix + number;
+	}
+
+	private void validatePassword(String rawPassword, String encodedPassword) {
+		if (!passwordEncoder.matches(rawPassword, encodedPassword)) {
+			throw new CoreApiException(ErrorType.UNAUTHORIZED, "Invalid password");
+		}
 	}
 }
