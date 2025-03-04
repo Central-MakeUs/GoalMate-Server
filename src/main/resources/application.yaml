@@ -22,6 +22,15 @@ server:
       min-spare: 100
   port: 8080
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: always
+
 ---
 spring.config.activate.on-profile: local
 
