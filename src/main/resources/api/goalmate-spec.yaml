@@ -58,8 +58,6 @@ servers:
 tags:
   - name: Auth
     description: 인증 API
-  - name: Admin
-    description: 관리자 API
   - name: Mentee
     description: 멘티 API
   - name: Mentor
@@ -530,6 +528,46 @@ paths:
                     properties:
                       data:
                         $ref: '#/components/schemas/GoalSummaryPagingResponse'
+    post:
+      tags:
+        - Goal
+      summary: "목표 생성"
+      description: >
+        ## 개요
+
+        새로운 목표를 생성합니다. 목표가 생성되면 목표 ID가 반환됩니다.
+
+        ## 요청 설명
+
+        아래의 필드들은 배열로 여러 개의 값을 받을 수 있습니다.
+
+          - `mid_objectives`: 중간 목표 설명 (1부터 시작)
+          - `weekly_objectives`: 주차별 목표 설명 (1주차부터 시작)
+          - `thumbnail_images`: 썸네일 이미지 URL. 첫 번째 이미지가 메인 이미지로 사용됩니다.
+          - `content_images`: 목표 상세 이미지 URL
+
+      operationId: createGoal
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GoalCreateRequest'
+      responses:
+        '201':
+          description: 생성 성공
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: integer
+                        format: int64
+                        example: 1
+                        description: 생성된 목표의 ID
   /goals/{goalId}:
     get:
       tags:
@@ -879,50 +917,7 @@ paths:
                       data:
                         $ref: '#/components/schemas/MenteeGoalTodoResponse'
 
-  # Mentor
-  /mentors/me/goals:
-    post:
-      tags:
-        - Mentor
-      summary: "목표 생성"
-      description: >
-        ## 개요
-        
-        새로운 목표를 생성합니다. 목표가 생성되면 목표 ID가 반환됩니다.
-        
-        ## 요청 설명
-        
-        아래의 필드들은 배열로 여러 개의 값을 받을 수 있습니다.
-        
-          - `mid_objectives`: 중간 목표 설명 (1부터 시작)
-          - `weekly_objectives`: 주차별 목표 설명 (1주차부터 시작)
-          - `thumbnail_images`: 썸네일 이미지 URL. 첫 번째 이미지가 메인 이미지로 사용됩니다.
-          - `content_images`: 목표 상세 이미지 URL
-
-      operationId: createGoal
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/GoalCreateRequest'
-      responses:
-        '201':
-          description: 생성 성공
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/ApiResponse'
-                  - type: object
-                    properties:
-                      data:
-                        type: integer
-                        format: int64
-                        example: 1
-                        description: 생성된 목표의 ID
-
-  /mentors/me/goals/{menteeGoalId}/mentor-letter:
+  /mentors/my/goals/{menteeGoalId}/mentor-letter:
     put:
       security:
         - bearerAuth: [ ]
@@ -1304,7 +1299,7 @@ components:
     TodoRequest:
       type: object
       properties:
-        dayNumber:
+        day_number:
           type: integer
           minimum: 1
           example: 1

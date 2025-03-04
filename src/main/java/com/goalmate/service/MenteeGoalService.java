@@ -69,7 +69,7 @@ public class MenteeGoalService {
 		MenteeGoalSummaryResponse summary = MenteeGoalResponseMapper
 			.mapToSummaryResponse(
 				menteeGoal,
-				getTodoProgress(menteeGoal));
+				getTodoProgress(menteeGoal, date));
 		List<MenteeGoalTodoResponse> todos = dailyTodoRepository.findByMenteeGoalIdAndDate(menteeGoalId, date)
 			.stream()
 			.map(MenteeGoalResponseMapper::mapToTodoResponse)
@@ -139,19 +139,22 @@ public class MenteeGoalService {
 		menteeGoal.updateMentorLetter(mentorLetter);
 		return MenteeGoalResponseMapper.mapToSummaryResponse(
 			menteeGoal,
-			getTodoProgress(menteeGoal));
+			getTodoProgress(menteeGoal, LocalDate.now()));
 	}
 
 	public TodoProgress getTodoProgress(MenteeGoalEntity menteeGoal) {
+		return getTodoProgress(menteeGoal, LocalDate.now());
+	}
+
+	public TodoProgress getTodoProgress(MenteeGoalEntity menteeGoal, LocalDate date) {
 		// 전체 투두를 조회하며, 완료된 투두개수, 전체 투두개수, 오늘 할 투두 개수, 오늘 완료한 투두 개수를 구한다.
 		List<MenteeGoalDailyTodoEntity> dailyTodos = dailyTodoRepository.findByMenteeGoalId(menteeGoal.getId());
-		final LocalDate today = LocalDate.now();
 		int totalCount = dailyTodos.size();
 		int totalCompletedCount = 0;
 		int todayCount = 0;
 		int todayCompletedCount = 0;
 		for (MenteeGoalDailyTodoEntity dailyTodo : dailyTodos) {
-			if (dailyTodo.getTodoDate().isEqual(today)) {
+			if (dailyTodo.getTodoDate().isEqual(date)) {
 				todayCount++;
 				if (dailyTodo.isCompleted()) {
 					todayCompletedCount++;
