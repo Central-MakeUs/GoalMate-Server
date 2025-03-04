@@ -1,6 +1,5 @@
 package com.goalmate.mapper;
 
-import java.time.ZoneOffset;
 import java.util.List;
 
 import com.goalmate.api.model.CommentPagingResponse;
@@ -12,13 +11,14 @@ import com.goalmate.domain.comment.CommentEntity;
 import com.goalmate.domain.comment.CommentRoomEntity;
 import com.goalmate.domain.goal.GoalEntity;
 import com.goalmate.domain.menteeGoal.MenteeGoalEntity;
+import com.goalmate.util.DateUtil;
 
 public class CommentResponseMapper {
 	public static CommentResponse mapToCommentResponse(CommentEntity comment) {
 		CommentResponse response = new CommentResponse();
 		response.setId(comment.getId());
 		response.setComment(comment.getComment());
-		response.setCommentedAt(comment.getUpdatedAt().atOffset(ZoneOffset.UTC));
+		response.setCommentedAt(DateUtil.toOffsetDateTime(comment.getCreatedAt()));
 		response.setWriter(comment.getSenderName());
 		response.setWriterRole(comment.getSenderRole().getValue());
 		return response;
@@ -50,7 +50,6 @@ public class CommentResponseMapper {
 		response.setStartDate(menteeGoal.getStartDate());
 		response.setEndDate(menteeGoal.getEndDate());
 		response.setNewCommentsCount(countedUnreadComments);
-
 		return response;
 	}
 

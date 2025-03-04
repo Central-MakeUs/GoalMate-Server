@@ -16,6 +16,7 @@ import com.goalmate.domain.goal.GoalEntity;
 import com.goalmate.domain.menteeGoal.MenteeGoalDailyTodoEntity;
 import com.goalmate.domain.menteeGoal.MenteeGoalEntity;
 import com.goalmate.domain.menteeGoal.TodoProgress;
+import com.goalmate.util.DateUtil;
 
 public class MenteeGoalResponseMapper {
 
@@ -47,8 +48,8 @@ public class MenteeGoalResponseMapper {
 		response.setCommentRoomId(menteeGoal.getCommentRoomId());
 		response.setMenteeGoalStatus(MenteeGoalStatusEnum.valueOf(menteeGoal.getStatus().getValue()));
 
-		response.setCreatedAt(menteeGoal.getCreatedAt().atOffset(java.time.ZoneOffset.UTC));
-		response.setUpdatedAt(menteeGoal.getUpdatedAt().atOffset(java.time.ZoneOffset.UTC));
+		response.setCreatedAt(DateUtil.toOffsetDateTime(menteeGoal.getCreatedAt()));
+		response.setUpdatedAt(DateUtil.toOffsetDateTime(menteeGoal.getUpdatedAt()));
 		return response;
 	}
 

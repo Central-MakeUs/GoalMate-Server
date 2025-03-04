@@ -13,6 +13,7 @@ import com.goalmate.api.model.MidObjectiveResponse;
 import com.goalmate.api.model.PageResponse;
 import com.goalmate.api.model.WeeklyObjectiveResponse;
 import com.goalmate.domain.goal.GoalEntity;
+import com.goalmate.util.DateUtil;
 
 public class GoalResponseMapper {
 	private static final int CLOSING_SOON_THRESHOLD = 3;
@@ -54,8 +55,8 @@ public class GoalResponseMapper {
 		detail.setGoalStatus(GoalStatusEnum.fromValue(goal.getGoalStatus().getValue()));
 		detail.setMentorName(goal.getMentor().getName());
 		detail.setIsClosingSoon(isClosingSoon(goal.getParticipantsLimit(), goal.getCurrentParticipants()));
-		detail.setCreatedAt(goal.getCreatedAt().atOffset(ZoneOffset.UTC));
-		detail.setUpdatedAt(goal.getUpdatedAt().atOffset(ZoneOffset.UTC));
+		detail.setCreatedAt(DateUtil.toOffsetDateTime(goal.getCreatedAt()));
+		detail.setUpdatedAt(DateUtil.toOffsetDateTime(goal.getUpdatedAt()));
 		// ThumbnailImages
 		detail.setThumbnailImages(goal.getThumbnailImages().stream()
 			.map(thumbnailImage -> mapToImageResponse(thumbnailImage.getSequence(), thumbnailImage.getImageUrl()))
