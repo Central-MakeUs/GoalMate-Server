@@ -1439,7 +1439,6 @@ components:
     GoalStatusEnum:
       type: string
       enum:
-        - UPCOMING
         - OPEN
         - CLOSED
       example:
