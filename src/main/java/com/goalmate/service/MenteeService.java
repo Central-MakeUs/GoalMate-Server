@@ -34,7 +34,7 @@ public class MenteeService {
 
 	public String updateMenteeName(Long menteeId, String name) {
 		if (!isNameAvailable(name)) {
-			throw new CoreApiException(ErrorType.CONFLICT, "Mentee name already exists: " + name);
+			throw new CoreApiException(ErrorType.CONFLICT, "Mentee name is not valid: " + name);
 		}
 		getMenteeById(menteeId).updateName(name);
 		return name;
@@ -42,12 +42,29 @@ public class MenteeService {
 
 	@Transactional(readOnly = true)
 	public boolean isNameAvailable(String name) {
+		// 길이 제한 (2~5자)
+		if (name.length() < 2 || name.length() > 5) {
+			return false;
+		}
+
+		for (char ch : name.toCharArray()) {
+			// 한글 자음/모음 단독 사용 불가
+			if (ch >= 'ㄱ' && ch <= 'ㅣ') {
+				return false;
+			}
+			// 특수문자 검사 (한글, 영문, 숫자만 허용)
+			if (!name.matches("^[가-힣a-zA-Z0-9]+$")) {
+				return false;
+			}
+		}
 		return !menteeRepository.existsByName(name);
 	}
 
+	@Transactional(readOnly = true)
 	public MenteeEntity getMenteeById(Long menteeId) {
 		return menteeRepository.findById(menteeId).orElseThrow(() ->
 			new CoreApiException(ErrorType.NOT_FOUND, "Mentee not found: " + menteeId));
 	}
+
 }
 
