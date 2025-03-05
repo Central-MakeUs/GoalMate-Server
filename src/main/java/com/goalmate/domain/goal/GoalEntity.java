@@ -106,6 +106,9 @@ public class GoalEntity extends BaseEntity {
 
 	public void increaseCurrentParticipants() {
 		this.currentParticipants++;
+		if (this.currentParticipants >= this.participantsLimit) {
+			this.goalStatus = GoalStatus.CLOSED;
+		}
 	}
 
 	public boolean isFull() {
