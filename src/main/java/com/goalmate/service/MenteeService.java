@@ -46,17 +46,17 @@ public class MenteeService {
 		if (name.length() < 2 || name.length() > 5) {
 			return false;
 		}
-
-		for (char ch : name.toCharArray()) {
-			// 한글 자음/모음 단독 사용 불가
-			if (ch >= 'ㄱ' && ch <= 'ㅣ') {
-				return false;
-			}
-			// 특수문자 검사 (한글, 영문, 숫자만 허용)
-			if (!name.matches("^[가-힣a-zA-Z0-9]+$")) {
-				return false;
-			}
-		}
+		
+		// for (char ch : name.toCharArray()) {
+		// 	// 한글 자음/모음 단독 사용 불가
+		// 	if (ch >= 'ㄱ' && ch <= 'ㅣ') {
+		// 		return false;
+		// 	}
+		// 	// 특수문자 검사 (한글, 영문, 숫자만 허용)
+		// 	if (!name.matches("^[가-힣a-zA-Z0-9]+$")) {
+		// 		return false;
+		// 	}
+		// }
 		return !menteeRepository.existsByName(name);
 	}
 
