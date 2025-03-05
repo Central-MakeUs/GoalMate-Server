@@ -4,14 +4,19 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.goalmate.api.v2.dto.request.GoalStatusUpdateRequest;
+import com.goalmate.api.v2.dto.request.GoalUpdateRequest;
 import com.goalmate.api.v2.dto.request.PageCondition;
-import com.goalmate.api.v2.dto.response.GoalSummaryResponse;
 import com.goalmate.api.v2.dto.response.PageResponse;
 import com.goalmate.api.v2.dto.response.ParticipationResponse;
+import com.goalmate.api.v2.dto.response.goal.GoalSummaryResponse;
 import com.goalmate.api.v2.service.GoalServiceV2;
 import com.goalmate.api.v2.service.ParticipationService;
 import com.goalmate.support.response.ApiResponse;
@@ -38,6 +43,22 @@ public class GoalControllerV2 {
 		@AuthenticationPrincipal Long mentorId,
 		@ModelAttribute PageCondition pageCondition) {
 		return null;
+	}
+
+	@PutMapping("/{goalId}")
+	public ResponseEntity<ApiResponse<?>> updateGoal(
+		@PathVariable Long goalId,
+		@RequestBody GoalUpdateRequest request) {
+		return null;
+	}
+
+	// 멘토, 관리자
+	@PatchMapping("/{goalId}/status")
+	public ResponseEntity<ApiResponse<?>> updateGoalStatus(
+		@PathVariable Long goalId,
+		@RequestBody GoalStatusUpdateRequest request) {
+		goalService.updateGoalStatus(goalId, request);
+		return ResponseEntity.ok(ApiResponse.success());
 	}
 
 	// GET /goals/{goalId}/participations   // 목표의 참여 조회 (멘토, 관리자)

@@ -1,4 +1,4 @@
-package com.goalmate.api.v2.dto.response;
+package com.goalmate.api.v2.dto.response.goal;
 
 import com.goalmate.domain.goal.GoalEntity;
 import com.goalmate.domain.goal.GoalStatus;
@@ -8,13 +8,11 @@ public record GoalSummaryResponse(
 	Long id,
 	String title,
 	String topic,
-	String description,
 	Integer period,
 	Integer dailyDuration,
-	Integer price,
-	Integer discountPrice,
 	Integer participantsLimit,
 	Integer currentParticipants,
+	boolean isClosingSoon,
 	GoalStatus goalStatus,
 	Long mentorId,
 	String mentorName,
@@ -25,13 +23,11 @@ public record GoalSummaryResponse(
 			goal.getId(),
 			goal.getTitle(),
 			goal.getTopic(),
-			goal.getDescription(),
 			goal.getPeriod(),
 			goal.getDailyDuration(),
-			goal.getPrice(),
-			goal.getDiscountPrice(),
 			goal.getParticipantsLimit(),
 			goal.getCurrentParticipants(),
+			goal.isClosingSoon(),
 			goal.getGoalStatus(),
 			goal.getMentor().getId(),
 			goal.getMentor().getName(),

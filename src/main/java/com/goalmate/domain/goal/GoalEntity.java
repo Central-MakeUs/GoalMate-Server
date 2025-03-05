@@ -111,11 +111,19 @@ public class GoalEntity extends BaseEntity {
 		}
 	}
 
+	public void updateStatus(GoalStatus status) {
+		this.goalStatus = status;
+	}
+
 	public boolean isFull() {
 		return this.currentParticipants >= this.participantsLimit;
 	}
 
 	public boolean isOpen() {
 		return this.goalStatus.equals(GoalStatus.OPEN);
+	}
+
+	public boolean isClosingSoon() {
+		return this.participantsLimit - this.currentParticipants <= 3;
 	}
 }

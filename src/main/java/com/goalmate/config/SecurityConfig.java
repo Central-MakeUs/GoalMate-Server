@@ -67,7 +67,7 @@ public class SecurityConfig {
 			antMatcher(HttpMethod.GET, "/mentees/name/validate"),
 			antMatcher("/uploads/**"),
 			antMatcher("/mentors/**"),
-			antMatcher("/api/v2/admin/**")
+			antMatcher("/v2/**")
 		);
 		return requestMatchers.toArray(RequestMatcher[]::new);
 	}

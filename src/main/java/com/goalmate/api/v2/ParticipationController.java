@@ -49,7 +49,7 @@ public class ParticipationController {
 		return null;
 	}
 
-	@GetMapping("/participations/{participationId}/comment-rooms")
+	@GetMapping("/{participationId}/comment-rooms")
 	public ResponseEntity<ApiResponse<PageResponse<CommentRoomResponse>>> getCommentRoomsByParticipation(
 		@PathVariable Long participationId,
 		@ModelAttribute PageCondition pageCondition) {
