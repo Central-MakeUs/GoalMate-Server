@@ -162,7 +162,7 @@ public class GoalService {
 	private MenteeGoalEntity createMenteeGoal(GoalEntity goal, MenteeEntity mentee) {
 		MenteeGoalEntity menteeGoal = MenteeGoalEntity.builder()
 			.startDate(LocalDate.now())
-			.endDate(LocalDate.now().plusDays(goal.getPeriod()))
+			.endDate(LocalDate.now().plusDays(goal.getPeriod() - 1))
 			.mentee(mentee)
 			.goal(goal)
 			.build();
