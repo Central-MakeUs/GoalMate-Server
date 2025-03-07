@@ -107,7 +107,7 @@ public class AuthService {
 			throw new CoreApiException(ErrorType.FORBIDDEN, "Already withdrawn");
 		}
 		if (mentee.getProvider() == SocialProvider.KAKAO) {
-			//kakaoUserProvider.unlinkUser(mentee.getSocialId());
+			kakaoUserProvider.unlinkUser(mentee.getSocialId());
 		}
 		mentee.delete();
 	}

@@ -1,5 +1,8 @@
 package com.goalmate.domain.mentee;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+
 import com.goalmate.domain.BaseEntity;
 
 import jakarta.persistence.Column;
@@ -82,6 +85,7 @@ public class MenteeEntity extends BaseEntity {
 	public void delete() {
 		this.name = "Unknown";
 		this.status = MenteeStatus.DELETED;
-		this.socialId = "Deleted." + socialId;
+		String prefix = "Deleted-" + LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS) + "-";
+		this.socialId = prefix + socialId;
 	}
 }
