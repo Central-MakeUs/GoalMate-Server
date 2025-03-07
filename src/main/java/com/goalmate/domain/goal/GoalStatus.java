@@ -2,8 +2,9 @@ package com.goalmate.domain.goal;
 
 public enum GoalStatus {
 	OPEN("OPEN"),
-	CLOSED("CLOSED");
-
+	CLOSED("CLOSED"),
+	DISABLED("DISABLED");
+	
 	private final String value;
 
 	GoalStatus(String value) {

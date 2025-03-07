@@ -27,6 +27,7 @@ import com.goalmate.domain.goal.MidObjectiveEntity;
 import com.goalmate.domain.goal.ThumbnailImageEntity;
 import com.goalmate.domain.goal.WeeklyObjectiveEntity;
 import com.goalmate.domain.mentee.MenteeEntity;
+import com.goalmate.domain.mentee.Role;
 import com.goalmate.domain.menteeGoal.MenteeGoalDailyTodoEntity;
 import com.goalmate.domain.menteeGoal.MenteeGoalEntity;
 import com.goalmate.domain.mentor.MentorEntity;
@@ -92,8 +93,13 @@ public class GoalService {
 	@Transactional(readOnly = true)
 	public GoalSummaryPagingResponse getGoals(Integer page, Integer size) {
 		Pageable pageable = PageRequestUtil.createPageRequest(page, size);
-		Page<GoalEntity> goals = goalRepository.findAll(pageable);
 
+		Page<GoalEntity> goals;
+		if (SecurityUtil.isUserLoggedIn() && SecurityUtil.getCurrenUserRole().equals(Role.ROLE_ADMIN)) {
+			goals = goalRepository.findAll(pageable);
+		} else {
+			goals = goalRepository.findAllExcludingStatus(GoalStatus.DISABLED, pageable);
+		}
 		List<GoalSummaryResponse> summaries = goals.getContent().stream()
 			.map(GoalResponseMapper::mapToSummaryResponse).toList();
 		PageResponse pageResponse = PageResponseMapper.mapToPageResponse(goals);

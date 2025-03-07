@@ -63,7 +63,6 @@ public class SecurityConfig {
 			antMatcher("/v3/api-docs/**"),
 			antMatcher("/auth/login/**"),
 			antMatcher("/auth/reissue"),
-			antMatcher(HttpMethod.GET, "/goals"),
 			antMatcher(HttpMethod.GET, "/mentees/name/validate"),
 			antMatcher("/uploads/**"),
 			antMatcher("/mentors/**"),
@@ -77,6 +76,7 @@ public class SecurityConfig {
 	public SecurityFilterChain securityFilterChainPermitAllButAuthenticate(HttpSecurity http) throws Exception {
 		configureDefaultSecurity(http);
 		http.securityMatchers(matchers -> matchers
+				.requestMatchers(antMatcher(HttpMethod.GET, "/goals"))
 				.requestMatchers(antMatcher("/goals/{goalId}")))
 			.authorizeHttpRequests(authorize -> authorize
 				.anyRequest().permitAll())

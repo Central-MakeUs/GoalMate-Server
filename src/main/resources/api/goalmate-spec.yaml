@@ -6,7 +6,6 @@ info:
     ### 공통응답
     
     모든 응답은 아래와 같은 필드를 포함합니다.
-    모든 응답은 아래와 같은 필드를 포함합니다.
     
       - `status`
     
@@ -50,7 +49,7 @@ info:
   version: Beta 1.0.4
 
 servers:
-  - url: http://3.39.253.230
+  - url: https://api.goalmate.site
     description: 개발 서버
   - url: http://localhost:8080
     description: 로컬 서버
@@ -1441,6 +1440,7 @@ components:
       enum:
         - OPEN
         - CLOSED
+        - DISABLED
       example:
         OPEN
 
