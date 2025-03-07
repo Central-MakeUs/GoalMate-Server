@@ -10,6 +10,7 @@ import com.goalmate.api.model.PageResponse;
 import com.goalmate.domain.comment.CommentEntity;
 import com.goalmate.domain.comment.CommentRoomEntity;
 import com.goalmate.domain.goal.GoalEntity;
+import com.goalmate.domain.mentee.Role;
 import com.goalmate.domain.menteeGoal.MenteeGoalEntity;
 import com.goalmate.util.DateUtil;
 
@@ -21,6 +22,10 @@ public class CommentResponseMapper {
 		response.setCommentedAt(DateUtil.toOffsetDateTime(comment.getCreatedAt()));
 		response.setWriter(comment.getSenderName());
 		response.setWriterRole(comment.getSenderRole().getValue());
+		// temporarily set writerRole to ROLE_MENTOR for admin comments
+		if (comment.getSenderRole() == Role.ROLE_ADMIN) {
+			response.setWriterRole(Role.ROLE_MENTOR.getValue());
+		}
 		return response;
 	}
 
