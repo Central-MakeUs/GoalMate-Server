@@ -13,7 +13,7 @@ import com.goalmate.domain.mentee.Role;
 
 public interface CommentRepository extends JpaRepository<CommentEntity, Long> {
 
-	@Query("SELECT c FROM CommentEntity c WHERE c.commentRoom.id = :roomId ORDER BY c.updatedAt DESC ")
+	@Query("SELECT c FROM CommentEntity c WHERE c.commentRoom.id = :roomId ORDER BY c.createdAt DESC ")
 	Page<CommentEntity> findLatestCommentsByRoomId(Long roomId, Pageable pageable);
 
 	@Query("SELECT c FROM CommentEntity c "
