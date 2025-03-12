@@ -10,7 +10,7 @@ permissions:
 
 # 배포 환경에 따라 변경
 env:
-  EC2_USERNAME: ubuntu
+  EC2_USERNAME: dhxl50
   DOCKER_REPOSITORY: goalmate
   ENV_FILE_PATH: ./src/main/resources
   ENV_FILE_NAME: env.yaml
@@ -88,8 +88,8 @@ jobs:
           source: "./deploy/*"
           target: "~"
 
-      # Deploy to Dev
-      - name: Deploy to Dev
+      # Deploy
+      - name: Deploy
         uses: appleboy/ssh-action@master
         with:
           username: ${{ env.EC2_USERNAME }}
@@ -111,4 +111,5 @@ jobs:
             docker stack deploy -c docker-compose.yaml goalmate-stack
 
             # 필요 없는 이미지 삭제
+            docker container prune -f
             docker image prune -af

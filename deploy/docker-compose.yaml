@@ -2,7 +2,7 @@ services:
   goalmate:
     image: dhxl50/goalmate:latest  # 빌드한 Docker 이미지
     ports:
-      - "80:8080"                 # 호스트 포트 80 -> 컨테이너 포트 8080 매핑
+      - "8080:8080"                 # 호스트 포트 80 -> 컨테이너 포트 8080 매핑
     deploy:
       replicas: 2                 # 컨테이너 2개 실행 (분산 배치)
       update_config:
@@ -12,10 +12,10 @@ services:
         condition: on-failure     # 실패 시 재시작
         max_attempts: 5          # 최대 재시작 횟수
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:8080/swagger-ui/index.html" ]
-      interval: 30s
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/actuator/health" ]
+      interval: 10s
       timeout: 10s
-      retries: 3
+      retries: 6
 
   redis:
     image: redis:latest
