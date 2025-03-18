@@ -10,7 +10,6 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.ForeignKey;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Builder;
@@ -22,8 +21,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "comment")
 public class CommentEntity extends BaseEntity {
-	@Lob
-	@Column(nullable = false)
+	@Column(columnDefinition = "TEXT", nullable = false)
 	private String comment;
 
 	@Column(nullable = false)

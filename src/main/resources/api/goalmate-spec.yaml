@@ -1335,7 +1335,6 @@ components:
         comment:
           type: string
           description: 코멘트 내용
-          maxLength: 300
           example: "멘토님, 오늘은 어떤 공부를 해야 할까요?"
       required:
         - comment
