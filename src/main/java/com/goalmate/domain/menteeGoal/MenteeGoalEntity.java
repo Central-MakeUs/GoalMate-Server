@@ -35,7 +35,7 @@ public class MenteeGoalEntity extends BaseEntity {
 	@Column(nullable = false)
 	private LocalDate endDate;
 
-	@Column
+	@Column(columnDefinition = "TEXT")
 	private String mentorLetter;
 
 	@Enumerated(EnumType.STRING)
