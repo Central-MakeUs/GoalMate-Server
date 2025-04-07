@@ -16,7 +16,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
 			.allowedOrigins(
 				"http://localhost:5173",
 				"https://goalmate-web-beta.vercel.app",
-				"https://api.goalmate.site")
+				"https://api.goalmate.site",
+				"https://manage.goalmate.site")
 			.allowedHeaders("*")
 			.exposedHeaders("Authorization")
 			.allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
