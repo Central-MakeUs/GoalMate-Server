@@ -1,0 +1,28 @@
+spring.config.activate.on-profile: dev
+
+spring:
+  config:
+    import:
+      - classpath:/env/dev-env.yaml
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+        show_sql: true
+      hibernate.default_batch_fetch_size: 1000
+    show-sql: true
+    generate-ddl: true
+    defer-datasource-initialization: true
+    open-in-view: false
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${aws.rds.url}
+    username: ${aws.rds.username}
+    password: ${aws.rds.password}
+  data:
+    redis:
+      host: ${redis.host}
+      port: ${redis.port}

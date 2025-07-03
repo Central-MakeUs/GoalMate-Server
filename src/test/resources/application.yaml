@@ -1,9 +1,6 @@
 spring:
   application:
     name: goalmate
-  config:
-    import:
-      - optional:classpath:env.yaml
   profiles:
     active: test
 
@@ -20,10 +17,10 @@ spring.config.activate.on-profile: test
 spring:
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: create-drop
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.MySQLDialect
+        dialect: org.hibernate.dialect.H2Dialect
         format_sql: true
         show_sql: true
       hibernate.default_batch_fetch_size: 1000
@@ -32,15 +29,10 @@ spring:
     defer-datasource-initialization: true
     open-in-view: false
   datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/goalmate_test?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
-    username: root
-    password: local1234!
-  sql:
-    init:
-      mode: always
-      data-locations: classpath:db/data.sql
-      #      schema-locations: classpath:db/schema.sql
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: password
   data:
     redis:
       host: localhost

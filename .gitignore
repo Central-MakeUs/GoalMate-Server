@@ -38,3 +38,5 @@ out/
 
 ### environment ###
 **/env.yaml
+**/*-env.yaml
+**/.env
