@@ -37,7 +37,6 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-hateoas'
     runtimeOnly 'com.mysql:mysql-connector-j'
 
-    implementation 'com.h2database:h2'
     implementation 'com.amazonaws:aws-java-sdk-s3:1.12.782'
 
     // Jwt
@@ -69,6 +68,7 @@ dependencies {
     swaggerUI 'org.webjars:swagger-ui:3.52.5'
 
     // Test Scope
+    testImplementation 'com.h2database:h2'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }

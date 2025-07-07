@@ -15,6 +15,14 @@
 
 ---
 
+### API 서버
+
+- 프로덕션 서버 주소: [https://api.goalmate.site](https://api.goalmate.site)
+- API 문서: [https://api.goalmate.site/swagger-ui/index.html](https://api.goalmate.site/swagger-ui/index.html)
+- 현재 서버 배포 중단 상태
+
+---
+
 ### 기술 스택
 
 - **언어 / 프레임워크**
@@ -36,7 +44,7 @@
 - API 문서 작성은 [OpenAPI 3.0](https://swagger.io/specification/) 스펙을 따릅니다.
 - API
   문서는 [goalmate-spec](https://github.com/Central-MakeUs/GoalMate-Server/blob/main/src/main/resources/api/goalmate-spec.yaml)
-  과 [Swagger UI](https://api.goalmate.site/swagger-ui/index.html) 등을 통해 확인할 수 있습니다.
+  를 통해 확인할 수 있습니다.
 
 ---
 
@@ -56,16 +64,9 @@
 
 ---
 
-### API 서버
-
-- 프로덕션 서버 주소: [https://api.goalmate.site](https://api.goalmate.site)
-- API 문서: [https://api.goalmate.site/swagger-ui/index.html](https://api.goalmate.site/swagger-ui/index.html)
-
----
-
 ### 관리자 페이지
 
-- 관리자 페이지: [https://goalmate-web-beta.vercel.app/](https://goalmate-web-beta.vercel.app/)
+- Github: https://github.com/kimday0326/Goalmate-web-beta
 - 주요 기능:
     - 멘토의 목표 등록, 수정, 삭제
     - 멘티 진행 상황 확인

@@ -33,7 +33,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-@Transactional
 public class AuthService {
 	private static final String[] MENTEE_PREFIXES = {"멘티", "골메"};
 	private final AppleUserProvider appleUserProvider;
@@ -47,6 +46,7 @@ public class AuthService {
 	private final RefreshTokenRepository refreshTokenRepository;
 	private final MenteeService menteeService;
 
+	@Transactional
 	public LoginResult authenticateWithOauth(String identityToken, String nonce, String provider) {
 		// 소셜 제공자 매핑
 		SocialProvider socialProvider = SocialProvider.valueOf(provider.toUpperCase());
@@ -65,15 +65,7 @@ public class AuthService {
 		return new LoginResult(tokenPair.accessToken(), tokenPair.refreshToken(), menteeEntity.isPending());
 	}
 
-	private OAuthMember getOAuthMember(String identityToken, String nonce, SocialProvider socialProvider) {
-		// 소셜 제공자에 따른 인증 처리
-		return switch (socialProvider) {
-			case APPLE -> appleUserProvider.getApplePlatformMember(identityToken, nonce);
-			case KAKAO -> kakaoUserProvider.getKaKaoPlatformMember(identityToken, nonce);
-			default -> throw new IllegalArgumentException("Unsupported social provider: " + socialProvider);
-		};
-	}
-
+	@Transactional
 	public TokenPair reissue(String refreshToken) {
 		jwtProvider.verifyToken(refreshToken);
 		RefreshToken token = refreshTokenRepository.findById(refreshToken)
@@ -98,7 +90,7 @@ public class AuthService {
 		return jwtProvider.generateTokenPair(mentor.getId(), mentor.getRole().name());
 	}
 
-	public void deleteMentee(CurrentUserContext user) {
+	public void withdraw(CurrentUserContext user) {
 		if (!user.isMentee()) {
 			throw new CoreApiException(ErrorType.FORBIDDEN, "Contact the administrator if you are not a mentee");
 		}
@@ -106,10 +98,11 @@ public class AuthService {
 		if (mentee.isDeleted()) {
 			throw new CoreApiException(ErrorType.FORBIDDEN, "Already withdrawn");
 		}
-		if (mentee.getProvider() == SocialProvider.KAKAO) {
+		mentee.delete();
+		// TODO: 이벤트 발행으로 변경필요
+		if (mentee.getProvider().equals(SocialProvider.KAKAO)) {
 			kakaoUserProvider.unlinkUser(mentee.getSocialId());
 		}
-		mentee.delete();
 	}
 
 	// for test
@@ -135,6 +128,15 @@ public class AuthService {
 		String prefix = MENTEE_PREFIXES[random.nextInt(MENTEE_PREFIXES.length)];
 		int number = random.nextInt(900) + 100; // 100~999 범위의 숫자 생성
 		return prefix + number;
+	}
+
+	private OAuthMember getOAuthMember(String identityToken, String nonce, SocialProvider socialProvider) {
+		// 소셜 제공자에 따른 인증 처리
+		return switch (socialProvider) {
+			case APPLE -> appleUserProvider.getApplePlatformMember(identityToken, nonce);
+			case KAKAO -> kakaoUserProvider.getKaKaoPlatformMember(identityToken, nonce);
+			default -> throw new IllegalArgumentException("Unsupported social provider: " + socialProvider);
+		};
 	}
 
 	private void validatePassword(String rawPassword, String encodedPassword) {

@@ -72,7 +72,7 @@ public class AuthController implements AuthApi {
 	@Override
 	public ResponseEntity withdraw() {
 		CurrentUserContext user = SecurityUtil.getCurrentUser();
-		authService.deleteMentee(user);
+		authService.withdraw(user);
 		return ResponseEntity.ok(ApiResponse.success());
 	}
 

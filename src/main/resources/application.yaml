@@ -1,6 +1,8 @@
 spring:
   application:
     name: goalmate
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
   config:
     import:
       - classpath:/yaml/
@@ -21,7 +23,7 @@ server:
       max: 600
       min-spare: 100
   port: 8080
-
+  shutdown: graceful
 management:
   endpoints:
     web:

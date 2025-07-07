@@ -1,8 +1,9 @@
 services:
-  goalmate:
+  api:
     image: dhxl50/goalmate:latest  # 빌드한 Docker 이미지
+    stop_grace_period: 30s  # 컨테이너 종료 대기 시간
     ports:
-      - "8080:8080"                 # 호스트 포트 80 -> 컨테이너 포트 8080 매핑
+      - "8080:8080"                 # 호스트 포트 8080 -> 컨테이너 포트 8080 매핑
     deploy:
       replicas: 2                 # 컨테이너 2개 실행 (분산 배치)
       update_config:
@@ -16,6 +17,8 @@ services:
       interval: 10s
       timeout: 10s
       retries: 6
+    env_file:
+      - .env                  # 환경 변수 파일 로드
 
   redis:
     image: redis:latest
